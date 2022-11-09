@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.Log
+namespace FoolishGame.Log
 {
     /// <summary>
     /// 类别名称
@@ -11,8 +11,6 @@ namespace FoolishServer.Log
     {
         public const string LOG = "Log";
 
-        public const string FOOLISH_SERVER = "Foolish Server";
-
-        public const string HOST = "Host";
+        public const string FOOLISH_GAME = "Foolish Game";
     }
 }

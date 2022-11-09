@@ -1,16 +1,20 @@
-﻿using FoolishServer.Common;
-using FoolishServer.Config;
-using FoolishServer.Framework.Log;
+﻿using FoolishGame.Common;
+using FoolishGame.Framework.Log;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-namespace FoolishServer.Log
+namespace FoolishGame.Log
 {
-    public class GConsole : IGConsole
+    public class FConsole : IGConsole
     {
+        /// <summary>
+        /// 是否输出堆栈
+        /// </summary>
+        public static bool LogStackTracker { get; set; } = false;
+
         private HashSet<ILogger> loggers = null;
 
         public IReadOnlyCollection<ILogger> LoggerList { get { return loggers; } }
@@ -21,21 +25,21 @@ namespace FoolishServer.Log
 
         private Object SyncRoot = new Object();
 
-        private static GConsole instance = null;
+        private static FConsole instance = null;
 
-        private static GConsole Instance
+        private static FConsole Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new GConsole();
+                    instance = new FConsole();
                 }
                 return instance;
             }
         }
 
-        private GConsole()
+        private FConsole()
         {
             SyncRoot = new Object();
             loggers = new HashSet<ILogger>();
@@ -227,13 +231,13 @@ namespace FoolishServer.Log
         private void SendMessage(string level, string category, string message, bool track)
         {
             message = $"{DateTime.Now.ToString()} [{category}] - " + message;
-            if (Settings.IsDebug && track)
+            if (LogStackTracker && track && level == LogLevel.ERROR)
             {
                 const string stackIndent = "  ";
                 StackTrace stackTrace = new StackTrace(true);
                 StringBuilder builder = new StringBuilder();
                 int count = stackTrace.FrameCount;
-                for (int i = 2; i < count; i++)
+                for (int i = 3; i < count; i++)
                 {
                     StackFrame stackFrame = stackTrace.GetFrame(i);
                     MethodBase method = stackFrame.GetMethod();
@@ -244,6 +248,7 @@ namespace FoolishServer.Log
                     {
                         builder.AppendFormat(" file {0}:line {1}", fileName, stackFrame.GetFileLineNumber());
                     }
+                    builder.AppendLine();
                 }
                 message += "\r\n" + builder.ToString();
             }

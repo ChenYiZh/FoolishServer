@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoolishServer.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,8 +9,11 @@ namespace FoolishServer
     {
         static void Main(string[] args)
         {
-            Launcher.Startup();
-            Console.Read();
+            RuntimeHost.Startup();
+            while (true)
+            {
+                Console.Read();
+            }
         }
     }
 }

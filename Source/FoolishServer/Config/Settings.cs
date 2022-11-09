@@ -1,4 +1,5 @@
 ﻿using FoolishServer.Common;
+using FoolishServer.Framework.Config;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -46,6 +47,10 @@ namespace FoolishServer.Config
         /// </summary>
         public static bool IsRelease { get { return !IsDebug; } }
         /// <summary>
+        /// 服务器配置队列
+        /// </summary>
+        public static IReadOnlyList<IHostSetting> HostSettings { get; private set; }
+        /// <summary>
         /// 读取配置
         /// </summary>
         internal static void LoadFromFile()
@@ -61,6 +66,26 @@ namespace FoolishServer.Config
             IsDebug = xml.SelectSingleNode("/configuration/script/debug").GetValue(true);
             ServerID = xml.SelectSingleNode("/configuration/settings/server").GetValue(1);
             ConvertVersion(xml.SelectSingleNode("/configuration/settings/version").GetValue(null));
+            LoadHostSettings(xml);
+        }
+
+        private static void LoadHostSettings(XmlDocument xml)
+        {
+            List<IHostSetting> settings = new List<IHostSetting>();
+            HostSettings = settings;
+            XmlNode node = xml.SelectSingleNode("/configuration/hosts");
+            if (node == null)
+            {
+                return;
+            }
+            foreach (XmlNode child in node)
+            {
+                HostSetting setting = new HostSetting(child);
+                if (setting.IsValid())
+                {
+                    settings.Add(setting);
+                }
+            }
         }
 
         private static void ConvertVersion(string version)

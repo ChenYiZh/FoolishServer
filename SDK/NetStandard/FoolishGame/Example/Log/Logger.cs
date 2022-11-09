@@ -1,38 +1,19 @@
-﻿using FoolishServer.Framework.Log;
+﻿using FoolishGame.Framework.Log;
+using FoolishGame.Log;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace FoolishServer.Log
+namespace Example.Log
 {
-    internal class NLogger : ILogger
+    class Logger : ILogger
     {
-        private NLog.Logger logger;
-
-        public NLogger()
-        {
-            logger = NLog.LogManager.GetCurrentClassLogger();
-        }
-
         public void SaveLog(string level, string message)
         {
             SetColor(GetColor(level));
-            switch (level)
-            {
-                case LogLevel.DEBUG: logger.Debug(message); break;
-                case LogLevel.INFO: logger.Info(message); break;
-                case LogLevel.WARN: logger.Warn(message); break;
-                case LogLevel.ERROR: logger.Error(message); break;
-                default:
-                    {
-                        NLog.Logger customLogger = NLog.LogManager.GetLogger(level);
-                        if (customLogger != null)
-                        {
-                            customLogger.Log(NLog.LogLevel.Trace, message);
-                        }
-                    }
-                    break;
-            }
+            Console.WriteLine(message);
             ResetColor();
         }
 
