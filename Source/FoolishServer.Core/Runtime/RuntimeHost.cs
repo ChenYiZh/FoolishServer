@@ -111,7 +111,7 @@ namespace FoolishServer.Runtime
                 FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
                 Shutdown();
                 FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
-                //System.Environment.Exit(0);
+                System.Environment.Exit(0);
             }
             catch (Exception ex)
             {

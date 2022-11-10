@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28307.2092
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoolishServer.Framework", "FoolishServer.Framework\FoolishServer.Framework.csproj", "{89D53A09-9F7A-4C66-95AE-B8D3F9C371C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoolishServer", "FoolishServer\FoolishServer.csproj", "{C84E5D23-0F86-4896-9E7D-5AE58151EF54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoolishServer.Core", "FoolishServer.Core\FoolishServer.Core.csproj", "{C84E5D23-0F86-4896-9E7D-5AE58151EF54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoolishServer", "FoolishServer\FoolishServer.csproj", "{12B0B0AF-5033-4A5A-9EDE-BDF1D13A3FB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C84E5D23-0F86-4896-9E7D-5AE58151EF54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C84E5D23-0F86-4896-9E7D-5AE58151EF54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C84E5D23-0F86-4896-9E7D-5AE58151EF54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12B0B0AF-5033-4A5A-9EDE-BDF1D13A3FB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12B0B0AF-5033-4A5A-9EDE-BDF1D13A3FB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12B0B0AF-5033-4A5A-9EDE-BDF1D13A3FB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12B0B0AF-5033-4A5A-9EDE-BDF1D13A3FB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

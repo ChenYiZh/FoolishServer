@@ -19,10 +19,10 @@ namespace FoolishServer.Collections
             _cache = new HashSet<T>();
         }
 
-        public ThreadSafeHashSet(int capacity)
-        {
-            _cache = new HashSet<T>(capacity);
-        }
+        //public ThreadSafeHashSet(int capacity)
+        //{
+        //    _cache = new HashSet<T>(capacity);
+        //}
 
         public int Count
         {
