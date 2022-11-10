@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoolishServer.Runtime
 {
@@ -111,7 +112,8 @@ namespace FoolishServer.Runtime
                 FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
                 Shutdown();
                 FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
-                System.Environment.Exit(0);
+                Task.Delay(1500).Wait();
+                Environment.Exit(0);
             }
             catch (Exception ex)
             {

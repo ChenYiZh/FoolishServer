@@ -24,7 +24,12 @@ namespace FoolishServer.Framework.Config
         EHostType Type { get; }
 
         /// <summary>
-        /// 挂起连接的最大长度
+        /// 执行类
+        /// </summary>
+        string MainClass { get; }
+
+        /// <summary>
+        /// TCP全连接队列长度
         /// </summary>
         int Backlog { get; }
 
@@ -39,9 +44,14 @@ namespace FoolishServer.Framework.Config
         int MaxAcceptCapacity { get; }
 
         /// <summary>
-        /// 执行类
+        /// 默认消息处理连接池容量大小
         /// </summary>
-        string MainClass { get; }
+        int MaxIOCapacity { get; }
+
+        /// <summary>
+        /// 数据通讯缓存字节大小
+        /// </summary>
+        int BufferSize { get; }
 
         /// <summary>
         /// 获取类别显示

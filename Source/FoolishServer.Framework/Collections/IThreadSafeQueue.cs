@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FoolishServer.Framework.Collections
 {
-    public interface IThreadSafeQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public interface IThreadSafeQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>
     {
         T Peek();
 

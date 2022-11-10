@@ -1,56 +1,61 @@
-﻿using FoolishServer.Framework.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 
 namespace FoolishServer.Framework.RPC.Sockets
 {
-    public interface ISocket
+    /// <summary>
+    /// 自定义套接字
+    /// </summary>
+    public interface ISocket : ISocketMini
     {
         /// <summary>
-        /// 对应Host的名称
+        /// 唯一id
         /// </summary>
-        string HostName { get; }
+        Guid HashCode { get; }
+
         /// <summary>
-        /// 是否在运行
+        /// 获取时间
         /// </summary>
-        bool IsRunning { get; }
+        DateTime AccessTime { get; }
 
         ///// <summary>
-        ///// 内部关键原生Socket
+        ///// 正在发送消息？
         ///// </summary>
-        //Socket Socket { get; }
+        //bool IsSending { get; }
 
         /// <summary>
-        /// 绑定的端口
+        /// Socket是否还连接着？
         /// </summary>
-        int Port { get; }
+        bool Connected { get; }
 
         /// <summary>
-        /// 封装的地址
+        /// 待发送的消息队列长度
         /// </summary>
-        IPEndPoint Address { get; }
+        int MessageQueueCount { get; }
 
         /// <summary>
-        /// 获取类型
+        /// 重置唯一id
         /// </summary>
-        EHostType Type { get; }
+        /// <param name="key"></param>
+        void ResetHashset(Guid key);
 
         /// <summary>
-        /// 获取配置信息
+        /// 重置发送标识
         /// </summary>
-        IHostSetting Setting { get; }
+        void ResetSendFlag();
 
         /// <summary>
-        /// 启动函数
+        /// 发送消息
         /// </summary>
-        void Start(IHostSetting setting);
+        /// <param name="data"></param>
+        /// <returns>是否发送成功</returns>
+        void Send(byte[] data, Action<ISocketAsyncResult> callback);
 
         /// <summary>
-        /// 关闭函数
+        /// 获取最早等待发送的消息
         /// </summary>
-        void Close();
+        /// <returns>是否有消息</returns>
+        bool TryDequeueOrReset(out ISocketAsyncResult result);
     }
 }

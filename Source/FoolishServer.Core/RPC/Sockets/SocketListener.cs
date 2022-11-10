@@ -10,11 +10,48 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using FoolishServer.Framework.Delegate;
 
 namespace FoolishServer.RPC.Sockets
 {
-    public class SocketListener : ISocket
+    public class SocketListener : IServerSocket
     {
+        /// <summary>
+        /// 连接事件
+        /// </summary>
+        public event ConnectionEventHandler OnConnected;
+        private void Connected(IConnectionEventArgs e) { OnConnected?.Invoke(this, e); }
+
+        /// <summary>
+        /// 握手事件
+        /// </summary>
+        public event ConnectionEventHandler OnHandshaked;
+        private void Handshaked(IConnectionEventArgs e) { OnHandshaked?.Invoke(this, e); }
+
+        /// <summary>
+        /// 断开连接事件
+        /// </summary>
+        public event ConnectionEventHandler OnDisconnected;
+        private void Disconnected(IConnectionEventArgs e) { OnDisconnected?.Invoke(this, e); }
+
+        /// <summary>
+        /// 接收到数据包事件
+        /// </summary>
+        public event ConnectionEventHandler OnMessageReceived;
+        private void MessageReceived(IConnectionEventArgs e) { OnMessageReceived?.Invoke(this, e); }
+
+        /// <summary>
+        /// 心跳探索事件
+        /// </summary>
+        public event ConnectionEventHandler OnPing;
+        private void Ping(IConnectionEventArgs e) { OnPing?.Invoke(this, e); }
+
+        /// <summary>
+        /// 心跳回应事件
+        /// </summary>
+        public event ConnectionEventHandler OnPong;
+        private void Pong(IConnectionEventArgs e) { OnPong?.Invoke(this, e); }
+
         /// <summary>
         /// 是否在运行
         /// </summary>
@@ -66,9 +103,14 @@ namespace FoolishServer.RPC.Sockets
         private Semaphore maxConnectionsEnforcer;
 
         /// <summary>
-        /// 对象池
+        /// 接受连接并发对象池
         /// </summary>
         private IThreadSafeStack<SocketAsyncEventArgs> acceptEventArgsPool;
+
+        /// <summary>
+        /// 回复并发对象池
+        /// </summary>
+        private IThreadSafeStack<SocketAsyncEventArgs> ioEventArgsPool;
 
         /// <summary>
         /// 入口函数
@@ -80,27 +122,33 @@ namespace FoolishServer.RPC.Sockets
             //默认参数赋值
             IsRunning = true;
             Setting = setting;
-            //连接对象池初始化
+            //对象池初始化
             acceptEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxAcceptCapacity);
             for (int i = 0; i < setting.MaxAcceptCapacity; i++)
             {
                 acceptEventArgsPool.Push(CreateAcceptEventArgs());
             }
+            ioEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxIOCapacity);
+            for (int i = 0; i < setting.MaxIOCapacity; i++)
+            {
+                SocketAsyncEventArgs ioEventArgs = new SocketAsyncEventArgs();
+                // TODO: 默认消息Buffer
+                ioEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(IOCompleted);
+                UserToken userToken = new UserToken();
+                ioEventArgs.UserToken = userToken;
+                ioEventArgsPool.Push(ioEventArgs);
+            }
             //并发锁初始化
             maxConnectionsEnforcer = new Semaphore(setting.MaxConnections, setting.MaxConnections);
             //生成套接字
             Address = new IPEndPoint(IPAddress.Any, Port);
-            if (setting.Type == EHostType.Tcp)
-            {
-                Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            }
-            else if (setting.Type == EHostType.Udp)
+            if (setting.Type != EHostType.Tcp)
             {
                 Socket = new Socket(Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
             }
             else
             {
-                throw new InvalidCastException("The type of socket is error.");
+                Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             }
             //相同端口可以重复绑定
             Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -108,11 +156,14 @@ namespace FoolishServer.RPC.Sockets
             Socket.Bind(Address);
             if (Type == EHostType.Tcp)
             {
-                //监听
+                //设置最大挂载连接数量
                 Socket.Listen(setting.Backlog);
             }
             //服务器状态输出周期
-            summaryTask = new Timer(WriteSummary, null, 0, 60000);
+            summaryTask = new Timer(WriteSummary, null, 60000, 60000);
+
+            //启动监听
+            PostAccept();
         }
 
         /// <summary>
@@ -186,12 +237,34 @@ namespace FoolishServer.RPC.Sockets
                 {
                     Interlocked.Increment(ref summary.CurrentConnectCount);
 
-                    // TODO: 生成连接对象
+                    // 生成连接对象
+                    SocketAsyncEventArgs ioEventArgs = null;
+                    FSocket socket = null;
+                    if (ioEventArgsPool.Count > 0)
+                    {
+                        ioEventArgs = ioEventArgsPool.Pop();
+                        ioEventArgs.AcceptSocket = acceptEventArgs.AcceptSocket;
+                        UserToken userToken = (UserToken)ioEventArgs.UserToken;
+                        ioEventArgs.SetBuffer(0, Setting.BufferSize);
+                        socket = new FSocket(ioEventArgs.AcceptSocket);
+                        socket.AccessTime = DateTime.Now;
+                        userToken.Socket = socket;
+                    }
+                    acceptEventArgs.AcceptSocket = null;
 
                     //release connect when socket has be closed.
                     ReleaseAccept(acceptEventArgs, false);
 
-                    // TODO: 连接后处理
+                    // 连接后处理
+                    try
+                    {
+                        Connected(new SocketConnectionEventArgs() { Socket = socket });
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                    }
+                    PostReceive(ioEventArgs);
                 }
             }
             catch (Exception e)
@@ -218,6 +291,82 @@ namespace FoolishServer.RPC.Sockets
             }
         }
 
+        /// <summary>
+        /// 消息接收处理
+        /// </summary>
+        private void IOCompleted(object sender, SocketAsyncEventArgs ioEventArgs)
+        {
+            UserToken userToken = (UserToken)ioEventArgs.UserToken;
+            try
+            {
+                ((FSocket)userToken.Socket).AccessTime = DateTime.Now;
+                switch (ioEventArgs.LastOperation)
+                {
+                    case SocketAsyncOperation.Receive: ProcessReceive(ioEventArgs); break;
+                    case SocketAsyncOperation.Send: ProcessSend(ioEventArgs); break;
+                    default: throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                ReleaseIOEventArgs(ioEventArgs);
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+            }
+        }
+
+        /// <summary>
+        /// 释放消息事件
+        /// </summary>
+        private void ReleaseIOEventArgs(SocketAsyncEventArgs ioEventArgs)
+        {
+            if (ioEventArgs == null) return;
+            UserToken userToken = (UserToken)ioEventArgs.UserToken;
+            if (userToken != null)
+            {
+                userToken.Reset();
+                userToken.Socket = null;
+            }
+            ioEventArgs.AcceptSocket = null;
+            ioEventArgsPool.Push(ioEventArgs);
+        }
+
+        /// <summary>
+        /// 投递接收数据请求
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        private void PostReceive(SocketAsyncEventArgs ioEventArgs)
+        {
+            if (ioEventArgs.AcceptSocket == null) return;
+
+            //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=net-6.0#system-net-sockets-socket-receiveasync(system-net-sockets-socketasynceventargs)
+            if (!ioEventArgs.AcceptSocket.ReceiveAsync(ioEventArgs))
+            {
+                ProcessReceive(ioEventArgs);
+            }
+        }
+
+        /// <summary>
+        /// 处理数据接收回调
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        private void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
+        {
+            FConsole.Write("Process Receive...");
+            // TODO: Process Receive
+        }
+
+        /// <summary>
+        /// 发送接口
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        private void ProcessSend(SocketAsyncEventArgs ioEventArgs)
+        {
+            FConsole.Write("Process Send...");
+            // TODO: Process Send
+        }
         /// <summary>
         /// 创建连接代理
         /// </summary>
