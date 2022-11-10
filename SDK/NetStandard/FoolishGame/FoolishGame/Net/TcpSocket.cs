@@ -67,6 +67,11 @@ namespace FoolishGame.Net
             return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
+        public void Send(byte[] data)
+        {
+            FConsole.Write(Socket.Send(data).ToString());
+        }
+
         /// <summary>
         /// 关闭函数
         /// </summary>

@@ -36,7 +36,7 @@ namespace FoolishServer.Framework.RPC.Host
         /// <summary>
         /// 监听套接字
         /// </summary>
-        ISocket SocketListener { get; }
+        IServerSocket SocketListener { get; }
 
         /// <summary>
         /// 启动结构

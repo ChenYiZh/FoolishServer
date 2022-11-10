@@ -14,7 +14,9 @@ namespace Example
         static void Main(string[] args)
         {
             FConsole.RegistLogger(new Logger());
-            new TcpSocket().Connect("default", "127.0.0.1", 9001);
+            TcpSocket socket = new TcpSocket();
+            socket.Connect("default", "127.0.0.1", 9001);
+            socket.Send(Encoding.UTF8.GetBytes("Hello World!"));
             while (true)
             {
                 Console.Read();

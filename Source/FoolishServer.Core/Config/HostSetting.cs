@@ -26,7 +26,12 @@ namespace FoolishServer.Config
         public EHostType Type { get; private set; }
 
         /// <summary>
-        /// 挂起连接的最大长度
+        /// 执行类
+        /// </summary>
+        public string MainClass { get; private set; }
+
+        /// <summary>
+        /// TCP全连接队列长度
         /// </summary>
         public int Backlog { get; private set; }
 
@@ -41,9 +46,14 @@ namespace FoolishServer.Config
         public int MaxAcceptCapacity { get; private set; }
 
         /// <summary>
-        /// 执行类
+        /// 默认消息处理连接池容量大小
         /// </summary>
-        public string MainClass { get; private set; }
+        public int MaxIOCapacity { get; private set; }
+
+        /// <summary>
+        /// 数据通讯缓存字节大小
+        /// </summary>
+        public int BufferSize { get; private set; }
 
         /// <summary>
         /// 获取类别显示
@@ -69,6 +79,8 @@ namespace FoolishServer.Config
             Backlog = node.SelectSingleNode("backlog").GetValue(10000);
             MaxConnections = node.SelectSingleNode("max-connections").GetValue(1000);
             MaxAcceptCapacity = node.SelectSingleNode("max-accept-capacity").GetValue(1000);
+            MaxIOCapacity = node.SelectSingleNode("max-io-capacity").GetValue(1000);
+            BufferSize = node.SelectSingleNode("buffer-size").GetValue(8192);
         }
         /// <summary>
         /// 判断是否有效
