@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>FoolishServer</RootNamespace>
+    <RootNamespace>FoolishClient</RootNamespace>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\Runtime\" />
-    <Folder Include="Sources\Config\" />
-    <Folder Include="Sources\Runtime\" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FoolishGames.Common\FoolishGames.Common.csproj" />

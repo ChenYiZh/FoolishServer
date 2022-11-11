@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoolishServer.Core\FoolishServer.Core.csproj" />
+    <ProjectReference Include="..\FoolishServer.Common\FoolishServer.Common.csproj" />
   </ItemGroup>
 
 </Project>

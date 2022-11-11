@@ -1,11 +1,3 @@
 .vs
-/Source/FoolishServer/obj
-/Source/FoolishServer/bin
-/Source/FoolishServer.Core/obj
-/Source/FoolishServer.Core/bin
-/Source/FoolishServer.Framework/obj
-/Source/FoolishServer.Framework/bin
-/SDK/NetStandard/FoolishGame/Example/bin
-/SDK/NetStandard/FoolishGame/Example/obj
-/SDK/NetStandard/FoolishGame/FoolishGame/bin
-/SDK/NetStandard/FoolishGame/FoolishGame/obj
+obj
+bin
