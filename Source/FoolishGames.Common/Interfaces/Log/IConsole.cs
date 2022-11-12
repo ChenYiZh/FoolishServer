@@ -92,11 +92,24 @@ namespace FoolishGames.Log
         void WriteExceptionImpl(Exception exception);
 
         /// <summary>
+        /// 输出到Exception目录
+        /// </summary>
+        /// <param name="exception"></param>
+        void WriteExceptionImpl(string message, Exception exception);
+
+        /// <summary>
         /// 指定类别输出到Exception目录
         /// </summary>
         /// <param name="category"></param>
         /// <param name="exception"></param>
         void WriteExceptionWithCategoryImpl(string category, Exception exception);
+
+        /// <summary>
+        /// 指定类别输出到Exception目录
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="exception"></param>
+        void WriteExceptionWithCategoryImpl(string category, string message, Exception exception);
 
         /// <summary>
         /// 输出到指定类别

@@ -54,7 +54,7 @@ namespace FoolishGames.Log
         ///// <summary>
         ///// 调用一下可以执行Instance
         ///// </summary>
-        //internal static void Initialize()
+        //public static void Initialize()
         //{
         //    Instance.WriteInfoWithCategoryImpl(Categories.GCONSOLE, "Console initialized");
         //}
@@ -206,6 +206,19 @@ namespace FoolishGames.Log
         {
             SendMessage(LogLevel.ERROR, CATEGORY, StringFactory.Make(exception), false);
         }
+
+        /// <summary>
+        /// 输出到Exception目录
+        /// </summary>
+        public static void WriteException(string message, Exception exception)
+        {
+            Instance.WriteExceptionImpl(message, exception);
+        }
+
+        public void WriteExceptionImpl(string message, Exception exception)
+        {
+            SendMessage(LogLevel.ERROR, CATEGORY, StringFactory.Make(message, exception), false);
+        }
         /// <summary>
         /// 输出到Exception目录
         /// </summary>
@@ -217,6 +230,19 @@ namespace FoolishGames.Log
         public void WriteExceptionWithCategoryImpl(string category, Exception exception)
         {
             SendMessage(LogLevel.ERROR, category, StringFactory.Make(exception), false);
+        }
+
+        /// <summary>
+        /// 输出到Exception目录
+        /// </summary>
+        public static void WriteExceptionWithCategory(string category, string message, Exception exception)
+        {
+            Instance.WriteExceptionWithCategoryImpl(category, message, exception);
+        }
+
+        public void WriteExceptionWithCategoryImpl(string category, string message, Exception exception)
+        {
+            SendMessage(LogLevel.ERROR, category, StringFactory.Make(message, exception), false);
         }
         /// <summary>
         /// 输出到指定类别
@@ -264,7 +290,7 @@ namespace FoolishGames.Log
         /// <summary>
         /// 服务器内部输出
         /// </summary>
-        internal static void WriteLine(string level, string category, string message)
+        public static void WriteLine(string level, string category, string message)
         {
             message = $"{DateTime.Now.ToString()} [{category}] - " + message;
             WriteLine(level, message);
@@ -272,7 +298,7 @@ namespace FoolishGames.Log
         /// <summary>
         /// 服务器内部输出
         /// </summary>
-        internal static void WriteLine(string level, string message)
+        public static void WriteLine(string level, string message)
         {
             Instance.SendMessage(level, message);
         }

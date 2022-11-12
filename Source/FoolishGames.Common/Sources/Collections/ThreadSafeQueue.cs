@@ -62,5 +62,13 @@ namespace FoolishGames.Collections
                 return _cache.GetEnumerator();
             }
         }
+
+        public void Clear()
+        {
+            lock (syncRoot)
+            {
+                _cache.Clear();
+            }
+        }
     }
 }

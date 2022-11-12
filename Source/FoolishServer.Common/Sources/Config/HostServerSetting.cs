@@ -56,6 +56,16 @@ namespace FoolishServer.Config
         public int BufferSize { get; private set; }
 
         /// <summary>
+        /// 通讯内容整体偏移
+        /// </summary>
+        public int Offset { get; private set; }
+
+        /// <summary>
+        /// 是否使用压缩
+        /// </summary>
+        public bool UseGZip { get; private set; }
+
+        /// <summary>
         /// 获取类别显示
         /// </summary>
         public string GetCategory()
@@ -81,6 +91,8 @@ namespace FoolishServer.Config
             MaxAcceptCapacity = node.SelectSingleNode("max-accept-capacity").GetValue(1000);
             MaxIOCapacity = node.SelectSingleNode("max-io-capacity").GetValue(1000);
             BufferSize = node.SelectSingleNode("buffer-size").GetValue(8192);
+            Offset = node.SelectSingleNode("offset").GetValue(8192);
+            UseGZip = node.SelectSingleNode("use-gzip").GetValue(true);
         }
         /// <summary>
         /// 判断是否有效

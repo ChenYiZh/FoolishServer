@@ -53,6 +53,16 @@ namespace FoolishServer.Config
         int BufferSize { get; }
 
         /// <summary>
+        /// 通讯内容整体偏移
+        /// </summary>
+        int Offset { get; }
+
+        /// <summary>
+        /// 是否使用压缩
+        /// </summary>
+        bool UseGZip { get; }
+
+        /// <summary>
         /// 获取类别显示
         /// </summary>
         string GetCategory();

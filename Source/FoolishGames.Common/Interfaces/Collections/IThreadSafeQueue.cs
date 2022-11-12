@@ -12,5 +12,7 @@ namespace FoolishGames.Collections
         T Dequeue();
 
         void Enqueue(T item);
+
+        void Clear();
     }
 }

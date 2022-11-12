@@ -12,5 +12,7 @@ namespace FoolishGames.Collections
         T Pop();
 
         void Push(T item);
+
+        void Clear();
     }
 }

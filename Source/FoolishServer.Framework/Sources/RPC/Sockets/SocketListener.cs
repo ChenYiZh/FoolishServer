@@ -11,6 +11,9 @@ using System.Text;
 using System.Threading;
 using FoolishServer.Delegate;
 using FoolishGames.Log;
+using FoolishServer.RPC.Tokens;
+using FoolishGames.IO;
+using FoolishGames.Common;
 
 namespace FoolishServer.RPC.Sockets
 {
@@ -132,7 +135,8 @@ namespace FoolishServer.RPC.Sockets
             for (int i = 0; i < setting.MaxIOCapacity; i++)
             {
                 SocketAsyncEventArgs ioEventArgs = new SocketAsyncEventArgs();
-                // TODO: 默认消息Buffer
+                // 设置缓冲区大小
+                ArrangeSocketBuffer(ioEventArgs);
                 ioEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(IOCompleted);
                 UserToken userToken = new UserToken();
                 ioEventArgs.UserToken = userToken;
@@ -160,10 +164,20 @@ namespace FoolishServer.RPC.Sockets
                 Socket.Listen(setting.Backlog);
             }
             //服务器状态输出周期
-            summaryTask = new Timer(WriteSummary, null, 60000, 60000);
+            summaryTask = new Timer(WriteSummary, null, 10000, 10000);
 
             //启动监听
             PostAccept();
+        }
+
+        /// <summary>
+        /// 设置缓冲区大小
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        private void ArrangeSocketBuffer(SocketAsyncEventArgs ioEventArgs)
+        {
+            int bufferSize = Setting.BufferSize;
+            ioEventArgs.SetBuffer(new byte[bufferSize], 0, bufferSize);
         }
 
         /// <summary>
@@ -184,7 +198,7 @@ namespace FoolishServer.RPC.Sockets
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Post accept listen error:", e);
             }
         }
 
@@ -201,7 +215,7 @@ namespace FoolishServer.RPC.Sockets
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Accept Completed method error:", e);
                 if (acceptEventArgs.AcceptSocket != null)
                 {
                     try
@@ -262,7 +276,7 @@ namespace FoolishServer.RPC.Sockets
                     }
                     catch (Exception e)
                     {
-                        FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                        FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "OnConnected error:", e);
                     }
                     PostReceive(ioEventArgs);
                 }
@@ -296,7 +310,7 @@ namespace FoolishServer.RPC.Sockets
         /// </summary>
         private void IOCompleted(object sender, SocketAsyncEventArgs ioEventArgs)
         {
-            UserToken userToken = (UserToken)ioEventArgs.UserToken;
+            IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
             try
             {
                 ((FSocket)userToken.Socket).AccessTime = DateTime.Now;
@@ -313,7 +327,7 @@ namespace FoolishServer.RPC.Sockets
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), $"IP {(userToken != null && userToken.Socket != null ? userToken.Socket.Address?.ToString() : "")} IOCompleted unkown error:", e);
             }
         }
 
@@ -354,8 +368,36 @@ namespace FoolishServer.RPC.Sockets
         /// <param name="ioEventArgs"></param>
         private void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
         {
+            if (ioEventArgs.BytesTransferred == 0)
+            {
+                Close(ioEventArgs, EOpCode.Empty);
+                return;
+            }
+
+            UserToken token = (UserToken)ioEventArgs.UserToken;
+
+            if (ioEventArgs.SocketError != SocketError.Success)
+            {
+                FConsole.WriteErrorWithCategory(Setting.GetCategory(),
+                    "Process Receive IP {0} SocketError:{1}, bytes len:{2}",
+                    (token != null ? token.Socket.Address?.ToString() : ""),
+                    ioEventArgs.SocketError.ToString(),
+                    ioEventArgs.BytesTransferred);
+                Close(ioEventArgs);
+                return;
+            }
+
             FConsole.Write("Process Receive...");
             // TODO: Process Receive
+            try
+            {
+                IMessageReader message = PackageFactory.Unpack(ioEventArgs.Buffer, Setting.Offset, true);
+                FConsole.Write(message.ReadString());
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Process Receive error.", e);
+            }
         }
 
         /// <summary>
@@ -366,6 +408,57 @@ namespace FoolishServer.RPC.Sockets
         {
             FConsole.Write("Process Send...");
             // TODO: Process Send
+        }
+
+        internal protected void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode = EOpCode.Close, string reason = "")
+        {
+            Interlocked.Decrement(ref summary.CurrentConnectCount);
+            Interlocked.Increment(ref summary.CloseConnectCount);
+
+            IUserToken token = (IUserToken)ioEventArgs.UserToken;
+            if (opCode != EOpCode.Empty)
+            {
+                try
+                {
+                    // TODO: 处理关闭握手协议 CloseHandshake(dataToken.Socket, reason);
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
+                }
+            }
+            if (ioEventArgs.AcceptSocket != null)
+            {
+                try
+                {
+                    ioEventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
+                }
+            }
+            try
+            {
+                maxConnectionsEnforcer.Release();
+            }
+            catch (Exception e)
+            {
+                string errorMessage = string.Format("Closed error, connect status: TotalCount={0}, CurrentCount={1}, CloseCount={2}, RejectedCount={3}",
+                    summary.TotalConnectCount, summary.CurrentConnectCount, summary.CloseConnectCount, summary.RejectedConnectCount);
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), errorMessage, e);
+            }
+
+            try
+            {
+                Disconnected(new SocketConnectionEventArgs { Socket = token.Socket });
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "OnDisconnected error:", e);
+            }
+            ResetSocketAsyncEventArgs(ioEventArgs);
+            ReleaseIOEventArgs(ioEventArgs);
         }
         /// <summary>
         /// 创建连接代理
