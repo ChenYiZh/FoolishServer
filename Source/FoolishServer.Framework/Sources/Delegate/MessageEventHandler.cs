@@ -7,7 +7,7 @@ using System.Text;
 namespace FoolishServer.Delegate
 {
     /// <summary>
-    /// 连接消息代理
+    /// 收发消息处理
     /// </summary>
-    public delegate void ConnectionEventHandler(IServerSocket socket, ISocket remoteSocket);
+    public delegate void MessageEventHandler(IServerSocket socket, IMessageEventArgs e);
 }

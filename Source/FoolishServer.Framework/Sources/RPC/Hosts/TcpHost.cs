@@ -3,7 +3,6 @@ using FoolishServer.RPC.Host;
 using FoolishServer.RPC.Sockets;
 using FoolishServer.Config;
 using FoolishServer.Log;
-using FoolishServer.RPC.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -31,6 +31,11 @@ namespace FoolishClient.Net
         bool IsReady { get; }
 
         /// <summary>
+        /// 是否已经开始工作
+        /// </summary>
+        bool IsRunning { get; }
+
+        /// <summary>
         /// 是否还连接着
         /// </summary>
         bool Connected { get; }

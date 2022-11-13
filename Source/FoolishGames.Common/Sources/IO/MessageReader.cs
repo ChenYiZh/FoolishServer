@@ -13,7 +13,7 @@ namespace FoolishGames.IO
         /// <summary>
         /// 消息Id
         /// </summary>
-        public int MsgId { get; private set; }
+        public long MsgId { get; private set; }
 
         /// <summary>
         /// 操作码
@@ -112,8 +112,8 @@ namespace FoolishGames.IO
         protected virtual void ReadHeader(byte[] package, int offset)
         {
             int index = offset;
-            MsgId = BitConverter.ToInt32(package, index);
-            index += SizeUtil.IntSize;
+            MsgId = BitConverter.ToInt64(package, index);
+            index += SizeUtil.LongSize;
             OpCode = (sbyte)package[index];
             index += 1;
             ActionId = BitConverter.ToInt32(package, index);

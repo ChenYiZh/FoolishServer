@@ -20,7 +20,7 @@ namespace FoolishGames.IO
         /// </summary>
         static MessageInfo()
         {
-            HeaderLength = SizeUtil.IntSize//MsgId
+            HeaderLength = SizeUtil.LongSize//MsgId
                      + SizeUtil.SByteSize//OpCode
                      + SizeUtil.IntSize//ActionId
                      ;

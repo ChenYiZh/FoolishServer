@@ -15,7 +15,7 @@ namespace FoolishGames.IO
         /// <summary>
         /// 消息Id
         /// </summary>
-        public int MsgId { get; set; }
+        public long MsgId { get; set; }
 
         /// <summary>
         /// 操作码
@@ -30,12 +30,12 @@ namespace FoolishGames.IO
         /// <summary>
         /// 是否数据压缩
         /// </summary>
-        public bool Compress { get; set; } = true;
+        public bool Compress { get; set; } = false;
 
         /// <summary>
         /// 是否加密
         /// </summary>
-        public bool Secret { get; set; } = true;
+        public bool Secret { get; set; } = false;
 
         /// <summary>
         /// 是否有报错

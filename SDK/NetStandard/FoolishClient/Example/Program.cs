@@ -16,10 +16,12 @@ namespace Example
     {
         static void Main(string[] args)
         {
+            FConsole.LogStackTracker = true;
             FConsole.RegistLogger(new Logger());
             TcpSocket socket = new TcpSocket();
-            socket.Compression = new GZipCompression();
-            socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
+            socket.MessageOffset = 2;
+            //socket.Compression = new GZipCompression();
+            //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
             socket.Ready("default", "127.0.0.1", 9001);
             MessageWriter message = new MessageWriter();
             //message.Secret = false;
@@ -29,9 +31,23 @@ namespace Example
             message.ActionId = 3356;
             message.WriteString("Hello World!");
             socket.SendAsync(message);
+            socket.SendAsync(message);
+            socket.SendAsync(message);
+            socket.SendAsync(message);
             while (true)
             {
-                Console.Read();
+                Console.ReadLine();
+                if (socket.IsRunning)
+                {
+                    socket.Close();
+                }
+                else
+                {
+                    socket.SendAsync(message);
+                    socket.SendAsync(message);
+                    socket.SendAsync(message);
+                    socket.SendAsync(message);
+                }
             }
         }
     }

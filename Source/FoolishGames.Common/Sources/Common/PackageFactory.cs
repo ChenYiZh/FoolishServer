@@ -42,13 +42,9 @@ namespace FoolishGames.Common
         public static byte[] Pack(IMessageWriter message, int offset, ICompression compression, ICryptoProvider cryptography)
         {
             byte[] context = message.GetContext();
-            byte[] buffer = new byte[offset + MessageInfo.HeaderLength + message.ContextLength];
-            for (int i = 0; i < offset; i++)
-            {
-                buffer[i] = RandomUtil.RandomByte();
-            }
-            message.WriteHeader(buffer, offset);
-            Buffer.BlockCopy(context, 0, buffer, offset + MessageInfo.HeaderLength, message.ContextLength);
+            byte[] buffer = new byte[MessageInfo.HeaderLength + message.ContextLength];
+            message.WriteHeader(buffer, 0);
+            Buffer.BlockCopy(context, 0, buffer, MessageInfo.HeaderLength, message.ContextLength);
             bool compress = message.Compress && compression != null;
             bool crypto = message.Secret && cryptography != null;
             EMessageType type = EMessageType.NoProcess;
@@ -72,20 +68,42 @@ namespace FoolishGames.Common
             {
                 buffer = compression.Compress(buffer);
             }
-            byte[] result = new byte[buffer.Length + 1];
-            result[0] = (byte)type;
-            Buffer.BlockCopy(buffer, 0, result, 1, buffer.Length);
+
+            int length = buffer.Length;
+            byte[] result = new byte[offset + SizeUtil.IntSize + 1 + length];
+            for (int i = 0; i < offset; i++)
+            {
+                result[i] = RandomUtil.RandomByte();
+            }
+            byte[] lenBs = BitConverter.GetBytes(length);
+            for (int i = 0; i < lenBs.Length; i++)
+            {
+                result[offset + i] = lenBs[i];
+            }
+            result[offset + SizeUtil.IntSize] = (byte)type;
+            Buffer.BlockCopy(buffer, 0, result, result.Length - length, buffer.Length);
+
             return result;
         }
 
         /// <summary>
         /// 解包
         /// </summary>
+        /// <returns>返回剩余字节位置</returns>
         public static IMessageReader Unpack(byte[] package, int offset, ICompression compression, ICryptoProvider cryptography)
         {
-            byte[] data = new byte[package.Length - 1];
-            Buffer.BlockCopy(package, 1, data, 0, data.Length);
-            EMessageType type = (EMessageType)package[0];
+            int pos = 0;
+
+            pos += offset;
+            int length = BitConverter.ToInt32(package, pos);
+            pos += SizeUtil.IntSize;
+            EMessageType type = (EMessageType)package[pos];
+            pos += 1;
+
+            byte[] data = new byte[length];
+            Buffer.BlockCopy(package, pos, data, 0, length);
+            pos += length;
+
             bool compress = type == EMessageType.OnlyCompress || type == EMessageType.CompressAndCrypto;
             bool crypto = type == EMessageType.OnlyCrypto || type == EMessageType.CompressAndCrypto;
             if (compress)
@@ -96,7 +114,22 @@ namespace FoolishGames.Common
             {
                 data = cryptography.Decrypt(data);
             }
-            return new MessageReader(data, offset, compress, crypto);
+            return new MessageReader(data, 0, compress, crypto);
+        }
+
+        /// <summary>
+        /// 预解析整体包体大小
+        /// </summary>
+        public static int GetTotalLength(byte[] package, int offset)
+        {
+            int headerLength = offset + SizeUtil.IntSize + 1;
+            if (package.Length < headerLength)
+            {
+                return -1;
+            }
+            int length = BitConverter.ToInt32(package, offset);
+            //偏移值，包体大小，消息格式
+            return headerLength + length;
         }
     }
 }

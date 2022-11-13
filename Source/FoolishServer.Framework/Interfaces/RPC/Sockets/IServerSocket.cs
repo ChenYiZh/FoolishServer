@@ -55,17 +55,17 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 接收到数据包事件
         /// </summary>
-        event ConnectionEventHandler OnMessageReceived;
+        event MessageEventHandler OnMessageReceived;
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
-        event ConnectionEventHandler OnPing;
+        event MessageEventHandler OnPing;
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
-        event ConnectionEventHandler OnPong;
+        event MessageEventHandler OnPong;
 
         /// <summary>
         /// 启动函数

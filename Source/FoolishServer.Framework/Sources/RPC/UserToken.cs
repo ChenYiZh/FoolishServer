@@ -22,10 +22,21 @@ namespace FoolishServer.RPC
         public ISocketAsyncResult AsyncResult { get; internal set; }
 
         /// <summary>
+        /// 已经接收的数据长度
+        /// </summary>
+        internal int TempStartIndex { get; set; } = 0;
+
+        /// <summary>
+        /// 解析包时解析不完的数据
+        /// </summary>
+        internal byte[] TempBuffer { get; set; } = null;
+
+        /// <summary>
         /// 重置数据
         /// </summary>
         public void Reset()
         {
+            TempBuffer = null;
             AsyncResult = null;
         }
     }

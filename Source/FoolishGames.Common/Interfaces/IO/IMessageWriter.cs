@@ -12,7 +12,7 @@ namespace FoolishGames.IO
         /// <summary>
         /// 消息Id
         /// </summary>
-        int MsgId { set; }
+        long MsgId { set; }
 
         /// <summary>
         /// 操作码

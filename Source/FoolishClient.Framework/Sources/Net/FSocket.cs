@@ -4,6 +4,7 @@ using FoolishGames.Collections;
 using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
+using FoolishGames.RPC;
 using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,11 @@ namespace FoolishClient.Net
         /// 标识名称
         /// </summary>
         public virtual string Name { get; private set; }
+
+        /// <summary>
+        /// 消息计数
+        /// </summary>
+        private long messageNumber = DateTime.Now.Ticks;
 
         /// <summary>
         /// 服务器地址
@@ -62,6 +68,11 @@ namespace FoolishClient.Net
         /// 数据是否已经初始化了
         /// </summary>
         public virtual bool IsReady { get { return readyFlag == 1; } }
+
+        /// <summary>
+        /// 是否已经开始工作
+        /// </summary>
+        public virtual bool IsRunning { get; protected set; } = false;
 
         /// <summary>
         /// 是否已经开始运行
@@ -133,6 +144,7 @@ namespace FoolishClient.Net
         /// </summary>
         public virtual void ConnectAsync(Action<bool> callback = null)
         {
+            IsRunning = true;
             ThreadPool.QueueUserWorkItem((state) =>
             {
                 bool success = Connect();
@@ -147,9 +159,11 @@ namespace FoolishClient.Net
         {
             if (!IsReady)
             {
+                IsRunning = false;
                 FConsole.WriteInfoWithCategory(Categories.SOCKET, "Socket is not ready!");
                 return false;
             }
+            IsRunning = true;
             FConsole.WriteInfoWithCategory(Category, "Socket is starting...");
             try
             {
@@ -158,6 +172,7 @@ namespace FoolishClient.Net
                 bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
                 if (!success || !opt.IsCompleted || !Socket.Connected)
                 {
+                    IsRunning = false;
                     throw new Exception(string.Format("Socket connect failed!"));
                 }
                 //Socket.Connect(host, port);//手机上测下来只有同步才有效
@@ -226,7 +241,9 @@ namespace FoolishClient.Net
         protected virtual byte[] BuildHeartbeatBuffer()
         {
             // TODO: 创建默认心跳包数据
-            return new byte[0];
+            MessageWriter msg = new MessageWriter();
+            msg.OpCode = (sbyte)EOpCode.Pong;
+            return PackageFactory.Pack(msg, MessageOffset, null, null);
         }
 
         /// <summary>
@@ -239,7 +256,7 @@ namespace FoolishClient.Net
         {
             if (IsReady)
             {
-                if (!Connected)
+                if (!IsRunning)
                 {
                     ConnectAsync();
                 }
@@ -254,7 +271,7 @@ namespace FoolishClient.Net
         {
             while (ThreadProcessSend != null && WaitToSendMessages != null)
             {
-                if (WaitToSendMessages.Count > 0)
+                while (WaitToSendMessages.Count > 0)
                 {
                     WaitSendMessage message = WaitToSendMessages.Dequeue() as WaitSendMessage;
                     if (message != null)
@@ -271,9 +288,18 @@ namespace FoolishClient.Net
                             }
                             if (Connected)
                             {
+                                Interlocked.Increment(ref messageNumber);
                                 IAsyncResult result;
+                                message.Message.MsgId = messageNumber;
                                 byte[] data = PackageFactory.Pack(message.Message, MessageOffset, Compression, CryptoProvide);
-                                message.Execute(Send(data, out result), result);
+                                try
+                                {
+                                    message.Execute(Send(data, out result), result);
+                                }
+                                catch (Exception e)
+                                {
+                                    Close();
+                                }
                             }
                             else
                             {
@@ -326,6 +352,7 @@ namespace FoolishClient.Net
             {
                 lock (this)
                 {
+                    IsRunning = false;
                     if (Socket != null)
                     {
                         try

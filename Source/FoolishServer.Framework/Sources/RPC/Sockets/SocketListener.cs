@@ -24,37 +24,37 @@ namespace FoolishServer.RPC.Sockets
         /// 连接事件
         /// </summary>
         public event ConnectionEventHandler OnConnected;
-        private void Connected(IConnectionEventArgs e) { OnConnected?.Invoke(this, e); }
+        private void Connected(ISocket remoteSocket) { OnConnected?.Invoke(this, remoteSocket); }
 
         /// <summary>
         /// 握手事件
         /// </summary>
         public event ConnectionEventHandler OnHandshaked;
-        private void Handshaked(IConnectionEventArgs e) { OnHandshaked?.Invoke(this, e); }
+        private void Handshaked(ISocket remoteSocket) { OnHandshaked?.Invoke(this, remoteSocket); }
 
         /// <summary>
         /// 断开连接事件
         /// </summary>
         public event ConnectionEventHandler OnDisconnected;
-        private void Disconnected(IConnectionEventArgs e) { OnDisconnected?.Invoke(this, e); }
+        private void Disconnected(ISocket remoteSocket) { OnDisconnected?.Invoke(this, remoteSocket); }
 
         /// <summary>
         /// 接收到数据包事件
         /// </summary>
-        public event ConnectionEventHandler OnMessageReceived;
-        private void MessageReceived(IConnectionEventArgs e) { OnMessageReceived?.Invoke(this, e); }
+        public event MessageEventHandler OnMessageReceived;
+        private void MessageReceived(IMessageEventArgs args) { OnMessageReceived?.Invoke(this, args); }
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
-        public event ConnectionEventHandler OnPing;
-        private void Ping(IConnectionEventArgs e) { OnPing?.Invoke(this, e); }
+        public event MessageEventHandler OnPing;
+        private void Ping(IMessageEventArgs args) { OnPing?.Invoke(this, args); }
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
-        public event ConnectionEventHandler OnPong;
-        private void Pong(IConnectionEventArgs e) { OnPong?.Invoke(this, e); }
+        public event MessageEventHandler OnPong;
+        private void Pong(IMessageEventArgs args) { OnPong?.Invoke(this, args); }
 
         /// <summary>
         /// 是否在运行
@@ -137,9 +137,9 @@ namespace FoolishServer.RPC.Sockets
             IsRunning = true;
             Setting = setting;
 
-            // TODO: Test测试代码，发布前驱除
-            Compression = new GZipCompression();
-            CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
+            //Test测试代码，发布前驱除
+            //Compression = new GZipCompression();
+            //CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
 
             //对象池初始化
             acceptEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxAcceptCapacity);
@@ -275,7 +275,7 @@ namespace FoolishServer.RPC.Sockets
                         ioEventArgs = ioEventArgsPool.Pop();
                         ioEventArgs.AcceptSocket = acceptEventArgs.AcceptSocket;
                         UserToken userToken = (UserToken)ioEventArgs.UserToken;
-                        ioEventArgs.SetBuffer(0, Setting.BufferSize);
+                        ArrangeSocketBuffer(ioEventArgs);
                         socket = new FSocket(ioEventArgs.AcceptSocket);
                         socket.AccessTime = DateTime.Now;
                         userToken.Socket = socket;
@@ -288,7 +288,7 @@ namespace FoolishServer.RPC.Sockets
                     // 连接后处理
                     try
                     {
-                        Connected(new SocketConnectionEventArgs() { Socket = socket });
+                        Connected(socket);
                     }
                     catch (Exception e)
                     {
@@ -405,17 +405,127 @@ namespace FoolishServer.RPC.Sockets
 
             FConsole.Write("Process Receive...");
             // TODO: Process Receive
-            try
+            if (ioEventArgs.BytesTransferred > 0)
             {
+                //从当前位置数据开始解析
+                int offset = 0;
+                //先缓存数据
                 byte[] buffer = new byte[ioEventArgs.BytesTransferred];
                 Buffer.BlockCopy(ioEventArgs.Buffer, ioEventArgs.Offset, buffer, 0, buffer.Length);
-                IMessageReader message = PackageFactory.Unpack(buffer, Setting.Offset, Compression, CryptoProvide);
-                FConsole.Write(message.ReadString());
+
+                //消息处理的队列
+                Queue<IMessageReader> messages = new Queue<IMessageReader>();
+                try
+                {
+                    //继续接收上次未接收完毕的数据
+                    if (token.TempBuffer != null)
+                    {
+                        //上次连报头都没接收完
+                        if (token.TempStartIndex < 0)
+                        {
+                            byte[] tBuffer = new byte[buffer.Length + token.TempBuffer.Length];
+                            Buffer.BlockCopy(token.TempBuffer, 0, tBuffer, 0, token.TempBuffer.Length);
+                            Buffer.BlockCopy(buffer, 0, tBuffer, token.TempBuffer.Length, buffer.Length);
+                            buffer = tBuffer;
+                            token.TempBuffer = null;
+                        }
+                        //数据仍然接收不完
+                        else if (token.TempStartIndex + buffer.Length < token.TempBuffer.Length)
+                        {
+                            Buffer.BlockCopy(buffer, 0, token.TempBuffer, token.TempStartIndex, buffer.Length);
+                            token.TempStartIndex += buffer.Length;
+                            offset += buffer.Length;
+                        }
+                        //这轮数据可以接受完
+                        else
+                        {
+                            int deltaLength = token.TempBuffer.Length - token.TempStartIndex;
+                            Buffer.BlockCopy(buffer, 0, token.TempBuffer, token.TempStartIndex, deltaLength);
+                            IMessageReader bigMessage = PackageFactory.Unpack(token.TempBuffer, Setting.Offset, Compression, CryptoProvide);
+                            token.TempBuffer = null;
+                            messages.Enqueue(bigMessage);
+                            offset += deltaLength;
+                        }
+                    }
+
+                    //针对接收到的数据进行完整解析
+                    while (offset < buffer.Length)
+                    {
+                        int totalLength = PackageFactory.GetTotalLength(buffer, offset + Setting.Offset);
+                        //包头解析不全
+                        if (totalLength < 0)
+                        {
+                            token.TempStartIndex = -1;
+                            token.TempBuffer = new byte[buffer.Length - offset];
+                            Buffer.BlockCopy(buffer, offset, token.TempBuffer, 0, token.TempBuffer.Length);
+                            break;
+                        }
+
+                        //包体解析不全
+                        if (totalLength > buffer.Length)
+                        {
+                            token.TempStartIndex = buffer.Length - offset;
+                            token.TempBuffer = new byte[totalLength - offset];
+                            Buffer.BlockCopy(buffer, offset, token.TempBuffer, 0, buffer.Length - offset);
+                            break;
+                        }
+
+                        offset += Setting.Offset;
+                        IMessageReader message = PackageFactory.Unpack(buffer, offset, Compression, CryptoProvide);
+                        messages.Enqueue(message);
+                        offset = totalLength;
+                    }
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Process Receive error.", e);
+                }
+
+                while (messages.Count > 0)
+                {
+                    IMessageReader message = messages.Dequeue();
+                    try
+                    {
+                        ISocket socket = token?.Socket;
+                        switch (message.OpCode)
+                        {
+                            case (sbyte)EOpCode.Close:
+                                {
+                                    // TODO: 检查关闭协议是否有效
+                                    Close(ioEventArgs, EOpCode.Empty);
+                                }
+                                break;
+                            case (sbyte)EOpCode.Ping:
+                                {
+                                    Ping(new MessageEventArgs { Socket = socket, Message = message });
+                                }
+                                break;
+                            case (sbyte)EOpCode.Pong:
+                                {
+                                    Pong(new MessageEventArgs { Socket = socket, Message = message });
+                                    FConsole.Write("Pong: {0}", message.MsgId);
+                                }
+                                break;
+                            default:
+                                {
+                                    MessageReceived(new MessageEventArgs { Socket = socket, Message = message });
+                                    FConsole.Write("Receive[{0}]: {1}", message.MsgId, message.ReadString());
+                                }
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Categories.FOOLISH_SERVER, "An exception occurred when resolve the message.", e);
+                    }
+                }
             }
-            catch (Exception e)
+            else if (token.TempBuffer != null)
             {
-                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Process Receive error.", e);
+                //数据错乱
+                token.TempBuffer = null;
             }
+            PostReceive(ioEventArgs);
         }
 
         /// <summary>
@@ -469,7 +579,7 @@ namespace FoolishServer.RPC.Sockets
 
             try
             {
-                Disconnected(new SocketConnectionEventArgs { Socket = token.Socket });
+                Disconnected(token.Socket);
             }
             catch (Exception e)
             {
