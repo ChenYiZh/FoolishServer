@@ -28,6 +28,16 @@ namespace FoolishGames.IO
         public int ActionId { get; set; }
 
         /// <summary>
+        /// 是否数据压缩
+        /// </summary>
+        public bool Compress { get; set; } = true;
+
+        /// <summary>
+        /// 是否加密
+        /// </summary>
+        public bool Secret { get; set; } = true;
+
+        /// <summary>
         /// 是否有报错
         /// </summary>
         public bool IsError { get { return !string.IsNullOrEmpty(Error); } }

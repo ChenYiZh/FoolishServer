@@ -14,6 +14,7 @@ using FoolishGames.Log;
 using FoolishServer.RPC.Tokens;
 using FoolishGames.IO;
 using FoolishGames.Common;
+using FoolishGames.Security;
 
 namespace FoolishServer.RPC.Sockets
 {
@@ -86,6 +87,16 @@ namespace FoolishServer.RPC.Sockets
         public IHostSetting Setting { get; private set; }
 
         /// <summary>
+        /// 压缩工具
+        /// </summary>
+        public ICompression Compression { get; set; } = null;
+
+        /// <summary>
+        /// 加密工具
+        /// </summary>
+        public ICryptoProvider CryptoProvide { get; set; } = null;
+
+        /// <summary>
         /// 类型
         /// </summary>
         public EHostType Type { get { return Setting.Type; } }
@@ -125,6 +136,11 @@ namespace FoolishServer.RPC.Sockets
             //默认参数赋值
             IsRunning = true;
             Setting = setting;
+
+            // TODO: Test测试代码，发布前驱除
+            Compression = new GZipCompression();
+            CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
+
             //对象池初始化
             acceptEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxAcceptCapacity);
             for (int i = 0; i < setting.MaxAcceptCapacity; i++)
@@ -391,7 +407,9 @@ namespace FoolishServer.RPC.Sockets
             // TODO: Process Receive
             try
             {
-                IMessageReader message = PackageFactory.Unpack(ioEventArgs.Buffer, Setting.Offset, true);
+                byte[] buffer = new byte[ioEventArgs.BytesTransferred];
+                Buffer.BlockCopy(ioEventArgs.Buffer, ioEventArgs.Offset, buffer, 0, buffer.Length);
+                IMessageReader message = PackageFactory.Unpack(buffer, Setting.Offset, Compression, CryptoProvide);
                 FConsole.Write(message.ReadString());
             }
             catch (Exception e)

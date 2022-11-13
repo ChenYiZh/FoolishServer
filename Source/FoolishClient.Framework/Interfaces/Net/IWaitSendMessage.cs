@@ -1,4 +1,5 @@
 ﻿using FoolishClient.Delegate;
+using FoolishGames.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace FoolishClient.Net
         /// <summary>
         /// 要发送的数据
         /// </summary>
-        byte[] Data { get; }
+        IMessageWriter Message { get; }
 
         /// <summary>
         /// 发送完成的回调

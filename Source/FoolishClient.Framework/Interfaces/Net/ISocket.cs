@@ -1,4 +1,6 @@
 ﻿using FoolishClient.Delegate;
+using FoolishGames.IO;
+using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -44,6 +46,21 @@ namespace FoolishClient.Net
         Socket Socket { get; }
 
         /// <summary>
+        /// 消息偏移值
+        /// </summary>
+        int MessageOffset { get; }
+
+        /// <summary>
+        /// 压缩工具
+        /// </summary>
+        ICompression Compression { get; set; }
+
+        /// <summary>
+        /// 加密工具
+        /// </summary>
+        ICryptoProvider CryptoProvide { get; set; }
+
+        /// <summary>
         /// 初始化信息
         /// </summary>
         /// <param name="name"></param>
@@ -68,7 +85,7 @@ namespace FoolishClient.Net
         /// <param name="data"></param>
         /// <param name="callback">发送回调</param>
         /// <returns>判断有没有发送出去</returns>
-        void SendAsync(byte[] data, SendCallback callback = null);
+        void SendAsync(IMessageWriter message, SendCallback callback = null);
 
         /// <summary>
         /// 关闭函数

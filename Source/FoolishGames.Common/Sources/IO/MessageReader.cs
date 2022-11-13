@@ -26,6 +26,16 @@ namespace FoolishGames.IO
         public int ActionId { get; private set; }
 
         /// <summary>
+        /// 是否数据压缩
+        /// </summary>
+        public bool Compress { get; private set; }
+
+        /// <summary>
+        /// 是否加密
+        /// </summary>
+        public bool Secret { get; private set; }
+
+        /// <summary>
         /// 是否有报错
         /// </summary>
         public bool IsError { get { return !string.IsNullOrEmpty(Error); } }
@@ -76,8 +86,10 @@ namespace FoolishGames.IO
         /// </summary>
         /// <param name="package"></param>
         /// <param name="offset"></param>
-        public MessageReader(byte[] package, int offset)
+        public MessageReader(byte[] package, int offset, bool compress, bool secret)
         {
+            Compress = compress;
+            Secret = secret;
             packetLength = package.Length - offset;
             if (packetLength < HeaderLength)
             {

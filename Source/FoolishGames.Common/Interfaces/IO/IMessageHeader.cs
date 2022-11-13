@@ -25,6 +25,16 @@ namespace FoolishGames.IO
         int ActionId { get; }
 
         /// <summary>
+        /// 是否数据压缩
+        /// </summary>
+        bool Compress { get; }
+
+        /// <summary>
+        /// 是否加密
+        /// </summary>
+        bool Secret { get; }
+
+        /// <summary>
         /// 是否有报错
         /// </summary>
         bool IsError { get; }

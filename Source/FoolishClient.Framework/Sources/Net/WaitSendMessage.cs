@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using FoolishClient.Delegate;
 using FoolishClient.Log;
+using FoolishGames.IO;
 using FoolishGames.Log;
 
 namespace FoolishClient.Net
 {
     internal class WaitSendMessage : IWaitSendMessage
     {
-        public byte[] Data { get; private set; }
+        public IMessageWriter Message { get; private set; }
 
         public SendCallback Callback { get; private set; }
 
         internal bool Executed { get; set; } = false;
 
-        public WaitSendMessage(byte[] data, SendCallback callback)
+        public WaitSendMessage(IMessageWriter message, SendCallback callback)
         {
-            Data = data;
+            Message = message;
             Callback = callback;
         }
 

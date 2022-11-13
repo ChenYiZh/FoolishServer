@@ -37,22 +37,22 @@ namespace FoolishGames.Common
 
         static SizeUtil()
         {
-            BoolSize = sizeof(short);
-            CharSize = sizeof(short);
+            BoolSize = sizeof(bool);
+            CharSize = sizeof(char);
 
-            FloatSize = sizeof(short);
-            DoubleSize = sizeof(short);
-            DecimalSize = sizeof(short);
+            FloatSize = sizeof(float);
+            DoubleSize = sizeof(double);
+            DecimalSize = sizeof(decimal);
 
             SByteSize = sizeof(sbyte);
             ShortSize = sizeof(short);
-            IntSize = sizeof(short);
-            LongSize = sizeof(short);
+            IntSize = sizeof(int);
+            LongSize = sizeof(long);
 
             ByteSize = sizeof(byte);
-            UShortSize = sizeof(short);
-            UIntSize = sizeof(short);
-            ULongSize = sizeof(short);
+            UShortSize = sizeof(ushort);
+            UIntSize = sizeof(uint);
+            ULongSize = sizeof(ulong);
         }
     }
 }

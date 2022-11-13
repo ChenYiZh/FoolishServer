@@ -1,4 +1,6 @@
-﻿using FoolishServer.Config;
+﻿using FoolishGames.IO;
+using FoolishGames.Security;
+using FoolishServer.Config;
 using FoolishServer.Delegate;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,16 @@ namespace FoolishServer.RPC.Sockets
         /// 获取配置信息
         /// </summary>
         IHostSetting Setting { get; }
+
+        /// <summary>
+        /// 压缩工具
+        /// </summary>
+        ICompression Compression { get; set; }
+
+        /// <summary>
+        /// 加密工具
+        /// </summary>
+        ICryptoProvider CryptoProvide { get; set; }
 
         /// <summary>
         /// 连接事件

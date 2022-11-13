@@ -1,4 +1,5 @@
 ﻿using FoolishGames.IO;
+using FoolishGames.Security;
 using FoolishGames.Sources.Common;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,28 @@ using System.Text;
 namespace FoolishGames.Common
 {
     /// <summary>
+    /// 消息类型
+    /// </summary>
+    internal enum EMessageType : byte
+    {
+        /// <summary>
+        /// 什么都不处理
+        /// </summary>
+        NoProcess = 0,
+        /// <summary>
+        /// 压缩过
+        /// </summary>
+        OnlyCompress = 10,
+        /// <summary>
+        /// 加密过
+        /// </summary>
+        OnlyCrypto = 15,
+        /// <summary>
+        /// 解压+加密
+        /// </summary>
+        CompressAndCrypto = 50,
+    }
+    /// <summary>
     /// 消息处理类
     /// </summary>
     public static class PackageFactory
@@ -16,58 +39,64 @@ namespace FoolishGames.Common
         /// <summary>
         /// 打包
         /// </summary>
-        public static byte[] Pack(IMessageWriter message, int offset, bool compress)
+        public static byte[] Pack(IMessageWriter message, int offset, ICompression compression, ICryptoProvider cryptography)
         {
             byte[] context = message.GetContext();
-            byte[] buffer = new byte[offset + MessageInfo.HeaderLength + context.Length];
+            byte[] buffer = new byte[offset + MessageInfo.HeaderLength + message.ContextLength];
             for (int i = 0; i < offset; i++)
             {
                 buffer[i] = RandomUtil.RandomByte();
             }
             message.WriteHeader(buffer, offset);
-            Buffer.BlockCopy(context, 0, buffer, offset + MessageInfo.HeaderLength, context.Length);
+            Buffer.BlockCopy(context, 0, buffer, offset + MessageInfo.HeaderLength, message.ContextLength);
+            bool compress = message.Compress && compression != null;
+            bool crypto = message.Secret && cryptography != null;
+            EMessageType type = EMessageType.NoProcess;
+            if (compress && crypto)
+            {
+                type = EMessageType.CompressAndCrypto;
+            }
+            else if (compress)
+            {
+                type = EMessageType.OnlyCompress;
+            }
+            else if (crypto)
+            {
+                type = EMessageType.OnlyCrypto;
+            }
+            if (crypto)
+            {
+                buffer = cryptography.Encrypt(buffer);
+            }
             if (compress)
             {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    using (GZipStream gzip = new GZipStream(stream, CompressionLevel.Fastest))
-                    {
-                        gzip.Write(buffer, 0, buffer.Length);
-                    }
-                    return stream.GetBuffer();
-                }
+                buffer = compression.Compress(buffer);
             }
-            else
-            {
-                return buffer;
-            }
+            byte[] result = new byte[buffer.Length + 1];
+            result[0] = (byte)type;
+            Buffer.BlockCopy(buffer, 0, result, 1, buffer.Length);
+            return result;
         }
 
         /// <summary>
         /// 解包
         /// </summary>
-        public static IMessageReader Unpack(byte[] package, int offset, bool uncompress)
+        public static IMessageReader Unpack(byte[] package, int offset, ICompression compression, ICryptoProvider cryptography)
         {
-            if (uncompress)
+            byte[] data = new byte[package.Length - 1];
+            Buffer.BlockCopy(package, 1, data, 0, data.Length);
+            EMessageType type = (EMessageType)package[0];
+            bool compress = type == EMessageType.OnlyCompress || type == EMessageType.CompressAndCrypto;
+            bool crypto = type == EMessageType.OnlyCrypto || type == EMessageType.CompressAndCrypto;
+            if (compress)
             {
-                using (MemoryStream reader = new MemoryStream())
-                {
-                    using (MemoryStream buffer = new MemoryStream(package))
-                    {
-                        using (GZipStream gzip = new GZipStream(buffer, CompressionMode.Decompress))
-                        {
-                            byte[] bits = new byte[1024];
-                            int length;
-                            while ((length = gzip.Read(bits, 0, bits.Length)) > 0)
-                            {
-                                reader.Write(bits, 0, length);
-                            }
-                        }
-                    }
-                    package = reader.GetBuffer();
-                }
+                data = compression.Uncompress(data);
             }
-            return new MessageReader(package, offset);
+            if (crypto)
+            {
+                data = cryptography.Decrypt(data);
+            }
+            return new MessageReader(data, offset, compress, crypto);
         }
     }
 }

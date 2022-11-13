@@ -1,7 +1,10 @@
 ﻿using FoolishClient.Delegate;
 using FoolishClient.Log;
 using FoolishGames.Collections;
+using FoolishGames.Common;
+using FoolishGames.IO;
 using FoolishGames.Log;
+using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -34,6 +37,21 @@ namespace FoolishClient.Net
         /// 内部套接字
         /// </summary>
         public virtual Socket Socket { get; private set; }
+
+        /// <summary>
+        /// 消息偏移值
+        /// </summary>
+        public int MessageOffset { get; set; } = 2;
+
+        /// <summary>
+        /// 压缩工具
+        /// </summary>
+        public ICompression Compression { get; set; } = null;
+
+        /// <summary>
+        /// 加密工具
+        /// </summary>
+        public ICryptoProvider CryptoProvide { get; set; } = null;
 
         /// <summary>
         /// 运行的标识
@@ -217,7 +235,7 @@ namespace FoolishClient.Net
         /// <param name="data"></param>
         /// <param name="callback">发送回调</param>
         /// <returns>判断有没有发送出去</returns>
-        public virtual void SendAsync(byte[] data, SendCallback callback = null)
+        public virtual void SendAsync(IMessageWriter message, SendCallback callback = null)
         {
             if (IsReady)
             {
@@ -225,7 +243,7 @@ namespace FoolishClient.Net
                 {
                     ConnectAsync();
                 }
-                WaitToSendMessages.Enqueue(new WaitSendMessage(data, callback));
+                WaitToSendMessages.Enqueue(new WaitSendMessage(message, callback));
             }
         }
 
@@ -241,7 +259,7 @@ namespace FoolishClient.Net
                     WaitSendMessage message = WaitToSendMessages.Dequeue() as WaitSendMessage;
                     if (message != null)
                     {
-                        if (message.Data == null)
+                        if (message.Message == null)
                         {
                             message.Execute(false, null);
                         }
@@ -254,7 +272,8 @@ namespace FoolishClient.Net
                             if (Connected)
                             {
                                 IAsyncResult result;
-                                message.Execute(Send(message.Data, out result), result);
+                                byte[] data = PackageFactory.Pack(message.Message, MessageOffset, Compression, CryptoProvide);
+                                message.Execute(Send(data, out result), result);
                             }
                             else
                             {

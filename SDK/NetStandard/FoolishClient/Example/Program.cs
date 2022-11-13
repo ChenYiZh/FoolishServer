@@ -3,6 +3,7 @@ using FoolishClient.Net;
 using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
+using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,17 @@ namespace Example
         {
             FConsole.RegistLogger(new Logger());
             TcpSocket socket = new TcpSocket();
+            socket.Compression = new GZipCompression();
+            socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
             socket.Ready("default", "127.0.0.1", 9001);
             MessageWriter message = new MessageWriter();
+            //message.Secret = false;
+            //message.Compress = false;
             message.MsgId = 132;
+            message.OpCode = -1;
+            message.ActionId = 3356;
             message.WriteString("Hello World!");
-            byte[] buffer = PackageFactory.Pack(message, 3, true);
-            Console.WriteLine(buffer.Length);
-            socket.SendAsync(buffer);
+            socket.SendAsync(message);
             while (true)
             {
                 Console.Read();
