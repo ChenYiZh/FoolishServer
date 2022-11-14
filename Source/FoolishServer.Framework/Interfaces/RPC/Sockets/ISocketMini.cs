@@ -26,7 +26,7 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 获取类型
         /// </summary>
-        EHostType Type { get; }
+        EServerType Type { get; }
 
         /// <summary>
         /// 关闭函数

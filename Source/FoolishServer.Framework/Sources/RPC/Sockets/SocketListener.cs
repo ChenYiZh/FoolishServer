@@ -15,6 +15,7 @@ using FoolishServer.RPC.Tokens;
 using FoolishGames.IO;
 using FoolishGames.Common;
 using FoolishGames.Security;
+using FoolishGames.Timer;
 
 namespace FoolishServer.RPC.Sockets
 {
@@ -79,7 +80,7 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 对应Host的名称
         /// </summary>
-        public string HostName { get { return Setting.Name; } }
+        public string ServerName { get { return Setting.Name; } }
 
         /// <summary>
         /// 配置信息
@@ -94,12 +95,12 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 加密工具
         /// </summary>
-        public ICryptoProvider CryptoProvide { get; set; } = null;
+        public ICryptoProvider CryptoProvider { get; set; } = null;
 
         /// <summary>
         /// 类型
         /// </summary>
-        public EHostType Type { get { return Setting.Type; } }
+        public EServerType Type { get { return Setting.Type; } }
 
         /// <summary>
         /// 状态类
@@ -162,7 +163,7 @@ namespace FoolishServer.RPC.Sockets
             maxConnectionsEnforcer = new Semaphore(setting.MaxConnections, setting.MaxConnections);
             //生成套接字
             Address = new IPEndPoint(IPAddress.Any, Port);
-            if (setting.Type != EHostType.Tcp)
+            if (setting.Type != EServerType.Tcp)
             {
                 Socket = new Socket(Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
             }
@@ -174,7 +175,7 @@ namespace FoolishServer.RPC.Sockets
             Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             //绑定端口
             Socket.Bind(Address);
-            if (Type == EHostType.Tcp)
+            if (Type == EServerType.Tcp)
             {
                 //设置最大挂载连接数量
                 Socket.Listen(setting.Backlog);
@@ -277,7 +278,7 @@ namespace FoolishServer.RPC.Sockets
                         UserToken userToken = (UserToken)ioEventArgs.UserToken;
                         ArrangeSocketBuffer(ioEventArgs);
                         socket = new FSocket(ioEventArgs.AcceptSocket);
-                        socket.AccessTime = DateTime.Now;
+                        socket.AccessTime = TimeLord.Now;
                         userToken.Socket = socket;
                     }
                     acceptEventArgs.AcceptSocket = null;
@@ -329,7 +330,7 @@ namespace FoolishServer.RPC.Sockets
             IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
             try
             {
-                ((FSocket)userToken.Socket).AccessTime = DateTime.Now;
+                ((FSocket)userToken.Socket).AccessTime = TimeLord.Now;
                 switch (ioEventArgs.LastOperation)
                 {
                     case SocketAsyncOperation.Receive: ProcessReceive(ioEventArgs); break;
@@ -403,8 +404,8 @@ namespace FoolishServer.RPC.Sockets
                 return;
             }
 
-            FConsole.Write("Process Receive...");
-            // TODO: Process Receive
+            //Process Receive
+            ISocket socket = token?.Socket;
             if (ioEventArgs.BytesTransferred > 0)
             {
                 //从当前位置数据开始解析
@@ -441,7 +442,7 @@ namespace FoolishServer.RPC.Sockets
                         {
                             int deltaLength = token.TempBuffer.Length - token.TempStartIndex;
                             Buffer.BlockCopy(buffer, 0, token.TempBuffer, token.TempStartIndex, deltaLength);
-                            IMessageReader bigMessage = PackageFactory.Unpack(token.TempBuffer, Setting.Offset, Compression, CryptoProvide);
+                            IMessageReader bigMessage = PackageFactory.Unpack(token.TempBuffer, Setting.Offset, Compression, CryptoProvider);
                             token.TempBuffer = null;
                             messages.Enqueue(bigMessage);
                             offset += deltaLength;
@@ -471,7 +472,7 @@ namespace FoolishServer.RPC.Sockets
                         }
 
                         offset += Setting.Offset;
-                        IMessageReader message = PackageFactory.Unpack(buffer, offset, Compression, CryptoProvide);
+                        IMessageReader message = PackageFactory.Unpack(buffer, offset, Compression, CryptoProvider);
                         messages.Enqueue(message);
                         offset = totalLength;
                     }
@@ -486,7 +487,11 @@ namespace FoolishServer.RPC.Sockets
                     IMessageReader message = messages.Dequeue();
                     try
                     {
-                        ISocket socket = token?.Socket;
+                        if (message.IsError)
+                        {
+                            FConsole.WriteErrorWithCategory(Categories.SOCKET, message.Error);
+                            continue;
+                        }
                         switch (message.OpCode)
                         {
                             case (sbyte)EOpCode.Close:
@@ -503,13 +508,11 @@ namespace FoolishServer.RPC.Sockets
                             case (sbyte)EOpCode.Pong:
                                 {
                                     Pong(new MessageEventArgs { Socket = socket, Message = message });
-                                    FConsole.Write("Pong: {0}", message.MsgId);
                                 }
                                 break;
                             default:
                                 {
                                     MessageReceived(new MessageEventArgs { Socket = socket, Message = message });
-                                    FConsole.Write("Receive[{0}]: {1}", message.MsgId, message.ReadString());
                                 }
                                 break;
                         }
@@ -525,7 +528,14 @@ namespace FoolishServer.RPC.Sockets
                 //数据错乱
                 token.TempBuffer = null;
             }
+
             PostReceive(ioEventArgs);
+
+            //延迟关闭
+            if (socket == null || !socket.IsRunning)
+            {
+                ResetSocketAsyncEventArgs(ioEventArgs);
+            }
         }
 
         /// <summary>

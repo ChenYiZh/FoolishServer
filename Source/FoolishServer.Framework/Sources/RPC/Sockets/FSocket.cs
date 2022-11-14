@@ -70,14 +70,14 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 类型
         /// </summary>
-        public EHostType Type { get; private set; }
+        public EServerType Type { get; private set; }
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public FSocket(Socket socket)
         {
-            HashCode = new Guid();
+            HashCode = Guid.NewGuid();
             sendQueue = new ThreadSafeQueue<ISocketAsyncResult>();
             Socket = socket;
             try

@@ -23,7 +23,7 @@ namespace FoolishServer.Config
         /// <summary>
         /// 类型
         /// </summary>
-        public EHostType Type { get; private set; }
+        public EServerType Type { get; private set; }
 
         /// <summary>
         /// 执行类
@@ -71,7 +71,7 @@ namespace FoolishServer.Config
         public string GetCategory()
         {
             //return $"Host: {Name} [{Type.ToString()}:{Port}]";
-            return $"Host: {Port}";
+            return $"{Type.ToString()}Server: {Port}";
         }
 
         internal HostServerSetting(XmlNode node)
@@ -81,10 +81,10 @@ namespace FoolishServer.Config
             string type = node.GetValue("type", "tcp");
             switch (type.ToLower())
             {
-                case "tcp": Type = EHostType.Tcp; break;
-                case "http": Type = EHostType.Http; break;
-                case "web-socket": Type = EHostType.WebSocket; break;
-                case "udp": Type = EHostType.Udp; break;
+                case "tcp": Type = EServerType.Tcp; break;
+                case "http": Type = EServerType.Http; break;
+                case "web": Type = EServerType.Web; break;
+                case "udp": Type = EServerType.Udp; break;
             }
             Backlog = node.SelectSingleNode("backlog").GetValue(10000);
             MaxConnections = node.SelectSingleNode("max-connections").GetValue(1000);

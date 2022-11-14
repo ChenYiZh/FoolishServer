@@ -15,7 +15,7 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 对应Host的名称
         /// </summary>
-        string HostName { get; }
+        string ServerName { get; }
 
         /// <summary>
         /// 绑定的端口
@@ -35,7 +35,7 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 加密工具
         /// </summary>
-        ICryptoProvider CryptoProvide { get; set; }
+        ICryptoProvider CryptoProvider { get; set; }
 
         /// <summary>
         /// 连接事件

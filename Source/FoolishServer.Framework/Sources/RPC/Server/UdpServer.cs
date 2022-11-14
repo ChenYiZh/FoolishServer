@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.RPC.Hosts
+namespace FoolishServer.RPC.Server
 {
-    public class UdpHost : TcpHost
+    public class UdpServer : SocketServer
     {
     }
 }

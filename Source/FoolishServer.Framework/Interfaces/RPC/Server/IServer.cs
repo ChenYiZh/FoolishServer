@@ -3,10 +3,13 @@ using FoolishServer.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FoolishGames.IO;
+using FoolishGames.Security;
+using FoolishGames.Proxy;
 
-namespace FoolishServer.RPC.Host
+namespace FoolishServer.RPC.Server
 {
-    public interface IHost
+    public interface IServer
     {
         /// <summary>
         /// 状态
@@ -31,12 +34,27 @@ namespace FoolishServer.RPC.Host
         /// <summary>
         /// 类型
         /// </summary>
-        EHostType Type { get; }
+        EServerType Type { get; }
 
         /// <summary>
         /// 监听套接字
         /// </summary>
         IServerSocket SocketListener { get; }
+
+        ///// <summary>
+        ///// 压缩工具
+        ///// </summary>
+        //ICompression Compression { get; set; }
+
+        ///// <summary>
+        ///// 加密工具
+        ///// </summary>
+        //ICryptoProvider CryptoProvider { get; set; }
+
+        ///// <summary>
+        ///// 消息处理的中转站
+        ///// </summary>
+        //ISupervisor MessageContractor { get; set; }
 
         /// <summary>
         /// 启动结构

@@ -20,7 +20,7 @@ namespace FoolishServer.Config
         /// <summary>
         /// 类型
         /// </summary>
-        EHostType Type { get; }
+        EServerType Type { get; }
 
         /// <summary>
         /// 执行类

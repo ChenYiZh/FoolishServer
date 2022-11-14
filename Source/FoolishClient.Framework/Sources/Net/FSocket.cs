@@ -296,7 +296,8 @@ namespace FoolishClient.Net
                                 {
                                     message.Execute(Send(data, out result), result);
                                 }
-                                catch (Exception e)
+                                //catch (Exception e)
+                                catch
                                 {
                                     Close();
                                 }

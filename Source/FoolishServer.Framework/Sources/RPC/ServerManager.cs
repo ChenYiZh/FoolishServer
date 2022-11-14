@@ -1,9 +1,8 @@
 ﻿using FoolishGames.Collections;
 using FoolishServer.RPC;
-using FoolishServer.RPC.Host;
+using FoolishServer.RPC.Server;
 using FoolishServer.Config;
 using FoolishGames.Log;
-using FoolishServer.RPC.Hosts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,13 +10,13 @@ using FoolishServer.Log;
 
 namespace FoolishServer.RPC
 {
-    public class HostManager
+    public class ServerManager
     {
-        private static ThreadSafeDictionary<string, IHost> hosts;
+        private static IDictionary<string, IServer> hosts;
 
-        static HostManager()
+        static ServerManager()
         {
-            hosts = new ThreadSafeDictionary<string, IHost>();
+            hosts = new ThreadSafeDictionary<string, IServer>();
         }
         /// <summary>
         /// 开启一个服务器
@@ -30,7 +29,7 @@ namespace FoolishServer.RPC
             {
                 return false;
             }
-            IHost host = CreateHost(setting);
+            IServer host = CreateServer(setting);
             try
             {
                 if (host.Start(setting))
@@ -55,7 +54,7 @@ namespace FoolishServer.RPC
         {
             if (hosts.ContainsKey(hostName))
             {
-                IHost host = hosts[hostName];
+                IServer host = hosts[hostName];
                 try
                 {
                     host.Shutdown();
@@ -72,7 +71,7 @@ namespace FoolishServer.RPC
         /// </summary>
         /// <param name="host"></param>
         /// <returns></returns>
-        public static bool Shutdown(IHost host)
+        public static bool Shutdown(IServer host)
         {
             try
             {
@@ -89,9 +88,9 @@ namespace FoolishServer.RPC
         /// </summary>
         public static void Shutdown()
         {
-            foreach (KeyValuePair<string, IHost> kv in hosts)
+            foreach (KeyValuePair<string, IServer> kv in hosts)
             {
-                IHost host = kv.Value;
+                IServer host = kv.Value;
                 try
                 {
                     host.Shutdown();
@@ -108,13 +107,13 @@ namespace FoolishServer.RPC
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        private static IHost CreateHost(IHostSetting setting)
+        private static IServer CreateServer(IHostSetting setting)
         {
-            IHost host = null;
+            IServer host = null;
             switch (setting.Type)
             {
-                case EHostType.Tcp: host = new TcpHost(); break;
-                case EHostType.Udp: host = new UdpHost(); break;
+                case EServerType.Tcp: host = new TcpServer(); break;
+                case EServerType.Udp: host = new UdpServer(); break;
             }
             return host;
         }
@@ -132,14 +131,14 @@ namespace FoolishServer.RPC
             }
             if (hosts.ContainsKey(setting.Name))
             {
-                FConsole.WriteErrorWithCategory(Categories.HOST, "The same host: {0} is running!", setting.Name);
+                FConsole.WriteErrorWithCategory(Categories.HOST, "The same server: {0} is running!", setting.Name);
                 return false;
             }
-            foreach (IHost host in hosts.Values)
+            foreach (IServer host in hosts.Values)
             {
                 if (host.Port == setting.Port)
                 {
-                    FConsole.WriteErrorWithCategory(Categories.HOST, "The port of the host: {0}:{1} has been used!", setting.Name, setting.Port);
+                    FConsole.WriteErrorWithCategory(Categories.HOST, "The port of the server: {0}:{1} has been used!", setting.Name, setting.Port);
                     return false;
                 }
             }

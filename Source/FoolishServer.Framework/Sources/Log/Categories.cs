@@ -16,5 +16,9 @@ namespace FoolishServer.Log
         public const string HOST = "Host";
 
         public const string SOCKET = "Socket";
+
+        public const string SESSION = "Session";
+
+        public const string ACTION = "Action";
     }
 }

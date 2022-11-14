@@ -26,9 +26,9 @@ namespace Example
             MessageWriter message = new MessageWriter();
             //message.Secret = false;
             //message.Compress = false;
-            message.MsgId = 132;
+            message.MsgId = 1;
             message.OpCode = -1;
-            message.ActionId = 3356;
+            message.ActionId = 1;
             message.WriteString("Hello World!");
             socket.SendAsync(message);
             socket.SendAsync(message);

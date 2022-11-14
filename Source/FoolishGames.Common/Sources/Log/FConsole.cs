@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Common;
+using FoolishGames.Timer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -263,7 +264,7 @@ namespace FoolishGames.Log
 
         private void SendMessage(string level, string category, string message, bool track)
         {
-            message = $"{DateTime.Now.ToString()} [{category}] - " + message;
+            message = $"{TimeLord.Now.ToString()} [{category}] - " + message;
             if (LogStackTracker && track && level == LogLevel.ERROR)
             {
                 const string stackIndent = "  ";
@@ -292,7 +293,7 @@ namespace FoolishGames.Log
         /// </summary>
         public static void WriteLine(string level, string category, string message)
         {
-            message = $"{DateTime.Now.ToString()} [{category}] - " + message;
+            message = $"{TimeLord.Now.ToString()} [{category}] - " + message;
             WriteLine(level, message);
         }
         /// <summary>

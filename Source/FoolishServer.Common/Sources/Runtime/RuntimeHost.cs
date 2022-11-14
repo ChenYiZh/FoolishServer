@@ -64,7 +64,7 @@ namespace FoolishServer.Runtime
             //起服
             foreach (IHostSetting setting in Settings.HostSettings)
             {
-                HostManager.Start(setting);
+                ServerManager.Start(setting);
             }
             FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
         }
@@ -72,7 +72,7 @@ namespace FoolishServer.Runtime
         public static void Shutdown()
         {
             IsRunning = false;
-            HostManager.Shutdown();
+            ServerManager.Shutdown();
         }
 
         private static int GetOSBit()

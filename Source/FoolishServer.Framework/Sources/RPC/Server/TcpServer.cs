@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.RPC
+namespace FoolishServer.RPC.Server
 {
-    public enum EServerType
+    public class TcpServer : SocketServer
     {
-        Http, Web, Tcp, Udp
     }
 }
