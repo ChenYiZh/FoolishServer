@@ -102,13 +102,13 @@ namespace FoolishGames.Action
                     TimeSpan deltaTime = watch.Elapsed;
                     if (deltaTime.TotalMilliseconds > AlertTimeout)
                     {
-                        FConsole.WriteWarnWithCategory("Action", "{0} is timeout, {1}ms.", TypeName, (int)deltaTime.TotalMilliseconds);
+                        FConsole.WriteWarnWithCategory(Categories.ACTION, "{0} is timeout, {1}ms.", TypeName, (int)deltaTime.TotalMilliseconds);
                     }
                 }
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory("Action", "An error occurred on process action", e);
+                FConsole.WriteExceptionWithCategory(Categories.ACTION, "An error occurred on process action", e);
             }
             if (watch != null)
             {

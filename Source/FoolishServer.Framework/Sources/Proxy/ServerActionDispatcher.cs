@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using FoolishGames.Reflection;
 using FoolishServer.Action;
 
 namespace FoolishServer.Proxy
@@ -25,10 +26,10 @@ namespace FoolishServer.Proxy
             ActionNameFormat = actionNameFormat;
         }
 
-        public ServerAction Provide(int actionId)
+        public virtual ServerAction Provide(int actionId)
         {
-            Assembly assembly = Assembly.GetEntryAssembly();
-            return (ServerAction)assembly.CreateInstance(string.Format(ActionNameFormat, actionId), true);
+            string typeName = string.Format(ActionNameFormat, actionId);
+            return ObjectFactory.Create<ServerAction>(Assembly.GetEntryAssembly(), typeName);
         }
     }
 }

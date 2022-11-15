@@ -55,7 +55,7 @@ namespace FoolishGames.Timer
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory("Time Lord", e);
+                    FConsole.WriteExceptionWithCategory(Categories.TIME_LORD, e);
                     return DateTime.Now;
                 }
             }
@@ -84,7 +84,7 @@ namespace FoolishGames.Timer
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory("Time Lord", e);
+                    FConsole.WriteExceptionWithCategory(Categories.TIME_LORD, e);
                     return DateTime.UtcNow;
                 }
             }

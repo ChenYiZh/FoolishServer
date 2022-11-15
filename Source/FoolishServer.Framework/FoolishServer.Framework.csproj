@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>FoolishServer</RootNamespace>
+    <Authors>ChenYiZh</Authors>
+    <Company>上海月音科技有限公司ChenYiZh</Company>
+    <PackageIconUrl>https://gitee.com/chenyizh/FoolishServer/blob/main/Logo.png</PackageIconUrl>
+    <PackageProjectUrl>https://gitee.com/chenyizh/FoolishServer</PackageProjectUrl>
+    <Copyright>Copyright ©2022-2030 ChenYiZh and Shanghai YueYin Tech, Inc. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -415,7 +415,7 @@ namespace FoolishServer.RPC.Sockets
                 Buffer.BlockCopy(ioEventArgs.Buffer, ioEventArgs.Offset, buffer, 0, buffer.Length);
 
                 //消息处理的队列
-                Queue<IMessageReader> messages = new Queue<IMessageReader>();
+                List<IMessageReader> messages = new List<IMessageReader>();
                 try
                 {
                     //继续接收上次未接收完毕的数据
@@ -444,7 +444,7 @@ namespace FoolishServer.RPC.Sockets
                             Buffer.BlockCopy(buffer, 0, token.TempBuffer, token.TempStartIndex, deltaLength);
                             IMessageReader bigMessage = PackageFactory.Unpack(token.TempBuffer, Setting.Offset, Compression, CryptoProvider);
                             token.TempBuffer = null;
-                            messages.Enqueue(bigMessage);
+                            messages.Add(bigMessage);
                             offset += deltaLength;
                         }
                     }
@@ -473,7 +473,7 @@ namespace FoolishServer.RPC.Sockets
 
                         offset += Setting.Offset;
                         IMessageReader message = PackageFactory.Unpack(buffer, offset, Compression, CryptoProvider);
-                        messages.Enqueue(message);
+                        messages.Add(message);
                         offset = totalLength;
                     }
                 }
@@ -482,9 +482,9 @@ namespace FoolishServer.RPC.Sockets
                     FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Process Receive error.", e);
                 }
 
-                while (messages.Count > 0)
+                for (int i = 0; i < messages.Count; i++)
                 {
-                    IMessageReader message = messages.Dequeue();
+                    IMessageReader message = messages[i];
                     try
                     {
                         if (message.IsError)
