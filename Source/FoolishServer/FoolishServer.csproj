@@ -11,7 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FoolishGames.Compiler.CSharp\FoolishGames.Compiler.CSharp.csproj" />
     <ProjectReference Include="..\FoolishServer.Common\FoolishServer.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Action\" />
   </ItemGroup>
 
 </Project>

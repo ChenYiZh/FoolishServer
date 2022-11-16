@@ -38,6 +38,14 @@ namespace FoolishServer.Config
         /// <returns></returns>
         public static string GetVersion() { return $"{MajorVersion}.{MinorVersion}.{(string.IsNullOrEmpty(RevisionInfo) ? "0" : RevisionInfo)}.{(string.IsNullOrEmpty(BuildInfo) ? "0" : BuildInfo)}"; }
         /// <summary>
+        /// 编译/执行的程序集名称
+        /// </summary>
+        public static string AssemblyName { get; private set; }
+        ///// <summary>
+        ///// Model类的命名空间
+        ///// </summary>
+        //public static string ModelNamespace { get; private set; }
+        /// <summary>
         /// 是否是Debug模式
         /// </summary>
         public static bool IsDebug { get; private set; }
@@ -54,7 +62,7 @@ namespace FoolishServer.Config
         /// </summary>
         internal static void LoadFromFile()
         {
-            string xmlFileName = Assembly.GetEntryAssembly().GetName().Name + ".config";
+            string xmlFileName = "FoolishServer.config";// Assembly.GetEntryAssembly().GetName().Name + ".config";
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.IgnoreComments = true;
             XmlDocument xml = new XmlDocument();
@@ -65,6 +73,8 @@ namespace FoolishServer.Config
             IsDebug = xml.SelectSingleNode("/configuration/script/debug").GetValue(true);
             ServerID = xml.SelectSingleNode("/configuration/settings/server").GetValue(1);
             ConvertVersion(xml.SelectSingleNode("/configuration/settings/version").GetValue(null));
+            AssemblyName = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Runtime.dll");
+            //ModelNamespace = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Model");
             LoadHostSettings(xml);
         }
 

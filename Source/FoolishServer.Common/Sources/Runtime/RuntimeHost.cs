@@ -4,16 +4,27 @@ using FoolishServer.Log;
 using FoolishServer.RPC;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FoolishServer.Runtime
 {
+    /// <summary>
+    /// 运行时
+    /// </summary>
     public static class RuntimeHost
     {
+        /// <summary>
+        /// 是否正在运行
+        /// </summary>
         public static bool IsRunning { get; private set; } = false;
 
+        /// <summary>
+        /// 启动字符串
+        /// </summary>
         const string START_INFO =
 @"////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,40 +52,57 @@ namespace FoolishServer.Runtime
         /// </summary>
         public static void Startup()
         {
-            if (IsRunning)
+            try
             {
-                return;
+                if (IsRunning)
+                {
+                    return;
+                }
+                IsRunning = true;
+                //注册关闭事件
+                RegistConsoleCancelKeyPress();
+                //注册日志
+                FConsole.RegistLogger(new NLogger());
+                //初始化配置
+                Configeration.Initialize();
+                ConsoleColor color = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine(string.Format(START_INFO,
+                    Assembly.GetExecutingAssembly().GetName().Version,
+                    GetOSBit(),
+                    GetRunPlatform(),
+                    Settings.GetVersion(),
+                    Settings.ServerID));
+                Console.ForegroundColor = color;
+                //起服
+                foreach (IHostSetting setting in Settings.HostSettings)
+                {
+                    ServerManager.Start(setting);
+                }
+                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
             }
-            IsRunning = true;
-            //注册关闭事件
-            RegistConsoleCancelKeyPress();
-            //注册日志
-            FConsole.RegistLogger(new NLogger());
-            //初始化配置
-            Configeration.Initialize();
-            ConsoleColor color = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine(string.Format(START_INFO,
-                Assembly.GetExecutingAssembly().GetName().Version,
-                GetOSBit(),
-                GetRunPlatform(),
-                Settings.GetVersion(),
-                Settings.ServerID));
-            Console.ForegroundColor = color;
-            //起服
-            foreach (IHostSetting setting in Settings.HostSettings)
+            catch (Exception e)
             {
-                ServerManager.Start(setting);
+                FConsole.WriteExceptionWithCategory(Categories.FOOLISH_SERVER, "Failed to start the server.", e);
             }
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
         }
 
+        /// <summary>
+        /// 关闭操作
+        /// </summary>
         public static void Shutdown()
         {
             IsRunning = false;
+            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
             ServerManager.Shutdown();
+            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
+            Task.Delay(1500).Wait();
         }
 
+        /// <summary>
+        /// 系统框架
+        /// </summary>
+        /// <returns></returns>
         private static int GetOSBit()
         {
             try
@@ -87,6 +115,10 @@ namespace FoolishServer.Runtime
             }
         }
 
+        /// <summary>
+        /// 运行平台
+        /// </summary>
+        /// <returns></returns>
         private static string GetRunPlatform()
         {
             try
@@ -99,26 +131,42 @@ namespace FoolishServer.Runtime
             }
         }
 
+        /// <summary>
+        /// 注册退出指令
+        /// </summary>
         private static void RegistConsoleCancelKeyPress()
         {
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnCancelKeyPress);
         }
 
+        /// <summary>
+        /// 输入退出指令时执行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             e.Cancel = true;
             try
             {
-                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
                 Shutdown();
-                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
-                Task.Delay(1500).Wait();
                 Environment.Exit(0);
             }
             catch (Exception ex)
             {
                 FConsole.WriteError("OnCancelKeyPress error:{1}", ex);
             }
+        }
+
+        /// <summary>
+        /// 重启应用
+        /// </summary>
+        internal static void Reboot()
+        {
+            FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "begin to reboot...");
+            Shutdown();
+            Process.Start(Process.GetCurrentProcess().ProcessName, Environment.CommandLine);
+            Process.GetCurrentProcess().Kill();
         }
     }
 }
