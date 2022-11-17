@@ -181,7 +181,7 @@ namespace FoolishServer.RPC.Sockets
                 Socket.Listen(setting.Backlog);
             }
             //服务器状态输出周期
-            summaryTask = new Timer(WriteSummary, null, 10000, 10000);
+            summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
             //启动监听
             PostAccept();
@@ -653,7 +653,7 @@ namespace FoolishServer.RPC.Sockets
         {
             try
             {
-                FConsole.WriteInfoWithCategory(Setting.GetCategory(),
+                FConsole.WriteWithCategory(Setting.GetCategory(),
               "Socket connect status: Total Count = {0}, Current Count = {1}, Closed Count = {2}, Rejected Count = {3}",
               summary.TotalConnectCount, summary.CurrentConnectCount, summary.CloseConnectCount, summary.RejectedConnectCount);
             }

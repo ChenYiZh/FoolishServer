@@ -41,7 +41,7 @@ namespace FoolishServer.Log
             switch (level)
             {
                 case LogLevel.ERROR: return ConsoleColor.Red;
-                case LogLevel.WARN: return ConsoleColor.DarkYellow;
+                case LogLevel.WARN: return ConsoleColor.Yellow;
                 case LogLevel.INFO: return ConsoleColor.Cyan;
                 default: return ConsoleColor.White;
             }

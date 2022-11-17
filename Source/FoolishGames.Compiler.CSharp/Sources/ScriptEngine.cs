@@ -20,7 +20,7 @@ namespace FoolishGames.Compiler.CSharp
         /// <summary>
         /// 动态编译
         /// </summary>
-        public static Assembly Compile(string scriptsPath, bool isDebug = false, string outputFile = null, string librariesPath = null)
+        public static bool Compile(string scriptsPath, bool isDebug = false, string outputFile = null, string librariesPath = null)
         {
             return CompileByRoslyn(scriptsPath, isDebug, outputFile, librariesPath);
         }
@@ -43,7 +43,7 @@ namespace FoolishGames.Compiler.CSharp
         /// 使用Roslyn动态编译
         /// <para>https://blog.csdn.net/Crazy2910/article/details/106918516</para>
         /// </summary>
-        public static Assembly CompileByRoslyn(string scriptsPath, bool isDebug = false, string outputFile = null, string librariesPath = null)
+        public static bool CompileByRoslyn(string scriptsPath, bool isDebug = false, string outputFile = null, string librariesPath = null)
         {
             //路径检查
             outputFile = CheckOutputFilePath(outputFile);
@@ -52,8 +52,8 @@ namespace FoolishGames.Compiler.CSharp
             librariesPath = FPath.GetFullPath(librariesPath);
 
             //获取文件
-            string[] scripts = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, scriptsPath), "*.cs", SearchOption.AllDirectories);
-            string[] dlls = Directory.GetFiles(librariesPath, "*.dll", SearchOption.AllDirectories);
+            string[] scripts = Directory.GetFiles(FPath.GetFullPath(scriptsPath), "*.cs", SearchOption.AllDirectories);
+            string[] dlls = Directory.GetFiles(FPath.GetFullPath(librariesPath), "*.dll", SearchOption.AllDirectories);
 
             //读取需要忽略的dll
             List<string> ignoreDlls = GetIgnoreReferences();
@@ -122,10 +122,10 @@ namespace FoolishGames.Compiler.CSharp
                         FConsole.WriteErrorWithCategory(Categories.COMPILER, diagnostic.GetMessage());
                     }
                 }
-                return null;
+                return false;
             }
             FConsole.WriteInfoWithCategory(Categories.COMPILER, "C# compiled successfully.");
-            return Assembly.LoadFrom(outputFile);
+            return true;
         }
         #endregion
 

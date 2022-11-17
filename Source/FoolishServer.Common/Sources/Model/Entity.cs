@@ -1,15 +1,31 @@
-﻿using FoolishGames.Timer;
+﻿using FoolishGames.Log;
+using FoolishGames.Timer;
+using FoolishServer.Log;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace FoolishServer.Model
 {
+    /// <summary>
+    /// 当属性发生变化时执行
+    /// </summary>
+    /// <param name="propertyName">属性名称</param>
+    /// <param name="oldValue">原本的数据</param>
+    /// <param name="value">现在的数据</param>
+    public delegate void OnPropertyModified(Entity sender, string propertyName, object oldValue, object value);
+
     /// <summary>
     /// Model基类
     /// </summary>
     public class Entity : IEntity
     {
+        /// <summary>
+        /// 当属性发生变化时执行
+        /// </summary>
+        public event OnPropertyModified OnPropertyModified;
+
         /// <summary>
         /// 锁
         /// </summary>
@@ -89,9 +105,17 @@ namespace FoolishServer.Model
         /// <summary>
         /// 注入时调用
         /// </summary>
-        protected void NotifyPropertyModified(string propertyName)
+        protected void NotifyPropertyModified(string propertyName, object oldValue, object value)
         {
             NotifyModified(EModifyType.Modify, propertyName);
+            try
+            {
+                OnPropertyModified?.Invoke(this, propertyName, oldValue, value);
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.MODEL, e);
+            }
         }
 
         /// <summary>

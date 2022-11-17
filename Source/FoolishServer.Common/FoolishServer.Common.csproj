@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoolishClient.Framework\FoolishClient.Framework.csproj" />
+    <ProjectReference Include="..\FoolishGames.Compiler.CSharp\FoolishGames.Compiler.CSharp.csproj" />
     <ProjectReference Include="..\FoolishServer.Framework\FoolishServer.Framework.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Log;
+using FoolishGames.Reflection;
 using FoolishServer.Config;
 using FoolishServer.Log;
 using FoolishServer.RPC;
@@ -48,6 +49,27 @@ namespace FoolishServer.Runtime
 ";
 
         /// <summary>
+        /// 输出启动信息
+        /// </summary>
+        internal static void PrintStartInfo()
+        {
+            ConsoleColor color = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine(string.Format(START_INFO,
+                Assembly.GetExecutingAssembly().GetName().Version,
+                GetOSBit(),
+                GetRunPlatform(),
+                Settings.GetVersion(),
+                Settings.ServerID));
+            Console.ForegroundColor = color;
+        }
+
+        /// <summary>
+        /// 自定义运行时
+        /// </summary>
+        public static IRuntime CustomRuntime { get; private set; }
+
+        /// <summary>
         /// 启动函数
         /// </summary>
         public static void Startup()
@@ -65,21 +87,32 @@ namespace FoolishServer.Runtime
                 FConsole.RegistLogger(new NLogger());
                 //初始化配置
                 Configeration.Initialize();
-                ConsoleColor color = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine(string.Format(START_INFO,
-                    Assembly.GetExecutingAssembly().GetName().Version,
-                    GetOSBit(),
-                    GetRunPlatform(),
-                    Settings.GetVersion(),
-                    Settings.ServerID));
-                Console.ForegroundColor = color;
+
+                if (!string.IsNullOrEmpty(Settings.MainClass))
+                {
+                    CustomRuntime = ObjectFactory.Create<IRuntime>(Settings.MainClass);
+                    if (CustomRuntime == null)
+                    {
+                        throw new Exception(Settings.MainClass + " is not exists.");
+                    }
+                }
+
+                if (CustomRuntime != null)
+                {
+                    CustomRuntime.OnStartup();
+                }
+
                 //起服
                 foreach (IHostSetting setting in Settings.HostSettings)
                 {
                     ServerManager.Start(setting);
                 }
-                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
+                FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
+
+                if (CustomRuntime != null)
+                {
+                    CustomRuntime.OnBegun();
+                }
             }
             catch (Exception e)
             {
@@ -92,10 +125,14 @@ namespace FoolishServer.Runtime
         /// </summary>
         public static void Shutdown()
         {
+            if (CustomRuntime != null)
+            {
+                CustomRuntime.OnShutdown();
+            }
             IsRunning = false;
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
+            FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
             ServerManager.Shutdown();
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
+            FConsole.WriteWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
             Task.Delay(1500).Wait();
         }
 
@@ -150,6 +187,10 @@ namespace FoolishServer.Runtime
             try
             {
                 Shutdown();
+                if (CustomRuntime != null)
+                {
+                    CustomRuntime.OnKilled();
+                }
                 Environment.Exit(0);
             }
             catch (Exception ex)
@@ -165,6 +206,10 @@ namespace FoolishServer.Runtime
         {
             FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "begin to reboot...");
             Shutdown();
+            if (CustomRuntime != null)
+            {
+                CustomRuntime.OnKilled();
+            }
             Process.Start(Process.GetCurrentProcess().ProcessName, Environment.CommandLine);
             Process.GetCurrentProcess().Kill();
         }

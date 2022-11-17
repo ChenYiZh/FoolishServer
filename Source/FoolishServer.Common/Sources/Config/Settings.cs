@@ -38,9 +38,17 @@ namespace FoolishServer.Config
         /// <returns></returns>
         public static string GetVersion() { return $"{MajorVersion}.{MinorVersion}.{(string.IsNullOrEmpty(RevisionInfo) ? "0" : RevisionInfo)}.{(string.IsNullOrEmpty(BuildInfo) ? "0" : BuildInfo)}"; }
         /// <summary>
-        /// 编译/执行的程序集名称
+        /// 脚本存放目录
+        /// </summary>
+        public static string CSScriptsPath { get; private set; }
+        /// <summary>
+        /// 编译后的程序集名称
         /// </summary>
         public static string AssemblyName { get; private set; }
+        /// <summary>
+        /// 服务器启动运行时,需要实现FoolishServer.Runtime.CustomRuntime
+        /// </summary>
+        public static string MainClass { get; private set; }
         ///// <summary>
         ///// Model类的命名空间
         ///// </summary>
@@ -73,7 +81,9 @@ namespace FoolishServer.Config
             IsDebug = xml.SelectSingleNode("/configuration/script/debug").GetValue(true);
             ServerID = xml.SelectSingleNode("/configuration/settings/server").GetValue(1);
             ConvertVersion(xml.SelectSingleNode("/configuration/settings/version").GetValue(null));
+            CSScriptsPath = xml.SelectSingleNode("/configuration/settings/cs-script-path").GetValue(null);
             AssemblyName = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Runtime.dll");
+            MainClass = xml.SelectSingleNode("/configuration/settings/main-class-fullname").GetValue(null);
             //ModelNamespace = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Model");
             LoadHostSettings(xml);
         }

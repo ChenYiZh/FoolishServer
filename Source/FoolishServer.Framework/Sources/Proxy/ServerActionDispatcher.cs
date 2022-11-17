@@ -29,7 +29,7 @@ namespace FoolishServer.Proxy
         public virtual ServerAction Provide(int actionId)
         {
             string typeName = string.Format(ActionNameFormat, actionId);
-            return ObjectFactory.Create<ServerAction>(Assembly.GetEntryAssembly(), typeName);
+            return ObjectFactory.Create<ServerAction>(typeName);
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using FoolishGames.Common;
+﻿using FoolishGames.Collections;
+using FoolishGames.Common;
 using FoolishGames.Timer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -22,6 +24,11 @@ namespace FoolishGames.Log
         /// 默认类别名称
         /// </summary>
         public static string CATEGORY { get; set; } = "Log";
+
+        /// <summary>
+        /// 需要输出堆栈的Level
+        /// </summary>
+        public static IList<string> LogStackLevels { get; private set; } = new ThreadSafeList<string>() { LogLevel.ERROR };
 
         private HashSet<ILogger> loggers = null;
 
@@ -265,7 +272,7 @@ namespace FoolishGames.Log
         private void SendMessage(string level, string category, string message, bool track)
         {
             message = $"{TimeLord.Now.ToString()} [{category}] - " + message;
-            if (LogStackTracker && track && level == LogLevel.ERROR)
+            if (LogStackTracker && track && LogStackLevels.Contains(level))
             {
                 const string stackIndent = "  ";
                 StackTrace stackTrace = new StackTrace(true);

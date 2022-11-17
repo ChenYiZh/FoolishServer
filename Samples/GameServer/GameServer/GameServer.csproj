@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>FoolishServer</RootNamespace>
+    <AssemblyName>FoolishServer.Runtime</AssemblyName>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="FoolishServer\**" />
+    <Compile Remove="ServerCore\**" />
+    <EmbeddedResource Remove="FoolishServer\**" />
+    <EmbeddedResource Remove="ServerCore\**" />
+    <None Remove="FoolishServer\**" />
+    <None Remove="ServerCore\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FoolishClient.Framework">
+      <HintPath>FoolishServer\FoolishClient.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="FoolishGames.Common">
+      <HintPath>FoolishServer\FoolishGames.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="FoolishServer.Common">
+      <HintPath>FoolishServer\FoolishServer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="FoolishServer.Framework">
+      <HintPath>FoolishServer\FoolishServer.Framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
