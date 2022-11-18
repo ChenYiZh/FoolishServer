@@ -1,0 +1,26 @@
+2022/11/18 16:21:58 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:24:25 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:26:57 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:29:31 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:31:33 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:33:55 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:42:27 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:43:40 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:44:24 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:55:39 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:56:16 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:56:43 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/18 16:57:20 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+

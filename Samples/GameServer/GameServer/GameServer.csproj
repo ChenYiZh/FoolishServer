@@ -9,12 +9,20 @@
     <StartupObject />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="FoolishServer\**" />
+    <Compile Remove="Scripts\Property\**" />
     <Compile Remove="ServerCore\**" />
     <EmbeddedResource Remove="FoolishServer\**" />
+    <EmbeddedResource Remove="Scripts\Property\**" />
     <EmbeddedResource Remove="ServerCore\**" />
     <None Remove="FoolishServer\**" />
+    <None Remove="Scripts\Property\**" />
     <None Remove="ServerCore\**" />
   </ItemGroup>
 

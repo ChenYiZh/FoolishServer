@@ -15,7 +15,7 @@ namespace FoolishServer
             FConsole.LogStackTracker = true;
             //FConsole.LogStackLevels.Add(LogLevel.WARN);
             base.OnStartup();
-            FConsole.Write("RuntimeMain OnStartup: " + Settings.IsDebug);
+            FConsole.WriteError("RuntimeMain OnStartup: " + Settings.IsDebug);
             Test a = new Test();
             a.OnPropertyModified += PropertyModified;
             a.UserId = 12345678;

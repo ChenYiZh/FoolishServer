@@ -8,3 +8,23 @@
    at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 13
 
 
+2022/11/17 23:53:01 [Log] - Test.UserId: from 0, to 12345678.
+   at FoolishGames.Log.FConsole.Void WriteError(System.String, System.Object[]) file D:\Projects\FoolishServer\Source\FoolishGames.Common\Sources\Log\FConsole.cs:line 186
+   at FoolishServer.RuntimeMain.Void PropertyModified(FoolishServer.Model.Entity, System.String, System.Object, System.Object)
+   at FoolishServer.Model.Entity.Void NotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Model\Entity.cs:line 113
+   at FoolishServer.Model.Test.Void set_UserId(Int64)
+   at FoolishServer.RuntimeMain.Void OnStartup()
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 102
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 13
+
+
+2022/11/17 23:53:33 [Log] - Test.UserId: from 0, to 12345678.
+   at FoolishGames.Log.FConsole.Void WriteError(System.String, System.Object[]) file D:\Projects\FoolishServer\Source\FoolishGames.Common\Sources\Log\FConsole.cs:line 186
+   at FoolishServer.RuntimeMain.Void PropertyModified(FoolishServer.Model.Entity, System.String, System.Object, System.Object)
+   at FoolishServer.Model.Entity.Void NotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Model\Entity.cs:line 113
+   at FoolishServer.Model.Test.Void set_UserId(Int64)
+   at FoolishServer.RuntimeMain.Void OnStartup()
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 102
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 13
+
+

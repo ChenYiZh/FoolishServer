@@ -64,7 +64,7 @@ namespace FoolishGames.Compiler.CSharp
             foreach (string file in scripts)
             {
                 string script = File.ReadAllText(file, Encoding.UTF8);
-                SyntaxTree synctaxTree = CSharpSyntaxTree.ParseText(script);
+                SyntaxTree synctaxTree = CSharpSyntaxTree.ParseText(script, CSharpParseOptions.Default, file, Encoding.UTF8);
                 synctaxTrees.AddLast(synctaxTree);
             }
             //synctaxTrees.AddFirst(CSharpSyntaxTree.ParseText(GenerateAssemblyInfo(assemblyName)));
@@ -85,7 +85,9 @@ namespace FoolishGames.Compiler.CSharp
             CSharpCompilationOptions options = new CSharpCompilationOptions(
                 outputKind: OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: (isDebug ? OptimizationLevel.Debug : OptimizationLevel.Release),
-                platform: Platform.AnyCpu
+                platform: Platform.AnyCpu,
+                moduleName: Path.GetFileNameWithoutExtension(outputFile)
+                //publicSign: true
             );
 
             //创建编译器

@@ -1,0 +1,30 @@
+2022/11/18 16:21:58 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 16:24:25 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 16:26:57 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 16:27:57 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:29:31 [Log] - log dll and pdb
+
+2022/11/18 16:29:31 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 16:31:33 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 16:34:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:35:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:36:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:37:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:38:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:39:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:40:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/18 16:41:55 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
