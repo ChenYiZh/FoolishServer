@@ -8,9 +8,11 @@ using System.Text;
 
 namespace FoolishServer.Data.Entity
 {
-    public class EntitySet<T> : Struct.Entity, IEntitySet<T> where T : MajorEntity, new()
+    public sealed class EntitySet<T> : Struct.Entity, IEntitySet<T> where T : MajorEntity, new()
     {
         private IDictionary<long, T> Dictionary { get; set; } = new Dictionary<long, T>();
+
+        internal EntitySet() { }
 
         public bool AddOrUpdate(T entity)
         {

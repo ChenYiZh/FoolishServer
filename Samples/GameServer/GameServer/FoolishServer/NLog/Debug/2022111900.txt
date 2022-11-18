@@ -12,3 +12,11 @@
 
 2022/11/19 0:33:02 [Log] - 12345678
 
+2022/11/19 0:37:31 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 0:37:31 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 0:37:31 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 0:37:31 [Log] - 12345678
+
