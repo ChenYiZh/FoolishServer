@@ -1,0 +1,794 @@
+2022/11/18 19:23:31 [Log] - FoolishClient.Framework.dll
+
+2022/11/18 19:23:31 [Log] - FoolishGames.Common.dll
+
+2022/11/18 19:23:31 [Log] - FoolishGames.Compiler.CSharp.dll
+
+2022/11/18 19:23:31 [Log] - FoolishServer.Common.dll
+
+2022/11/18 19:23:31 [Log] - FoolishServer.dll
+
+2022/11/18 19:23:31 [Log] - FoolishServer.Framework.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.CodeAnalysis.CSharp.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.CodeAnalysis.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.CSharp.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.VisualBasic.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.Win32.Primitives.dll
+
+2022/11/18 19:23:31 [Log] - Microsoft.Win32.Registry.dll
+
+2022/11/18 19:23:31 [Log] - Mono.Cecil.dll
+
+2022/11/18 19:23:31 [Log] - Mono.Cecil.Mdb.dll
+
+2022/11/18 19:23:31 [Log] - Mono.Cecil.Pdb.dll
+
+2022/11/18 19:23:31 [Log] - Mono.Cecil.Rocks.dll
+
+2022/11/18 19:23:31 [Log] - mscorlib.dll
+
+2022/11/18 19:23:32 [Log] - netstandard.dll
+
+2022/11/18 19:23:32 [Log] - NLog.dll
+
+2022/11/18 19:23:32 [Log] - SOS.NETCore.dll
+
+2022/11/18 19:23:32 [Log] - System.AppContext.dll
+
+2022/11/18 19:23:32 [Log] - System.Buffers.dll
+
+2022/11/18 19:23:32 [Log] - System.Collections.Concurrent.dll
+
+2022/11/18 19:23:32 [Log] - System.Collections.dll
+
+2022/11/18 19:23:32 [Log] - System.Collections.Immutable.dll
+
+2022/11/18 19:23:32 [Log] - System.Collections.NonGeneric.dll
+
+2022/11/18 19:23:32 [Log] - System.Collections.Specialized.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.Annotations.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.DataAnnotations.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.EventBasedAsync.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.ComponentModel.TypeConverter.dll
+
+2022/11/18 19:23:32 [Log] - System.Configuration.dll
+
+2022/11/18 19:23:32 [Log] - System.Console.dll
+
+2022/11/18 19:23:32 [Log] - System.Core.dll
+
+2022/11/18 19:23:32 [Log] - System.Data.Common.dll
+
+2022/11/18 19:23:32 [Log] - System.Data.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.Contracts.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.Debug.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.DiagnosticSource.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.FileVersionInfo.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.Process.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.StackTrace.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.TextWriterTraceListener.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.Tools.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.TraceSource.dll
+
+2022/11/18 19:23:32 [Log] - System.Diagnostics.Tracing.dll
+
+2022/11/18 19:23:32 [Log] - System.dll
+
+2022/11/18 19:23:32 [Log] - System.Drawing.dll
+
+2022/11/18 19:23:32 [Log] - System.Drawing.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.Dynamic.Runtime.dll
+
+2022/11/18 19:23:32 [Log] - System.Globalization.Calendars.dll
+
+2022/11/18 19:23:32 [Log] - System.Globalization.dll
+
+2022/11/18 19:23:32 [Log] - System.Globalization.Extensions.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Compression.Brotli.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Compression.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Compression.FileSystem.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Compression.ZipFile.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.FileSystem.AccessControl.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.FileSystem.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.FileSystem.DriveInfo.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.FileSystem.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.FileSystem.Watcher.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.IsolatedStorage.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.MemoryMappedFiles.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Pipes.AccessControl.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.Pipes.dll
+
+2022/11/18 19:23:32 [Log] - System.IO.UnmanagedMemoryStream.dll
+
+2022/11/18 19:23:32 [Log] - System.Linq.dll
+
+2022/11/18 19:23:32 [Log] - System.Linq.Expressions.dll
+
+2022/11/18 19:23:32 [Log] - System.Linq.Parallel.dll
+
+2022/11/18 19:23:32 [Log] - System.Linq.Queryable.dll
+
+2022/11/18 19:23:32 [Log] - System.Memory.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Http.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.HttpListener.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Mail.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.NameResolution.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.NetworkInformation.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Ping.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Requests.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Security.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.ServicePoint.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.Sockets.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.WebClient.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.WebHeaderCollection.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.WebProxy.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.WebSockets.Client.dll
+
+2022/11/18 19:23:32 [Log] - System.Net.WebSockets.dll
+
+2022/11/18 19:23:32 [Log] - System.Numerics.dll
+
+2022/11/18 19:23:32 [Log] - System.Numerics.Vectors.dll
+
+2022/11/18 19:23:32 [Log] - System.ObjectModel.dll
+
+2022/11/18 19:23:32 [Log] - System.Private.CoreLib.dll
+
+2022/11/18 19:23:32 [Log] - System.Private.DataContractSerialization.dll
+
+2022/11/18 19:23:32 [Log] - System.Private.Uri.dll
+
+2022/11/18 19:23:32 [Log] - System.Private.Xml.dll
+
+2022/11/18 19:23:32 [Log] - System.Private.Xml.Linq.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.DispatchProxy.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Emit.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Emit.ILGeneration.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Emit.Lightweight.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Extensions.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Metadata.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.Reflection.TypeExtensions.dll
+
+2022/11/18 19:23:32 [Log] - System.Resources.Reader.dll
+
+2022/11/18 19:23:32 [Log] - System.Resources.ResourceManager.dll
+
+2022/11/18 19:23:32 [Log] - System.Resources.Writer.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.CompilerServices.Unsafe.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.CompilerServices.VisualC.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Extensions.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Handles.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.InteropServices.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.InteropServices.RuntimeInformation.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.InteropServices.WindowsRuntime.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Loader.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Numerics.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Serialization.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Serialization.Formatters.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Serialization.Json.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Serialization.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.Runtime.Serialization.Xml.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.AccessControl.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Claims.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.Algorithms.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.Cng.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.Csp.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.Encoding.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.OpenSsl.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.Primitives.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Cryptography.X509Certificates.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Principal.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.Principal.Windows.dll
+
+2022/11/18 19:23:32 [Log] - System.Security.SecureString.dll
+
+2022/11/18 19:23:32 [Log] - System.ServiceModel.Web.dll
+
+2022/11/18 19:23:32 [Log] - System.ServiceProcess.dll
+
+2022/11/18 19:23:32 [Log] - System.Text.Encoding.CodePages.dll
+
+2022/11/18 19:23:33 [Log] - System.Text.Encoding.dll
+
+2022/11/18 19:23:33 [Log] - System.Text.Encoding.Extensions.dll
+
+2022/11/18 19:23:33 [Log] - System.Text.RegularExpressions.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Overlapped.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Tasks.Dataflow.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Tasks.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Tasks.Extensions.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Tasks.Parallel.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Thread.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.ThreadPool.dll
+
+2022/11/18 19:23:33 [Log] - System.Threading.Timer.dll
+
+2022/11/18 19:23:33 [Log] - System.Transactions.dll
+
+2022/11/18 19:23:33 [Log] - System.Transactions.Local.dll
+
+2022/11/18 19:23:33 [Log] - System.ValueTuple.dll
+
+2022/11/18 19:23:33 [Log] - System.Web.dll
+
+2022/11/18 19:23:33 [Log] - System.Web.HttpUtility.dll
+
+2022/11/18 19:23:33 [Log] - System.Windows.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.Linq.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.ReaderWriter.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.Serialization.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.XDocument.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.XmlDocument.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.XmlSerializer.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.XPath.dll
+
+2022/11/18 19:23:33 [Log] - System.Xml.XPath.XDocument.dll
+
+2022/11/18 19:23:33 [Log] - WindowsBase.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:33 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - FoolishClient.Framework.dll
+
+2022/11/18 19:23:51 [Log] - FoolishGames.Common.dll
+
+2022/11/18 19:23:51 [Log] - FoolishGames.Compiler.CSharp.dll
+
+2022/11/18 19:23:51 [Log] - FoolishServer.Common.dll
+
+2022/11/18 19:23:51 [Log] - FoolishServer.dll
+
+2022/11/18 19:23:51 [Log] - FoolishServer.Framework.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CSharp.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.VisualBasic.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.Win32.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.Win32.Registry.dll
+
+2022/11/18 19:23:51 [Log] - Mono.Cecil.dll
+
+2022/11/18 19:23:51 [Log] - Mono.Cecil.Mdb.dll
+
+2022/11/18 19:23:51 [Log] - Mono.Cecil.Pdb.dll
+
+2022/11/18 19:23:51 [Log] - Mono.Cecil.Rocks.dll
+
+2022/11/18 19:23:51 [Log] - mscorlib.dll
+
+2022/11/18 19:23:51 [Log] - netstandard.dll
+
+2022/11/18 19:23:51 [Log] - NLog.dll
+
+2022/11/18 19:23:51 [Log] - SOS.NETCore.dll
+
+2022/11/18 19:23:51 [Log] - System.AppContext.dll
+
+2022/11/18 19:23:51 [Log] - System.Buffers.dll
+
+2022/11/18 19:23:51 [Log] - System.Collections.Concurrent.dll
+
+2022/11/18 19:23:51 [Log] - System.Collections.dll
+
+2022/11/18 19:23:51 [Log] - System.Collections.Immutable.dll
+
+2022/11/18 19:23:51 [Log] - System.Collections.NonGeneric.dll
+
+2022/11/18 19:23:51 [Log] - System.Collections.Specialized.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.Annotations.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.DataAnnotations.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.EventBasedAsync.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.ComponentModel.TypeConverter.dll
+
+2022/11/18 19:23:51 [Log] - System.Configuration.dll
+
+2022/11/18 19:23:51 [Log] - System.Console.dll
+
+2022/11/18 19:23:51 [Log] - System.Core.dll
+
+2022/11/18 19:23:51 [Log] - System.Data.Common.dll
+
+2022/11/18 19:23:51 [Log] - System.Data.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.Contracts.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.Debug.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.DiagnosticSource.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.FileVersionInfo.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.Process.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.StackTrace.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.TextWriterTraceListener.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.Tools.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.TraceSource.dll
+
+2022/11/18 19:23:51 [Log] - System.Diagnostics.Tracing.dll
+
+2022/11/18 19:23:51 [Log] - System.dll
+
+2022/11/18 19:23:51 [Log] - System.Drawing.dll
+
+2022/11/18 19:23:51 [Log] - System.Drawing.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.Dynamic.Runtime.dll
+
+2022/11/18 19:23:51 [Log] - System.Globalization.Calendars.dll
+
+2022/11/18 19:23:51 [Log] - System.Globalization.dll
+
+2022/11/18 19:23:51 [Log] - System.Globalization.Extensions.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Compression.Brotli.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Compression.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Compression.FileSystem.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Compression.ZipFile.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.FileSystem.AccessControl.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.FileSystem.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.FileSystem.DriveInfo.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.FileSystem.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.FileSystem.Watcher.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.IsolatedStorage.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.MemoryMappedFiles.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Pipes.AccessControl.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.Pipes.dll
+
+2022/11/18 19:23:51 [Log] - System.IO.UnmanagedMemoryStream.dll
+
+2022/11/18 19:23:51 [Log] - System.Linq.dll
+
+2022/11/18 19:23:51 [Log] - System.Linq.Expressions.dll
+
+2022/11/18 19:23:51 [Log] - System.Linq.Parallel.dll
+
+2022/11/18 19:23:51 [Log] - System.Linq.Queryable.dll
+
+2022/11/18 19:23:51 [Log] - System.Memory.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Http.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.HttpListener.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Mail.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.NameResolution.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.NetworkInformation.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Ping.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Requests.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Security.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.ServicePoint.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.Sockets.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.WebClient.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.WebHeaderCollection.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.WebProxy.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.WebSockets.Client.dll
+
+2022/11/18 19:23:51 [Log] - System.Net.WebSockets.dll
+
+2022/11/18 19:23:51 [Log] - System.Numerics.dll
+
+2022/11/18 19:23:51 [Log] - System.Numerics.Vectors.dll
+
+2022/11/18 19:23:51 [Log] - System.ObjectModel.dll
+
+2022/11/18 19:23:51 [Log] - System.Private.CoreLib.dll
+
+2022/11/18 19:23:51 [Log] - System.Private.DataContractSerialization.dll
+
+2022/11/18 19:23:51 [Log] - System.Private.Uri.dll
+
+2022/11/18 19:23:51 [Log] - System.Private.Xml.dll
+
+2022/11/18 19:23:51 [Log] - System.Private.Xml.Linq.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.DispatchProxy.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Emit.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Emit.ILGeneration.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Emit.Lightweight.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Extensions.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Metadata.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.Reflection.TypeExtensions.dll
+
+2022/11/18 19:23:51 [Log] - System.Resources.Reader.dll
+
+2022/11/18 19:23:51 [Log] - System.Resources.ResourceManager.dll
+
+2022/11/18 19:23:51 [Log] - System.Resources.Writer.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.CompilerServices.Unsafe.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.CompilerServices.VisualC.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Extensions.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Handles.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.InteropServices.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.InteropServices.RuntimeInformation.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.InteropServices.WindowsRuntime.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Loader.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Numerics.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Serialization.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Serialization.Formatters.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Serialization.Json.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Serialization.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.Runtime.Serialization.Xml.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.AccessControl.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Claims.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.Algorithms.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.Cng.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.Csp.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.Encoding.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.OpenSsl.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.Primitives.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Cryptography.X509Certificates.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Principal.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.Principal.Windows.dll
+
+2022/11/18 19:23:51 [Log] - System.Security.SecureString.dll
+
+2022/11/18 19:23:51 [Log] - System.ServiceModel.Web.dll
+
+2022/11/18 19:23:51 [Log] - System.ServiceProcess.dll
+
+2022/11/18 19:23:51 [Log] - System.Text.Encoding.CodePages.dll
+
+2022/11/18 19:23:51 [Log] - System.Text.Encoding.dll
+
+2022/11/18 19:23:51 [Log] - System.Text.Encoding.Extensions.dll
+
+2022/11/18 19:23:51 [Log] - System.Text.RegularExpressions.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Overlapped.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Tasks.Dataflow.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Tasks.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Tasks.Extensions.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Tasks.Parallel.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Thread.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.ThreadPool.dll
+
+2022/11/18 19:23:51 [Log] - System.Threading.Timer.dll
+
+2022/11/18 19:23:51 [Log] - System.Transactions.dll
+
+2022/11/18 19:23:51 [Log] - System.Transactions.Local.dll
+
+2022/11/18 19:23:51 [Log] - System.ValueTuple.dll
+
+2022/11/18 19:23:51 [Log] - System.Web.dll
+
+2022/11/18 19:23:51 [Log] - System.Web.HttpUtility.dll
+
+2022/11/18 19:23:51 [Log] - System.Windows.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.Linq.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.ReaderWriter.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.Serialization.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.XDocument.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.XmlDocument.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.XmlSerializer.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.XPath.dll
+
+2022/11/18 19:23:51 [Log] - System.Xml.XPath.XDocument.dll
+
+2022/11/18 19:23:51 [Log] - WindowsBase.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.CSharp.resources.dll
+
+2022/11/18 19:23:51 [Log] - Microsoft.CodeAnalysis.resources.dll
+
+2022/11/18 19:25:05 [Log] - RuntimeMain OnStartup: True
+
+2022/11/18 19:25:05 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/18 19:25:37 [Foolish Server] - RuntimeHost has closed.
+

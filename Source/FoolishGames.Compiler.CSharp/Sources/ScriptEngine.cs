@@ -77,6 +77,7 @@ namespace FoolishGames.Compiler.CSharp
                 {
                     continue;
                 }
+                //FConsole.Write(Path.GetFileName(file));
                 MetadataReference reference = MetadataReference.CreateFromFile(file);
                 references.Add(reference);
             }
@@ -87,7 +88,7 @@ namespace FoolishGames.Compiler.CSharp
                 optimizationLevel: (isDebug ? OptimizationLevel.Debug : OptimizationLevel.Release),
                 platform: Platform.AnyCpu,
                 moduleName: Path.GetFileNameWithoutExtension(outputFile)
-                //publicSign: true
+            //publicSign: true
             );
 
             //创建编译器

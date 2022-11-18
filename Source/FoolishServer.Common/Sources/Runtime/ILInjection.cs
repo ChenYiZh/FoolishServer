@@ -3,7 +3,7 @@ using FoolishGames.Log;
 using FoolishServer.Common;
 using FoolishServer.Config;
 using FoolishServer.Log;
-using FoolishServer.Model;
+using FoolishServer.Struct;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Pdb;

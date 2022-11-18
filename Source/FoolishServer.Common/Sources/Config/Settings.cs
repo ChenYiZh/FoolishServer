@@ -1,6 +1,7 @@
 ﻿using FoolishGames.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -66,6 +67,14 @@ namespace FoolishServer.Config
         /// </summary>
         public static IReadOnlyList<IHostSetting> HostSettings { get; private set; }
         /// <summary>
+        /// Redis的配置信息
+        /// </summary>
+        public static IRedisSetting RedisSetting { get; private set; }
+        /// <summary>
+        /// 数据库连接信息
+        /// </summary>
+        public static Dictionary<string, IDatabaseSetting> DatabaseSettings { get; private set; }
+        /// <summary>
         /// 读取配置
         /// </summary>
         internal static void LoadFromFile()
@@ -81,11 +90,12 @@ namespace FoolishServer.Config
             IsDebug = xml.SelectSingleNode("/configuration/script/debug").GetValue(true);
             ServerID = xml.SelectSingleNode("/configuration/settings/server").GetValue(1);
             ConvertVersion(xml.SelectSingleNode("/configuration/settings/version").GetValue(null));
-            CSScriptsPath = xml.SelectSingleNode("/configuration/settings/cs-script-path").GetValue(null);
-            AssemblyName = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Runtime.dll");
-            MainClass = xml.SelectSingleNode("/configuration/settings/main-class-fullname").GetValue(null);
-            //ModelNamespace = xml.SelectSingleNode("/configuration/settings/assembly").GetValue("FoolishServer.Model");
+            CSScriptsPath = xml.SelectSingleNode("/configuration/script/cs-script-path").GetValue(null);
+            AssemblyName = xml.SelectSingleNode("/configuration/script/assembly").GetValue("FoolishServer.Runtime.dll");
+            MainClass = xml.SelectSingleNode("/configuration/script/main-class-fullname").GetValue(null);
+            //ModelNamespace = xml.SelectSingleNode("/configuration/script/model-namespace").GetValue("FoolishServer.Model");
             LoadHostSettings(xml);
+            // TODO: 读取RedisSettings，DatabaseSettings
         }
 
         private static void LoadHostSettings(XmlDocument xml)
@@ -128,6 +138,15 @@ namespace FoolishServer.Config
                     BuildInfo = values[3];
                 }
             }
+        }
+
+        public static string GetDefaultConnectKey()
+        {
+            if (DatabaseSettings == null || DatabaseSettings.Count == 0 || DatabaseSettings.ContainsKey("default"))
+            {
+                return "default";
+            }
+            return DatabaseSettings.Keys.First();
         }
     }
 }

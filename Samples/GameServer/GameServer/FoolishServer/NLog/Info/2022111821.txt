@@ -1,0 +1,20 @@
+2022/11/18 21:03:56 [Foolish Server] - Compiling scripts...
+
+2022/11/18 21:03:58 [Compiler] - C# compiled successfully.
+
+2022/11/18 21:03:58 [Foolish Server] - Checking models...
+
+2022/11/18 21:03:58 [Foolish Server] - Some models have been modified automatically.
+
+2022/11/18 21:03:58 [Foolish Server] - Ready to start servers...
+
+2022/11/18 21:04:15 [Foolish Server] - Compiling scripts...
+
+2022/11/18 21:04:18 [Compiler] - C# compiled successfully.
+
+2022/11/18 21:04:18 [Foolish Server] - Checking models...
+
+2022/11/18 21:04:18 [Foolish Server] - Some models have been modified automatically.
+
+2022/11/18 21:04:18 [Foolish Server] - Ready to start servers...
+

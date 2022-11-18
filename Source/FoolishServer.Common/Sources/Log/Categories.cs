@@ -18,5 +18,11 @@ namespace FoolishServer.Log
         public const string SOCKET = "Socket";
 
         public const string MODEL = "Model";
+
+        public const string REDIS = "Redis";
+
+        public const string MYSQL = "MySQL";
+
+        public const string ENTITY = "Entity";
     }
 }

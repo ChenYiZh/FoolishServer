@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1/win-x64",
-    "signature": "b4e8dbaf68fac2bb5f19f124677b37e1b1d3be73"
+    "signature": "7e5e2ca72082ac63d6e9f819833704cc85e32834"
   },
   "compilationOptions": {},
   "targets": {
@@ -178,6 +178,14 @@
       "NETStandard.Library/2.0.3": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "2.1.14"
+        }
+      },
+      "Newtonsoft.Json/13.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.1.25517"
+          }
         }
       },
       "NLog/5.0.5": {
@@ -1072,7 +1080,8 @@
           "FoolishGames.Compiler.CSharp": "1.0.0",
           "FoolishServer.Framework": "1.0.0",
           "Mono.Cecil": "0.11.4",
-          "NLog": "5.0.5"
+          "NLog": "5.0.5",
+          "Newtonsoft.Json": "13.0.1"
         },
         "runtime": {
           "FoolishServer.Common.dll": {}
@@ -1170,6 +1179,13 @@
       "sha512": "sha512-st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
       "path": "netstandard.library/2.0.3",
       "hashPath": "netstandard.library.2.0.3.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
+      "path": "newtonsoft.json/13.0.1",
+      "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
     },
     "NLog/5.0.5": {
       "type": "package",

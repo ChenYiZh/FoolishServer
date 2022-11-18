@@ -1,6 +1,0 @@
-2022/11/17 23:43:44 [Log] - RuntimeMain OnStartup: True
-
-2022/11/17 23:53:01 [Log] - RuntimeMain OnStartup: True
-
-2022/11/17 23:53:33 [Log] - RuntimeMain OnStartup: True
-

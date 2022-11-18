@@ -1,6 +1,8 @@
-﻿using FoolishGames.Compiler.CSharp;
+﻿using FoolishGames.Common;
+using FoolishGames.Compiler.CSharp;
 using FoolishGames.IO;
 using FoolishGames.Log;
+using FoolishServer.Data;
 using FoolishServer.Log;
 using FoolishServer.Runtime;
 using System;
@@ -54,38 +56,15 @@ namespace FoolishServer.Config
 
             //加载程序集
             Assembly assembly;
-            if ((assembly = LoadAssembly()) == null)
+            if ((assembly = AssemblyService.Load(Settings.AssemblyName)) == null)
             {
                 throw new Exception("Failed to load the assembly: " + Settings.AssemblyName);
             }
 
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");
-        }
+            //数据库信息初始化
+            DataContext.Initialize();
 
-        private static Assembly LoadAssembly()
-        {
-            string dllPath = FPath.GetFullPath(Settings.AssemblyName);
-            return Assembly.LoadFrom(dllPath);
-            string pdbFile = dllPath.Substring(0, dllPath.Length - 4) + ".pdb";
-            if (!File.Exists(dllPath))
-            {
-                return null;
-            }
-            if (Settings.IsRelease)
-            {
-                return Assembly.LoadFile(dllPath);
-            }
-            byte[] dll = File.ReadAllBytes(dllPath);
-            byte[] pdb = null;
-            if (File.Exists(pdbFile))
-            {
-                pdb = File.ReadAllBytes(pdbFile);
-            }
-            if (pdb == null)
-            {
-                return Assembly.LoadFile(dllPath);
-            }
-            return Assembly.Load(dll, pdb);
+            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using FoolishServer.Collections;
+using FoolishServer.Data.Entity;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FoolishServer.Model
 {
     [Serializable]
-    public class Test : Entity
+    public class Test : MajorEntity
     {
         [EntityField]
         public long UserId { get; set; }
@@ -13,6 +15,8 @@ namespace FoolishServer.Model
         public int UserName { get; set; }
         [EntityField]
         public string Password { get; set; }
+        [EntityField]
+        public EntityList<Test2> Tests { get; set; }
 
         private long testStr;
         public long TestStr
@@ -36,6 +40,11 @@ namespace FoolishServer.Model
                     }
                 }
             }
+        }
+
+        public override long GetEntityId()
+        {
+            return UserId;
         }
     }
 }

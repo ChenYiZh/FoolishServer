@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Collections;
+using FoolishGames.Common;
 using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
@@ -34,14 +35,26 @@ namespace FoolishGames.Reflection
                     }
                     else
                     {
-                        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                        foreach (Assembly assembly in assemblies)
+                        foreach (Assembly assembly in AssemblyService.Assemblies)
                         {
                             type = assembly.GetType(typeName);
                             if (type != null)
                             {
                                 types[typeName] = type;
                                 break;
+                            }
+                        }
+                        if (type == null)
+                        {
+                            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                            foreach (Assembly assembly in assemblies)
+                            {
+                                type = assembly.GetType(typeName);
+                                if (type != null)
+                                {
+                                    types[typeName] = type;
+                                    break;
+                                }
                             }
                         }
                     }

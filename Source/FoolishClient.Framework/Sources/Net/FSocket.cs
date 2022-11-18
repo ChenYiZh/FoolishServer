@@ -240,7 +240,7 @@ namespace FoolishClient.Net
         /// <returns></returns>
         protected virtual byte[] BuildHeartbeatBuffer()
         {
-            // TODO: 创建默认心跳包数据
+            // 创建默认心跳包数据
             MessageWriter msg = new MessageWriter();
             msg.OpCode = (sbyte)EOpCode.Pong;
             return PackageFactory.Pack(msg, MessageOffset, null, null);
