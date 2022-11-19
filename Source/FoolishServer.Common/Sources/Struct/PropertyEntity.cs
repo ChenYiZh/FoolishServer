@@ -13,6 +13,7 @@ namespace FoolishServer.Struct
         /// <summary>
         /// 父实例
         /// </summary>
+        [NonSerialized]
         private Entity parent = null;
 
         /// <summary>
@@ -23,6 +24,7 @@ namespace FoolishServer.Struct
         /// <summary>
         /// 当前实例在父实例中的属性名称
         /// </summary>
+        [NonSerialized]
         private string propertyNameInParent = null;
 
         /// <summary>

@@ -126,19 +126,19 @@ namespace FoolishServer.RPC
         {
             if (string.IsNullOrWhiteSpace(setting.Name))
             {
-                FConsole.WriteErrorWithCategory(Categories.HOST, "Fail to start the host, because the name of it is empty.");
+                FConsole.WriteErrorFormatWithCategory(Categories.HOST, "Fail to start the host, because the name of it is empty.");
                 return false;
             }
             if (hosts.ContainsKey(setting.Name))
             {
-                FConsole.WriteErrorWithCategory(Categories.HOST, "The same server: {0} is running!", setting.Name);
+                FConsole.WriteErrorFormatWithCategory(Categories.HOST, "The same server: {0} is running!", setting.Name);
                 return false;
             }
             foreach (IServer host in hosts.Values)
             {
                 if (host.Port == setting.Port)
                 {
-                    FConsole.WriteErrorWithCategory(Categories.HOST, "The port of the server: {0}:{1} has been used!", setting.Name, setting.Port);
+                    FConsole.WriteErrorFormatWithCategory(Categories.HOST, "The port of the server: {0}:{1} has been used!", setting.Name, setting.Port);
                     return false;
                 }
             }

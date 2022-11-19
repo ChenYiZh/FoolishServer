@@ -31,9 +31,9 @@ namespace FoolishServer.Data
         bool SaveOrAddEntity(MajorEntity entity);
 
         /// <summary>
-        /// 保存一堆数据
+        /// 操作一堆数据
         /// </summary>
-        bool SaveOrAddEntitys(ICollection<MajorEntity> entities);
+        bool ModifyEntitys(ICollection<MajorEntity> entities);
 
         /// <summary>
         /// 删除数据

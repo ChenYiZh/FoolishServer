@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoolishServer.Data.Entity;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,19 +8,21 @@ namespace FoolishServer.Data
     /// <summary>
     /// 表结构
     /// </summary>
-    public interface ITableScheme
+    public interface ITableScheme : IEntityTable
     {
         /// <summary>
-        /// 映射的数据库链接名称
+        /// Attribute信息
         /// </summary>
-        string ConnectKey { get; }
+        IEntityTable Attribute { get; }
+
         /// <summary>
-        /// 表名
+        /// 结构类型
         /// </summary>
-        string TableName { get; }
+        Type Type { get; }
+
         /// <summary>
-        /// 表名的格式
+        /// 列信息
         /// </summary>
-        string TableNameFormat { get; }
+        IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; }
     }
 }

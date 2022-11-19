@@ -1,0 +1,43 @@
+2022/11/19 19:27:43 [Foolish Server] - Failed to start the server.
+An item with the same key has already been added. Key: FoolishServer.Model.Test
+   at System.Collections.Generic.Dictionary`2.TryInsert(TKey key, TValue value, InsertionBehavior behavior)
+   at FoolishServer.Data.DataContext.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 63
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 107
+
+2022/11/19 19:28:17 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 104
+
+2022/11/19 19:28:17 [Foolish Server] - Failed to start the server.
+An item with the same key has already been added. Key: FoolishServer.Model.Test
+   at System.Collections.Generic.Dictionary`2.TryInsert(TKey key, TValue value, InsertionBehavior behavior)
+   at FoolishServer.Data.DataContext.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 63
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 107
+
+2022/11/19 19:31:10 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 104
+
+2022/11/19 19:33:06 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 104
+
+2022/11/19 19:34:41 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 104
+
+2022/11/19 19:43:44 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 105
+
+2022/11/19 19:45:23 [Redis] - This operation is not available unless admin mode is enabled: SAVE
+   at StackExchange.Redis.ConnectionMultiplexer.CheckMessage(Message message) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 365
+   at StackExchange.Redis.RedisServer.ExecuteSync[T](Message message, ResultProcessor`1 processor, ServerEndPoint server, T defaultValue) in /_/src/StackExchange.Redis/RedisServer.cs:line 742
+   at StackExchange.Redis.RedisServer.Save(SaveType type, CommandFlags flags) in /_/src/StackExchange.Redis/RedisServer.cs:line 441
+   at FoolishServer.Data.RedisDatabase.Close() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 65
+

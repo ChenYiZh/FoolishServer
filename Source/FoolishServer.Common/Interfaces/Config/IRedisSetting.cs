@@ -25,5 +25,9 @@ namespace FoolishServer.Config
         /// DbIndex
         /// </summary>
         int DbIndex { get; }
+        /// <summary>
+        /// 连接Timeout
+        /// </summary>
+        int Timeout { get; }
     }
 }

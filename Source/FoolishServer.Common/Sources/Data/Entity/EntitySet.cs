@@ -10,7 +10,9 @@ namespace FoolishServer.Data.Entity
 {
     public sealed class EntitySet<T> : Struct.Entity, IEntitySet<T> where T : MajorEntity, new()
     {
-        private IDictionary<long, T> Dictionary { get; set; } = new Dictionary<long, T>();
+        private Type EntityType = typeof(T);
+
+        private IDictionary<string, T> Dictionary { get; set; } = new Dictionary<string, T>();
 
         internal EntitySet() { }
 
@@ -19,12 +21,27 @@ namespace FoolishServer.Data.Entity
             NotifyModified(EModifyType.Modify);
             return true;
         }
-
+        /// <summary>
+        /// 通过唯一主键查询
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
         public T Find(long entityId)
         {
-            if (Dictionary.ContainsKey(entityId))
+            return Find(entityId);
+        }
+
+        /// <summary>
+        /// 符合主键查询
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        public T Find(params object[] keys)
+        {
+            string entityKey = MajorEntity.GenerateKeys(EntityType, keys);
+            if (Dictionary.ContainsKey(entityKey))
             {
-                return Dictionary[entityId];
+                return Dictionary[entityKey];
             }
             // TODO: 从数据库中加载
             return null;
@@ -42,7 +59,7 @@ namespace FoolishServer.Data.Entity
 
         public bool Remove(T entity)
         {
-            if (Dictionary.Remove(entity.GetEntityId()))
+            if (Dictionary.Remove(entity.GetEntityKey()))
             {
                 return true;
             }

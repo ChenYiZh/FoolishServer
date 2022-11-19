@@ -135,7 +135,7 @@ namespace FoolishClient.Net
             Category = string.Format("{0}:{1},{2}", GetType().Name, Host, Port);
             HeartbeatInterval = heartbeatInterval;
             WaitToSendMessages = new ThreadSafeQueue<IWaitSendMessage>();
-            FConsole.WriteInfoWithCategory(Category, "Socket is ready...");
+            FConsole.WriteInfoFormatWithCategory(Category, "Socket is ready...");
             Interlocked.Exchange(ref readyFlag, 1);
         }
 
@@ -160,11 +160,11 @@ namespace FoolishClient.Net
             if (!IsReady)
             {
                 IsRunning = false;
-                FConsole.WriteInfoWithCategory(Categories.SOCKET, "Socket is not ready!");
+                FConsole.WriteInfoFormatWithCategory(Categories.SOCKET, "Socket is not ready!");
                 return false;
             }
             IsRunning = true;
-            FConsole.WriteInfoWithCategory(Category, "Socket is starting...");
+            FConsole.WriteInfoFormatWithCategory(Category, "Socket is starting...");
             try
             {
                 Socket = MakeSocket();
@@ -197,7 +197,7 @@ namespace FoolishClient.Net
             ThreadProcessSend = new Thread(new ThreadStart(ProcessSend));
             ThreadProcessSend.Start();
 
-            FConsole.WriteInfoWithCategory(Category, "Socket connected.");
+            FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
             return true;
         }
@@ -217,7 +217,7 @@ namespace FoolishClient.Net
                 IAsyncResult result;
                 if (heartbeatBuffer != null && !Send(heartbeatBuffer, out result))
                 {
-                    FConsole.WriteErrorWithCategory(Category, error);
+                    FConsole.WriteErrorFormatWithCategory(Category, error);
                 }
             }
             catch (Exception e)
@@ -329,7 +329,7 @@ namespace FoolishClient.Net
             result = asyncSend;
             if (!asyncSend.AsyncWaitHandle.WaitOne(5000, true))
             {
-                FConsole.WriteErrorWithCategory(Category, "Process send error and close socket");
+                FConsole.WriteErrorFormatWithCategory(Category, "Process send error and close socket");
                 Close();
                 return false;
             }
@@ -410,7 +410,7 @@ namespace FoolishClient.Net
             {
                 FConsole.WriteExceptionWithCategory(Category, e);
             }
-            FConsole.WriteInfoWithCategory(Category, "Socket Closed.");
+            FConsole.WriteInfoFormatWithCategory(Category, "Socket Closed.");
         }
     }
 }

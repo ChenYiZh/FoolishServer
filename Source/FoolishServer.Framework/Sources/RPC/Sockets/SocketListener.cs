@@ -395,7 +395,7 @@ namespace FoolishServer.RPC.Sockets
 
             if (ioEventArgs.SocketError != SocketError.Success)
             {
-                FConsole.WriteErrorWithCategory(Setting.GetCategory(),
+                FConsole.WriteErrorFormatWithCategory(Setting.GetCategory(),
                     "Process Receive IP {0} SocketError:{1}, bytes len:{2}",
                     (token != null ? token.Socket.Address?.ToString() : ""),
                     ioEventArgs.SocketError.ToString(),
@@ -489,7 +489,7 @@ namespace FoolishServer.RPC.Sockets
                     {
                         if (message.IsError)
                         {
-                            FConsole.WriteErrorWithCategory(Categories.SOCKET, message.Error);
+                            FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, message.Error);
                             continue;
                         }
                         switch (message.OpCode)
@@ -653,7 +653,7 @@ namespace FoolishServer.RPC.Sockets
         {
             try
             {
-                FConsole.WriteWithCategory(Setting.GetCategory(),
+                FConsole.WriteFormatWithCategory(Setting.GetCategory(),
               "Socket connect status: Total Count = {0}, Current Count = {1}, Closed Count = {2}, Rejected Count = {3}",
               summary.TotalConnectCount, summary.CurrentConnectCount, summary.CloseConnectCount, summary.RejectedConnectCount);
             }

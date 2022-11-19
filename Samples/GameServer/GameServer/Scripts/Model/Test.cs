@@ -9,10 +9,10 @@ namespace FoolishServer.Model
     [Serializable]
     public class Test : MajorEntity
     {
-        [EntityField]
+        [EntityField(IsKey = true)]
         public long UserId { get; set; }
-        [EntityField]
-        public int UserName { get; set; }
+        [EntityField(IsKey = true)]
+        public string UserName { get; set; }
         [EntityField]
         public string Password { get; set; }
         [EntityField]
@@ -40,11 +40,6 @@ namespace FoolishServer.Model
                     }
                 }
             }
-        }
-
-        public override long GetEntityId()
-        {
-            return UserId;
         }
     }
 }

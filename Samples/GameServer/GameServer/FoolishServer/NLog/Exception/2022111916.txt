@@ -1,0 +1,10 @@
+2022/11/19 16:42:11 [Foolish Server] - Failed to start the server.
+Input string was not in a correct format.
+   at System.Text.StringBuilder.FormatError()
+   at System.Text.StringBuilder.AppendFormatHelper(IFormatProvider provider, String format, ParamsArray args)
+   at System.String.FormatHelper(IFormatProvider provider, String format, ParamsArray args)
+   at System.String.Format(String format, Object[] args)
+   at FoolishGames.Log.FConsole.Write(String message, Object[] args) in D:\Projects\FoolishServer\Source\FoolishGames.Common\Sources\Log\FConsole.cs:line 83
+   at FoolishServer.RuntimeMain.OnStartup() in D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 29
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 79
+

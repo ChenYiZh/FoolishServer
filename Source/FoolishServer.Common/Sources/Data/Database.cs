@@ -32,7 +32,7 @@ namespace FoolishServer.Data
             throw new NotImplementedException();
         }
 
-        public bool SaveOrAddEntitys(ICollection<MajorEntity> entities)
+        public bool ModifyEntitys(ICollection<MajorEntity> entities)
         {
             throw new NotImplementedException();
         }

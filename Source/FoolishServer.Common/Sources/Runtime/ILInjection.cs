@@ -89,7 +89,7 @@ namespace FoolishServer.Runtime
 
             if (notifyMethod == null || syncRootField == null)
             {
-                FConsole.WriteErrorWithCategory(Categories.FOOLISH_SERVER, "The class Entity was not found!");
+                FConsole.WriteErrorFormatWithCategory(Categories.FOOLISH_SERVER, "The class Entity was not found!");
                 return false;
             }
 

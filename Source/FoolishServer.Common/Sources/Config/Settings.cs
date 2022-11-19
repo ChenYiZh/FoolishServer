@@ -75,6 +75,10 @@ namespace FoolishServer.Config
         /// </summary>
         public static Dictionary<string, IDatabaseSetting> DatabaseSettings { get; private set; }
         /// <summary>
+        /// Redis Key 分隔符
+        /// </summary>
+        internal const char SPLITE_KEY = '_';
+        /// <summary>
         /// 读取配置
         /// </summary>
         internal static void LoadFromFile()
@@ -95,7 +99,8 @@ namespace FoolishServer.Config
             MainClass = xml.SelectSingleNode("/configuration/script/main-class-fullname").GetValue(null);
             //ModelNamespace = xml.SelectSingleNode("/configuration/script/model-namespace").GetValue("FoolishServer.Model");
             LoadHostSettings(xml);
-            // TODO: 读取RedisSettings，DatabaseSettings
+            RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
+            // TODO: 读取DatabaseSettings
         }
 
         private static void LoadHostSettings(XmlDocument xml)

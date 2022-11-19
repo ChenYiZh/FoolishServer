@@ -102,7 +102,7 @@ namespace FoolishGames.Action
                     TimeSpan deltaTime = watch.Elapsed;
                     if (deltaTime.TotalMilliseconds > AlertTimeout)
                     {
-                        FConsole.WriteWarnWithCategory(Categories.ACTION, "{0} is timeout, {1}ms.", TypeName, (int)deltaTime.TotalMilliseconds);
+                        FConsole.WriteWarnFormatWithCategory(Categories.ACTION, "{0} is timeout, {1}ms.", TypeName, (int)deltaTime.TotalMilliseconds);
                     }
                 }
             }

@@ -78,58 +78,115 @@ namespace FoolishGames.Log
         /// <summary>
         /// 输出到Debug目录
         /// </summary>
-        public static void Write(string message, params object[] args)
+        public static void Write(object message)
         {
-            SendMessage(LogLevel.DEBUG, CATEGORY, string.Format(message, args), true);
+            SendMessage(LogLevel.DEBUG, CATEGORY, message?.ToString(), true);
         }
         /// <summary>
         /// 输出到Debug目录
         /// </summary>
-        public static void WriteWithCategory(string category, string message, params object[] args)
+        public static void WriteWithCategory(string category, object message)
         {
-            SendMessage(LogLevel.DEBUG, category, string.Format(message, args), true);
+            SendMessage(LogLevel.DEBUG, category, message?.ToString(), true);
+        }
+
+        /// <summary>
+        /// 输出到Debug目录
+        /// </summary>
+        public static void WriteFormat(string message, params object[] args)
+        {
+            SendMessage(LogLevel.DEBUG, CATEGORY, Format(message, args), true);
+        }
+        /// <summary>
+        /// 输出到Debug目录
+        /// </summary>
+        public static void WriteFormatWithCategory(string category, string message, params object[] args)
+        {
+            SendMessage(LogLevel.DEBUG, category, Format(message, args), true);
         }
         /// <summary>
         /// 输出到Info目录
         /// </summary>
-        public static void WriteInfo(string message, params object[] args)
+        public static void WriteInfo(object message)
         {
-            SendMessage(LogLevel.INFO, CATEGORY, string.Format(message, args), true);
+            SendMessage(LogLevel.INFO, CATEGORY, message?.ToString(), true);
         }
         /// <summary>
         /// 输出到Info目录
         /// </summary>
-        public static void WriteInfoWithCategory(string category, string message, params object[] args)
+        public static void WriteInfoWithCategory(string category, object message)
         {
-            SendMessage(LogLevel.INFO, category, string.Format(message, args), true);
+            SendMessage(LogLevel.INFO, category, message?.ToString(), true);
+        }
+        /// <summary>
+        /// 输出到Info目录
+        /// </summary>
+        public static void WriteInfoFormat(string message, params object[] args)
+        {
+            SendMessage(LogLevel.INFO, CATEGORY, Format(message, args), true);
+        }
+        /// <summary>
+        /// 输出到Info目录
+        /// </summary>
+        public static void WriteInfoFormatWithCategory(string category, string message, params object[] args)
+        {
+            SendMessage(LogLevel.INFO, category, Format(message, args), true);
         }
         /// <summary>
         /// 输出到Warn目录
         /// </summary>
-        public static void WriteWarn(string message, params object[] args)
+        public static void WriteWarn(object message)
         {
-            SendMessage(LogLevel.WARN, CATEGORY, string.Format(message, args), true);
+            SendMessage(LogLevel.WARN, CATEGORY, message?.ToString(), true);
         }
         /// <summary>
         /// 指定类别输出到Warn目录
         /// </summary>
-        public static void WriteWarnWithCategory(string category, string message, params object[] args)
+        public static void WriteWarnWithCategory(string category, object message)
         {
-            SendMessage(LogLevel.WARN, category, string.Format(message, args), true);
+            SendMessage(LogLevel.WARN, category, message?.ToString(), true);
+        }
+        /// <summary>
+        /// 输出到Warn目录
+        /// </summary>
+        public static void WriteWarnFormat(string message, params object[] args)
+        {
+            SendMessage(LogLevel.WARN, CATEGORY, Format(message, args), true);
+        }
+        /// <summary>
+        /// 指定类别输出到Warn目录
+        /// </summary>
+        public static void WriteWarnFormatWithCategory(string category, string message, params object[] args)
+        {
+            SendMessage(LogLevel.WARN, category, Format(message, args), true);
         }
         /// <summary>
         /// 输出到Exception目录
         /// </summary>
-        public static void WriteError(string message, params object[] args)
+        public static void WriteError(object message)
         {
-            SendMessage(LogLevel.ERROR, CATEGORY, string.Format(message, args), true);
+            SendMessage(LogLevel.ERROR, CATEGORY, message?.ToString(), true);
         }
         /// <summary>
         /// 输出到Exception目录
         /// </summary>
-        public static void WriteErrorWithCategory(string category, string message, params object[] args)
+        public static void WriteErrorWithCategory(string category, object message)
         {
-            SendMessage(LogLevel.ERROR, category, string.Format(message, args), true);
+            SendMessage(LogLevel.ERROR, category, message?.ToString(), true);
+        }
+        /// <summary>
+        /// 输出到Exception目录
+        /// </summary>
+        public static void WriteErrorFormat(string message, params object[] args)
+        {
+            SendMessage(LogLevel.ERROR, CATEGORY, Format(message, args), true);
+        }
+        /// <summary>
+        /// 输出到Exception目录
+        /// </summary>
+        public static void WriteErrorFormatWithCategory(string category, string message, params object[] args)
+        {
+            SendMessage(LogLevel.ERROR, category, Format(message, args), true);
         }
         /// <summary>
         /// 输出到Exception目录
@@ -171,7 +228,7 @@ namespace FoolishGames.Log
         /// <param name="args"></param>
         public static void WriteTo(string level, string category, string message, params object[] args)
         {
-            SendMessage(level, category, string.Format(message, args), true);
+            SendMessage(level, category, Format(message, args), true);
         }
 
         private static void SendMessage(string level, string category, string message, bool track)
@@ -223,6 +280,11 @@ namespace FoolishGames.Log
             {
                 logger.SaveLog(level, message);
             }
+        }
+
+        private static string Format(string message, params object[] args)
+        {
+            return string.IsNullOrEmpty(message) ? "NULL" : string.Format(message, args);
         }
     }
 }

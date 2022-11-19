@@ -5,6 +5,7 @@ using System.Text;
 
 namespace FoolishServer.Model
 {
+    [Serializable]
     public class Test2 : MinorEntity
     {
         [EntityField]

@@ -39,6 +39,9 @@
     <Reference Include="FoolishServer.Framework">
       <HintPath>FoolishServer\FoolishServer.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>FoolishServer\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -2,3 +2,4 @@
 obj
 bin
 /Samples/DynamicCompiler/packages
+/Tools/Redis_x64/dump.rdb

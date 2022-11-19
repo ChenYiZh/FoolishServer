@@ -1,0 +1,14 @@
+2022/11/19 20:08:45 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 20:08:45 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 20:08:45 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 20:08:45 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 20:08:45 [Log] - {"UserId":12345678,"UserName":"Hello_World!","Password":null,"Tests":[{"TestId":"TestTest","ModifiedTime":"2022-11-19T20:08:45.5077518+08:00"}],"TestStr":0,"ModifiedTime":"2022-11-19T20:08:45.508024+08:00"}
+
+2022/11/19 20:08:47 [Redis] - Redis closing...
+
+2022/11/19 20:08:47 [Foolish Server] - RuntimeHost has closed.
+

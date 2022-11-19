@@ -1,5 +1,6 @@
 ﻿using FoolishGames.Common;
 using FoolishServer.Common;
+using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,14 @@ namespace FoolishServer.Data
         /// 连接着的数据库
         /// </summary>
         public static IReadOnlyDictionary<string, IDatabase> Databases { get; private set; }
-
+        /// <summary>
+        /// 表结构
+        /// </summary>
         private static Dictionary<Type, ITableScheme> tableSchemes = new Dictionary<Type, ITableScheme>();
         /// <summary>
         /// 表结构映射
         /// </summary>
-        internal static IReadOnlyDictionary<Type, ITableScheme> TableSchemes { get; private set; }
+        internal static IReadOnlyDictionary<Type, ITableScheme> TableSchemes { get { return tableSchemes; } }
         /// <summary>
         /// 读取数据
         /// </summary>
@@ -40,11 +43,14 @@ namespace FoolishServer.Data
         /// </summary>
         public static ITableScheme GetTableScheme(Type type)
         {
-            return TableSchemes[type];
+            return tableSchemes[type];
         }
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
         internal static void Initialize()
         {
+            //生成表的映射关系
             Assembly assembly = AssemblyService.Assemblies.FirstOrDefault();
             Type majorType = Types.MajorEntity;
             if (assembly != null)
@@ -57,6 +63,20 @@ namespace FoolishServer.Data
                         tableSchemes.Add(type, new TableScheme(type));
                     }
                 }
+            }
+
+            //建立Redis连接
+            Redis = new RedisDatabase(Settings.RedisSetting);
+            Redis.Connect();
+        }
+        /// <summary>
+        /// 退出时调用
+        /// </summary>
+        internal static void Shutdown()
+        {
+            if (Redis != null)
+            {
+                Redis.Close();
             }
         }
     }

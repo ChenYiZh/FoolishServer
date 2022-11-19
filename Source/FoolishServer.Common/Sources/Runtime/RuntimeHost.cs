@@ -1,6 +1,7 @@
 ﻿using FoolishGames.Log;
 using FoolishGames.Reflection;
 using FoolishServer.Config;
+using FoolishServer.Data;
 using FoolishServer.Log;
 using FoolishServer.RPC;
 using System;
@@ -107,7 +108,7 @@ namespace FoolishServer.Runtime
                 {
                     ServerManager.Start(setting);
                 }
-                FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
+                FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
 
                 if (CustomRuntime != null)
                 {
@@ -130,8 +131,9 @@ namespace FoolishServer.Runtime
                 CustomRuntime.OnShutdown();
             }
             IsRunning = false;
-            FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
+            FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
             ServerManager.Shutdown();
+            DataContext.Shutdown();
             FConsole.WriteWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
             Task.Delay(1500).Wait();
         }
@@ -195,7 +197,7 @@ namespace FoolishServer.Runtime
             }
             catch (Exception ex)
             {
-                FConsole.WriteError("OnCancelKeyPress error:{1}", ex);
+                FConsole.WriteErrorFormat("OnCancelKeyPress error:{1}", ex);
             }
         }
 
@@ -204,7 +206,7 @@ namespace FoolishServer.Runtime
         /// </summary>
         internal static void Reboot()
         {
-            FConsole.WriteWarnWithCategory(Categories.FOOLISH_SERVER, "begin to reboot...");
+            FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "begin to reboot...");
             Shutdown();
             if (CustomRuntime != null)
             {

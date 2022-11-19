@@ -100,7 +100,7 @@ namespace FoolishGames.Reflection
         {
             if (assembly == null)
             {
-                FConsole.WriteErrorWithCategory(Categories.REFLECTION, "Create object failed, because assembly is null.");
+                FConsole.WriteErrorFormatWithCategory(Categories.REFLECTION, "Create object failed, because assembly is null.");
                 return null;
             }
             try

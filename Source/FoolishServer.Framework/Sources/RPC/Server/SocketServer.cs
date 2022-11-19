@@ -96,7 +96,7 @@ namespace FoolishServer.RPC.Server
         {
             if (IsRunning) { return false; }
             Setting = setting;
-            FConsole.WriteInfoWithCategory(setting.GetCategory(), "Server is starting...", setting.Name);
+            FConsole.WriteInfoFormatWithCategory(setting.GetCategory(), "Server is starting...", setting.Name);
             try
             {
                 OnStart();
@@ -173,7 +173,7 @@ namespace FoolishServer.RPC.Server
         {
             if (message == null)
             {
-                FConsole.WriteErrorWithCategory(Categories.SESSION, "{0} receive empty message.", session.SessionId);
+                FConsole.WriteErrorFormatWithCategory(Categories.SESSION, "{0} receive empty message.", session.SessionId);
                 return;
             }
             try
@@ -218,7 +218,7 @@ namespace FoolishServer.RPC.Server
         protected virtual void OnSessionConnected(ISession session)
         {
             //在客户端连接时执行
-            FConsole.Write("Hello {0}!", session.SessionId);
+            FConsole.WriteFormat("Hello {0}!", session.SessionId);
         }
 
         private void OnSocketDisconnected(IServerSocket socket, ISocket remoteSocket)
@@ -251,7 +251,7 @@ namespace FoolishServer.RPC.Server
         protected virtual void OnSessionDisonnected(ISession session)
         {
             //在客户端断开时执行
-            FConsole.Write("Bye {0}!", session.SessionId);
+            FConsole.WriteFormat("Bye {0}!", session.SessionId);
         }
 
         private void OnSocketReceiveHeartbeat(IServerSocket socket, IMessageEventArgs args)
@@ -278,7 +278,7 @@ namespace FoolishServer.RPC.Server
         protected virtual void OnSessionHeartbeat(ISession session)
         {
             //收到客户端的心跳包时执行
-            FConsole.Write("Beat {0}!", session.SessionId);
+            FConsole.WriteFormat("Beat {0}!", session.SessionId);
         }
 
         /// <summary>

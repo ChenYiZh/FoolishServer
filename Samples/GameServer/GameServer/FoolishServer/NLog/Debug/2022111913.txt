@@ -1,0 +1,78 @@
+2022/11/19 13:37:12 [Log] - UserId
+
+2022/11/19 13:37:12 [Log] - UserName
+
+2022/11/19 13:37:12 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:37:12 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:37:12 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:37:12 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:42:25 [Log] - UserId
+
+2022/11/19 13:42:25 [Log] - UserName
+
+2022/11/19 13:42:25 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:42:25 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:42:25 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:42:25 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:42:25 [Log] - NULL
+
+2022/11/19 13:42:38 [Log] - UserId
+
+2022/11/19 13:42:38 [Log] - UserName
+
+2022/11/19 13:42:38 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:42:38 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:42:38 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:42:38 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:44:17 [Log] - UserId
+
+2022/11/19 13:44:17 [Log] - UserName
+
+2022/11/19 13:44:17 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:44:17 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:44:17 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:44:17 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:44:19 [Log] - 12345678_Hello_World!
+
+2022/11/19 13:50:02 [Log] - UserId
+
+2022/11/19 13:50:02 [Log] - UserName
+
+2022/11/19 13:50:02 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:50:02 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:50:02 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:50:02 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:50:02 [Log] - 12345678_Hello%46World!
+
+2022/11/19 13:50:14 [Foolish Server] - RuntimeHost has closed.
+
+2022/11/19 13:51:08 [Log] - RuntimeMain OnStartup: True
+
+2022/11/19 13:51:08 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/19 13:51:08 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/19 13:51:08 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/19 13:51:08 [Log] - 12345678_Hello%46World!
+

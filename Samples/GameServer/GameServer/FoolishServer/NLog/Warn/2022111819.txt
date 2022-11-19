@@ -1,8 +1,0 @@
-2022/11/18 19:23:35 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
-
-2022/11/18 19:23:54 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
-
-2022/11/18 19:25:05 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
-
-2022/11/18 19:25:37 [Foolish Server] - RuntimeHost begin to shutdown...
-

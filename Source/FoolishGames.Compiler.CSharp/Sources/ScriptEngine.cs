@@ -117,17 +117,17 @@ namespace FoolishGames.Compiler.CSharp
             //判断
             if (!result.Success)
             {
-                FConsole.WriteErrorWithCategory(Categories.COMPILER, "Failed to compile C# scripts.");
+                FConsole.WriteErrorFormatWithCategory(Categories.COMPILER, "Failed to compile C# scripts.");
                 foreach (Diagnostic diagnostic in result.Diagnostics)
                 {
                     if (diagnostic.WarningLevel == 0)
                     {
-                        FConsole.WriteErrorWithCategory(Categories.COMPILER, diagnostic.GetMessage());
+                        FConsole.WriteErrorFormatWithCategory(Categories.COMPILER, diagnostic.GetMessage());
                     }
                 }
                 return false;
             }
-            FConsole.WriteInfoWithCategory(Categories.COMPILER, "C# compiled successfully.");
+            FConsole.WriteInfoFormatWithCategory(Categories.COMPILER, "C# compiled successfully.");
             return true;
         }
         #endregion

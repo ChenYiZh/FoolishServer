@@ -1,8 +1,0 @@
-2022/11/19 0:30:03 [Foolish Server] - Failed to start the server.
-Absolute path information is required.
-Parameter name: path
-   at System.Reflection.Assembly.LoadFile(String path)
-   at FoolishGames.Common.AssemblyService.Load(String dllPath) in D:\Projects\FoolishServer\Source\FoolishGames.Common\Sources\Common\AssemblyService.cs:line 33
-   at FoolishServer.Config.Configeration.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Config\Configeration.cs:line 48
-   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 89
-

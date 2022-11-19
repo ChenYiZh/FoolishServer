@@ -36,7 +36,7 @@ namespace FoolishServer.Config
             //编译脚本
             if (Directory.Exists(FPath.GetFullPath(Settings.CSScriptsPath)))
             {
-                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Compiling scripts...");
+                FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Compiling scripts...");
                 if (!ScriptEngine.CompileByRoslyn(Settings.CSScriptsPath, Settings.IsDebug, Settings.AssemblyName))
                 {
                     throw new Exception("There is some errors on compiling the scripts.");
@@ -44,10 +44,10 @@ namespace FoolishServer.Config
             }
 
             //IL代码注入
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Checking models...");
+            FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Checking models...");
             if (ILInjection.InjectEntityChangeEvent())
             {
-                FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Some models have been modified automatically.");
+                FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Some models have been modified automatically.");
                 //if (string.Equals(Path.GetFileName(Assembly.GetEntryAssembly().GetName().Name + ".dll"), Settings.AssemblyName, StringComparison.OrdinalIgnoreCase))
                 //{
                 //    RuntimeHost.Reboot();
@@ -64,7 +64,7 @@ namespace FoolishServer.Config
             //数据库信息初始化
             DataContext.Initialize();
 
-            FConsole.WriteInfoWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");
+            FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");
         }
     }
 }

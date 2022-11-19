@@ -2,6 +2,8 @@
 using FoolishGames.Timer;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
+using Newtonsoft.Json;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,26 +32,36 @@ namespace FoolishServer.Struct
         /// <summary>
         /// 是否已经发生变化
         /// </summary>
+        [JsonIgnore]
         public bool IsModified { get { lock (SyncRoot) { return ModifiedType != EModifyType.UnModified; } } }
 
         /// <summary>
         /// 上次修改的时间
         /// </summary>
+        [NonSerialized]
         private DateTime modifiedTime;
 
         /// <summary>
         /// 上次修改的时间
-        /// </summary>
-        public DateTime ModifiedTime { get { lock (SyncRoot) { return modifiedTime; } } }
+        /// </summary>        
+        [ProtoMember(ushort.MaxValue), EntityField]
+        public DateTime ModifiedTime
+        {
+            get { lock (SyncRoot) { return modifiedTime; } }
+            //加载的时候还原
+            internal set { modifiedTime = value; }
+        }
 
         /// <summary>
         /// 操作类型
         /// </summary>
+        [NonSerialized]
         private EModifyType modifiedType = EModifyType.Add;
 
         /// <summary>
         /// 操作类型
         /// </summary>
+        [JsonIgnore]
         public EModifyType ModifiedType { get { lock (SyncRoot) { return modifiedType; } } }
 
         /// <summary>
@@ -81,8 +93,35 @@ namespace FoolishServer.Struct
         {
             lock (SyncRoot)
             {
-                this.modifiedType = modifiedType;
+                NotifyModifiedType(modifiedType);
                 modifiedTime = TimeLord.Now;
+            }
+        }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        private void NotifyModifiedType(EModifyType modifiedType)
+        {
+            switch (this.modifiedType)
+            {
+                case EModifyType.UnModified: this.modifiedType = modifiedType; break;
+                case EModifyType.Modify:
+                    {
+                        if (modifiedType == EModifyType.Remove || modifiedType == EModifyType.Add)
+                        {
+                            this.modifiedType = modifiedType;
+                        }
+                    }
+                    break;
+                case EModifyType.Add:
+                    {
+                        if (modifiedType == EModifyType.Remove)
+                        {
+                            this.modifiedType = EModifyType.UnModified;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -93,8 +132,16 @@ namespace FoolishServer.Struct
         {
             lock (SyncRoot)
             {
-                modifiedType = EModifyType.UnModified;
+                ResetModifiedType();
                 modifiedTime = TimeLord.Now;
+            }
+        }
+
+        internal virtual void ResetModifiedType()
+        {
+            lock (SyncRoot)
+            {
+                modifiedType = EModifyType.UnModified;
             }
         }
     }
