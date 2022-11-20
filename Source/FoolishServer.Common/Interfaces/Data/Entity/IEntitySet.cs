@@ -18,6 +18,16 @@ namespace FoolishServer.Data.Entity
         T Find(long entityId);
 
         /// <summary>
+        /// 复合主键查询
+        /// </summary>
+        T Find(params object[] keys);
+
+        /// <summary>
+        /// 主键类查询
+        /// </summary>
+        T Find(EntityKey key);
+
+        /// <summary>
         /// 添加数据
         /// </summary>
         bool AddOrUpdate(T entity);
@@ -26,6 +36,11 @@ namespace FoolishServer.Data.Entity
         /// 删除数据，同时删除缓存，Redis，数据库中的数据
         /// </summary>
         bool Remove(T entity);
+
+        /// <summary>
+        /// 通过Key删除数据，同时删除缓存，Redis，数据库中的数据
+        /// </summary>
+        bool Remove(EntityKey key);
 
         /// <summary>
         /// 加载完整的数据，从数据库中加载并附加到缓存中

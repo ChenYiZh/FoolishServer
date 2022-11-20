@@ -23,6 +23,11 @@ namespace FoolishGames.Collections
             _cache = new Dictionary<TKey, TValue>(capacity);
         }
 
+        public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary)
+        {
+            _cache = new Dictionary<TKey, TValue>(dictionary);
+        }
+
         public ICollection<TKey> Keys
         {
             get

@@ -1,0 +1,10 @@
+2022/11/20 19:14:57 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 107
+
+2022/11/20 19:18:52 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 107
+

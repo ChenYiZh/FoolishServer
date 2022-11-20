@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Collections;
+using FoolishGames.Common;
 using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
@@ -16,7 +17,7 @@ namespace FoolishServer.Collections
     /// </summary>
     public sealed class EntityDictionary<TKey, TValue> : PropertyEntity, IThreadSafeDictionary<TKey, TValue> where TKey : struct
     {
-        private bool isPropertyEntity = typeof(TValue).IsSubclassOf(Types.PropertyEntity);
+        private bool isPropertyEntity = FType<TValue>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
 
         private ThreadSafeDictionary<TKey, TValue> Dictionary = new ThreadSafeDictionary<TKey, TValue>();
 

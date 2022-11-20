@@ -1,4 +1,5 @@
-﻿using FoolishGames.IO;
+﻿using FoolishGames.Common;
+using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishServer.Common;
 using FoolishServer.Config;
@@ -64,7 +65,7 @@ namespace FoolishServer.Runtime
             bool hasChanged = false;
 
             //搜寻基类
-            string entityName = typeof(Entity).FullName;
+            string entityName = FType<Entity>.Type.FullName;
             string refDll = Path.Combine(Environment.CurrentDirectory, "FoolishServer.Common.dll");
             ModuleDefinition module = ModuleDefinition.ReadModule(refDll);
             TypeDefinition entityType = module.GetType(entityName);
@@ -234,8 +235,8 @@ namespace FoolishServer.Runtime
             /// </summary>
             public GlobalMethodTypes(ModuleDefinition module, FieldDefinition syncRootField, MethodDefinition notifyMethod)
             {
-                BoolType = module.ImportReference(typeof(bool));
-                ObjectType = module.ImportReference(typeof(object));
+                BoolType = module.ImportReference(FType<bool>.Type);
+                ObjectType = module.ImportReference(FType<object>.Type);
                 SyncRootField = module.ImportReference(syncRootField);
                 NotifyMethod = module.ImportReference(notifyMethod);
                 MethodInfo monitorEnterMethodInfo = null;
@@ -254,7 +255,7 @@ namespace FoolishServer.Runtime
                 }
                 MonitorEnter = module.ImportReference(monitorEnterMethodInfo);
                 MonitorExit = module.ImportReference(typeof(System.Threading.Monitor).GetMethod("Exit", new Type[] { typeof(object) }));
-                EqualsMethod = module.ImportReference(typeof(object).GetMethod("Equals", new Type[] { typeof(object), typeof(object) }));
+                EqualsMethod = module.ImportReference(FType<object>.Type.GetMethod("Equals", new Type[] { typeof(object), typeof(object) }));
             }
         }
 

@@ -10,26 +10,26 @@ namespace FoolishServer.Data.Entity
     /// </summary>
     public enum EStorageType
     {
+        ///// <summary>
+        ///// 通过默认的策略从Redis和db加载保存
+        ///// </summary>
+        //Default = 0,
         /// <summary>
-        /// 通过默认的策略从Redis和db加载保存
+        /// 往Redis写
         /// </summary>
-        ReadWrite = 0,
+        WriteToRedis = 10,
         /// <summary>
-        /// 在Redis层读写，只往Db写
+        /// 从Redis读
         /// </summary>
-        ReadWriteRedisAndOnlyWriteToDb = 5,
+        ReadFromRedis = 11,
         /// <summary>
-        /// 只在Redis保存加载
+        /// 往Db写
         /// </summary>
-        OnlyRedis = 10,
+        WriteToDb = 20,
         /// <summary>
-        /// 只在Db保存加载
+        /// 从Db读
         /// </summary>
-        OnlyDb = 20,
-        /// <summary>
-        /// 只往db写
-        /// </summary>
-        OnlyWriteToDb = 21,
+        ReadFromDb = 21,
     }
     /// <summary>
     /// 实体表映射属性
@@ -55,12 +55,13 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 是否从不过期,模式True
         /// </summary>
-        public bool NeverExpired { get; set; } = true;
+        public bool NeverExpired { get; set; } = false;
 
         /// <summary>
-        /// 存储方案，默认Redis和db都读写
+        /// 存储方案(位运算)
+        /// <para>默认 StorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb</para>
         /// </summary>
-        public EStorageType StorageType { get; set; } = EStorageType.ReadWrite;
+        public EStorageType StorageType { get; set; } = EStorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb;
 
         public EntityTableAttribute()
         {

@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Collections;
+using FoolishGames.Common;
 using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
@@ -15,7 +16,7 @@ namespace FoolishServer.Collections
     /// </summary>
     public sealed class EntityList<T> : PropertyEntity, IThreadSafeList<T>
     {
-        private bool isPropertyEntity = typeof(T).IsSubclassOf(Types.PropertyEntity);
+        private bool isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
 
         private ThreadSafeList<T> List = new ThreadSafeList<T>();
 

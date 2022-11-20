@@ -1,0 +1,4 @@
+2022/11/20 19:14:57 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+
+2022/11/20 19:18:52 [Foolish Server] - Foolish Server exit command "Ctrl+C" or "Ctrl+Break".
+

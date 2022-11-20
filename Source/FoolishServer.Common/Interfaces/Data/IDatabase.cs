@@ -26,18 +26,8 @@ namespace FoolishServer.Data
         void Close();
 
         /// <summary>
-        /// 保存表
-        /// </summary>
-        bool SaveOrAddEntity(MajorEntity entity);
-
-        /// <summary>
         /// 操作一堆数据
         /// </summary>
-        bool ModifyEntitys(ICollection<MajorEntity> entities);
-
-        /// <summary>
-        /// 删除数据
-        /// </summary>
-        bool RemoveEntity(MajorEntity entity);
+        bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions);
     }
 }

@@ -79,6 +79,14 @@ namespace FoolishServer.Config
         /// </summary>
         internal const char SPLITE_KEY = '_';
         /// <summary>
+        /// 当数据(LoadAll)从db中全部拉取进来后，过多久释放
+        /// </summary>
+        public static int DataReleasePeriod { get; private set; }
+        /// <summary>
+        /// 每隔多少时间检测修改的数据并提交
+        /// </summary>
+        public static int DataCommitInterval { get; private set; }
+        /// <summary>
         /// 读取配置
         /// </summary>
         internal static void LoadFromFile()
@@ -98,6 +106,8 @@ namespace FoolishServer.Config
             AssemblyName = xml.SelectSingleNode("/configuration/script/assembly").GetValue("FoolishServer.Runtime.dll");
             MainClass = xml.SelectSingleNode("/configuration/script/main-class-fullname").GetValue(null);
             //ModelNamespace = xml.SelectSingleNode("/configuration/script/model-namespace").GetValue("FoolishServer.Model");
+            DataReleasePeriod = xml.SelectSingleNode("/configuration/settings/data-release-period").GetValue(15000);
+            DataCommitInterval = xml.SelectSingleNode("/configuration/settings/data-commit-interval").GetValue(1000);
             LoadHostSettings(xml);
             RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
             // TODO: 读取DatabaseSettings

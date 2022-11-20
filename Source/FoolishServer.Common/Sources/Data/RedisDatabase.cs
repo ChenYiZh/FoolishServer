@@ -162,31 +162,16 @@ namespace FoolishServer.Data
                 FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
             }
         }
+
         /// <summary>
-        /// 修改数据集合
+        /// 操作一堆数据
         /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public bool ModifyEntitys(ICollection<MajorEntity> entities)
+        public bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions)
         {
-            return false;
-        }
-        /// <summary>
-        /// 删除一个数据
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public bool RemoveEntity(MajorEntity entity)
-        {
-            return false;
-        }
-        /// <summary>
-        /// 保存或添加
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public bool SaveOrAddEntity(MajorEntity entity)
-        {
+            foreach (DbCommition commition in commitions)
+            {
+                FConsole.Write(commition.Key + ": " + commition.ModifyType);
+            }
             return false;
         }
     }

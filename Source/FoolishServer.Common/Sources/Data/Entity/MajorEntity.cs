@@ -12,10 +12,42 @@ using System.Web;
 namespace FoolishServer.Data.Entity
 {
     /// <summary>
+    /// 当前实例的存储状态
+    /// </summary>
+    public enum EStorageState
+    {
+        /// <summary>
+        /// 刚创建的
+        /// </summary>
+        New,
+        /// <summary>
+        /// 已经在堆栈中
+        /// </summary>
+        Stored,
+        /// <summary>
+        /// 移除了
+        /// </summary>
+        Removed,
+    }
+    /// <summary>
     /// 基于表的类区别于Minor
     /// </summary>
     public abstract class MajorEntity : Struct.Entity
     {
+        /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        [JsonIgnore]
+        private EStorageState state = EStorageState.New;
+        /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        [JsonIgnore]
+        public EStorageState State
+        {
+            get { lock (SyncRoot) { return state; } }
+            internal set { lock (SyncRoot) { state = value; } }
+        }
         /// <summary>
         /// 表名
         /// </summary>
@@ -25,17 +57,26 @@ namespace FoolishServer.Data.Entity
         /// EntityKey被修改前的数据
         /// </summary>
         [JsonIgnore]
-        internal string OldEntityKey { get; private set; }
+        private EntityKey oldEntityKey;
         /// <summary>
         /// Redis主键名称
         /// </summary>
         [JsonIgnore]
-        private string EntityKey { get; set; }
+        private EntityKey entityKey;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public MajorEntity()
         {
             Type type = GetType();
             TableScheme = DataContext.GetTableScheme(type);
+            object[] keys = new object[((TableScheme)TableScheme).KeyFields.Count];
+            for (int i = 0; i < keys.Length; i++)
+            {
+                keys[i] = null;
+            }
+            oldEntityKey = entityKey = new EntityKey(type, keys);
         }
 
         /// <summary>
@@ -51,7 +92,11 @@ namespace FoolishServer.Data.Entity
             base.OnNotifyPropertyModified(propertyName, oldValue, value);
             if (TableScheme != null && TableScheme.Fields.ContainsKey(propertyName) && TableScheme.Fields[propertyName].IsKey)
             {
-                UpdateEntityKey(TableScheme.Fields[propertyName], value.ToString());
+                UpdateEntityKey(TableScheme.Fields[propertyName], value);
+            }
+            if (State == EStorageState.Stored)
+            {
+                DataContext.EntityPool[TableScheme.Type].OnModified(GetEntityKey(), this);
             }
             try
             {
@@ -67,7 +112,7 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         /// <param name="tableField"></param>
         /// <param name="value"></param>
-        private void UpdateEntityKey(ITableFieldScheme tableField, string value)
+        private void UpdateEntityKey(ITableFieldScheme tableField, object value)
         {
             TableScheme tableScheme = TableScheme as TableScheme;
             if (tableScheme == null) return;
@@ -85,37 +130,41 @@ namespace FoolishServer.Data.Entity
                 FConsole.WriteErrorFormatWithCategory(tableScheme.Type.Name, "Failed to generate entity id... check this class");
                 return;
             }
-            string[] keys;
-            if (string.IsNullOrEmpty(EntityKey))
-            {
-                keys = new string[tableScheme.KeyFields.Count + 1];
-                keys[0] = TableScheme.Type.FullName;
-            }
-            else
-            {
-                keys = EntityKey.Split(Settings.SPLITE_KEY);
-            }
-            keys[index + 1] = value;
-            EntityKey = GenerateKeys(null, keys);
+            entityKey.keys[index] = value;
+            entityKey.RefreshKeyName();
         }
-        /// <summary>
-        /// 生成Redis遍历主键
-        /// </summary>
-        internal static string GenerateKeys(Type entityType, params object[] keys)
-        {
-            string entityKey = string.Join(Settings.SPLITE_KEY.ToString(), keys.Select(k =>
-                 {
-                     return k == null ? "" : HttpUtility.UrlEncode(k.ToString()).Replace(Settings.SPLITE_KEY.ToString(), "%" + (int)Settings.SPLITE_KEY);
-                 }));
-            return entityType == null ? entityKey : entityType.FullName + Settings.SPLITE_KEY + entityKey;
-        }
+
         /// <summary>
         /// 主键
         /// </summary>
         /// <returns></returns>
-        public string GetEntityKey()
+        public EntityKey GetEntityKey()
         {
-            return EntityKey;
+            lock (SyncRoot)
+            {
+                return entityKey;
+            }
+        }
+        /// <summary>
+        /// EntityKey被修改前的数据
+        /// </summary>
+        /// <returns></returns>
+        internal EntityKey GetOldEntityKey()
+        {
+            lock (SyncRoot)
+            {
+                return oldEntityKey;
+            }
+        }
+        /// <summary>
+        /// 判断主键是否发生了变化
+        /// </summary>
+        internal bool KeyIsModified()
+        {
+            lock (SyncRoot)
+            {
+                return !string.IsNullOrEmpty(oldEntityKey) && oldEntityKey != entityKey;
+            }
         }
         /// <summary>
         /// 重置时，把Key也重置
@@ -123,7 +172,15 @@ namespace FoolishServer.Data.Entity
         internal override void ResetModifiedType()
         {
             base.ResetModifiedType();
-            OldEntityKey = EntityKey;
+            RefreshEntityKey();
+        }
+
+        internal void RefreshEntityKey()
+        {
+            lock (SyncRoot)
+            {
+                oldEntityKey = entityKey;
+            }
         }
     }
 }

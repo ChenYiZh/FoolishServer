@@ -1,0 +1,28 @@
+2022/11/20 19:14:47 [Foolish Server] - Compiling scripts...
+
+2022/11/20 19:14:52 [Compiler] - C# compiled successfully.
+
+2022/11/20 19:14:52 [Foolish Server] - Checking models...
+
+2022/11/20 19:14:52 [Foolish Server] - Some models have been modified automatically.
+
+2022/11/20 19:14:52 [Redis] - Redis connecting
+
+2022/11/20 19:14:57 [Foolish Server] - Ready to start servers...
+
+2022/11/20 19:14:57 [TcpServer: 9001] - Server is starting...
+
+2022/11/20 19:18:45 [Foolish Server] - Compiling scripts...
+
+2022/11/20 19:18:47 [Compiler] - C# compiled successfully.
+
+2022/11/20 19:18:47 [Foolish Server] - Checking models...
+
+2022/11/20 19:18:47 [Foolish Server] - Some models have been modified automatically.
+
+2022/11/20 19:18:47 [Redis] - Redis connecting
+
+2022/11/20 19:18:52 [Foolish Server] - Ready to start servers...
+
+2022/11/20 19:18:52 [TcpServer: 9001] - Server is starting...
+

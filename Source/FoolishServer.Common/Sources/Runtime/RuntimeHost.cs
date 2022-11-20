@@ -132,7 +132,9 @@ namespace FoolishServer.Runtime
             }
             IsRunning = false;
             FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
+            //先关闭所有玩家连接
             ServerManager.Shutdown();
+            //后关闭数据连接，因为需要保存
             DataContext.Shutdown();
             FConsole.WriteWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost has closed.");
             Task.Delay(1500).Wait();

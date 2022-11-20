@@ -16,7 +16,7 @@ namespace FoolishServer.Model
         [EntityField]
         public string Password { get; set; }
         [EntityField]
-        public EntityList<Test2> Tests { get; set; }
+        public EntityDictionary<int, Test2> Tests { get; set; }
 
         private long testStr;
         public long TestStr

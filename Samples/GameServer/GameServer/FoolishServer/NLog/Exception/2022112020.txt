@@ -1,0 +1,155 @@
+2022/11/20 20:11:00 [Foolish Server] - Failed to start the server.
+Value cannot be null.
+Parameter name: type
+   at System.Activator.CreateInstance(Type type, Boolean nonPublic, Boolean wrapExceptions)
+   at FoolishServer.Data.DataContext.InitializeDataContainer(Type type) in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 124
+   at FoolishServer.Data.DataContext.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 102
+   at FoolishServer.Config.Configeration.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Config\Configeration.cs:line 65
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 90
+
+2022/11/20 20:12:17 [Foolish Server] - Failed to start the server.
+Value cannot be null.
+Parameter name: type
+   at System.Activator.CreateInstance(Type type, Boolean nonPublic, Boolean wrapExceptions)
+   at FoolishServer.Data.DataContext.InitializeDataContainer(Type type) in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 125
+   at FoolishServer.Data.DataContext.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 102
+   at FoolishServer.Config.Configeration.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Config\Configeration.cs:line 65
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 90
+
+2022/11/20 20:13:10 [Foolish Server] - Failed to start the server.
+Value cannot be null.
+Parameter name: type
+   at System.Activator.CreateInstance(Type type, Boolean nonPublic, Boolean wrapExceptions)
+   at FoolishServer.Data.DataContext.InitializeDataContainer(Type type) in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 125
+   at FoolishServer.Data.DataContext.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 102
+   at FoolishServer.Config.Configeration.Initialize() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Config\Configeration.cs:line 65
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 90
+
+2022/11/20 20:15:35 [Reflection] - Value cannot be null.
+Parameter name: type
+   at System.Activator.CreateInstance(Type type, BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes)
+   at FoolishGames.Reflection.ObjectFactory.Create[T](String typeName, Object[] args) in D:\Projects\FoolishServer\Source\FoolishGames.Common\Sources\Reflection\ObjectFactory.cs:line 62
+
+2022/11/20 20:20:29 [Redis] - It was not possible to connect to the redis server(s). Error connecting right now. To allow this multiplexer to continue retrying until it's able to connect, use abortConnect=false in your connection string or AbortOnConnectFail=false; in your code.
+   at StackExchange.Redis.ConnectionMultiplexer.ConnectImpl(ConfigurationOptions configuration, TextWriter log, Nullable`1 serverType, EndPointCollection endpoints) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 702
+   at StackExchange.Redis.ConnectionMultiplexer.Connect(ConfigurationOptions configuration, TextWriter log) in /_/src/StackExchange.Redis/ConnectionMultiplexer.cs:line 675
+   at FoolishServer.Data.RedisDatabase.Connect() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\RedisDatabase.cs:line 107
+
+2022/11/20 20:20:45 [Foolish Server] - Failed to start the server.
+Value cannot be null.
+Parameter name: dictionary
+   at System.Collections.Generic.Dictionary`2..ctor(IDictionary`2 dictionary, IEqualityComparer`1 comparer)
+   at FoolishServer.Data.Entity.EntitySet`1..ctor(IDbSet`1 dbSet) in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\EntitySet.cs:line 34
+   at FoolishServer.Data.DataContext.GetEntity[T]() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 69
+   at FoolishServer.RuntimeMain.OnStartup() in D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 22
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+
+2022/11/20 20:21:55 [Foolish Server] - Failed to start the server.
+Value cannot be null.
+Parameter name: dictionary
+   at System.Collections.Generic.Dictionary`2..ctor(IDictionary`2 dictionary, IEqualityComparer`1 comparer)
+   at FoolishServer.Data.Entity.EntitySet`1..ctor(IDbSet`1 dbSet) in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\EntitySet.cs:line 34
+   at FoolishServer.Data.DataContext.GetEntity[T]() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\DataContext.cs:line 69
+   at FoolishServer.RuntimeMain.OnStartup() in D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 22
+   at FoolishServer.Runtime.RuntimeHost.Startup() in D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+
+2022/11/20 20:56:33 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserId(Int64) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 13
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 26
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:56:33 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserName(System.String) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 15
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 27
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:56:33 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserId(Int64) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 13
+   at Newtonsoft.Json.Serialization.ExpressionValueProvider.Void SetValue(System.Object, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Boolean SetPropertyValue(Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonConverter, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonReader, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object PopulateObject(System.Object, Newtonsoft.Json.JsonReader, Newtonsoft.Json.Serialization.JsonObjectContract, Newtonsoft.Json.Serialization.JsonProperty, System.String)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateObject(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateValueInternal(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object Deserialize(Newtonsoft.Json.JsonReader, System.Type, Boolean)
+   at Newtonsoft.Json.JsonSerializer.System.Object DeserializeInternal(Newtonsoft.Json.JsonReader, System.Type)
+   at Newtonsoft.Json.JsonConvert.System.Object DeserializeObject(System.String, System.Type, Newtonsoft.Json.JsonSerializerSettings)
+   at Newtonsoft.Json.JsonConvert.T DeserializeObject[T](System.String, Newtonsoft.Json.JsonSerializerSettings)
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 33
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:56:33 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserName(System.String) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 15
+   at Newtonsoft.Json.Serialization.ExpressionValueProvider.Void SetValue(System.Object, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Boolean SetPropertyValue(Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonConverter, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonReader, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object PopulateObject(System.Object, Newtonsoft.Json.JsonReader, Newtonsoft.Json.Serialization.JsonObjectContract, Newtonsoft.Json.Serialization.JsonProperty, System.String)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateObject(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateValueInternal(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object Deserialize(Newtonsoft.Json.JsonReader, System.Type, Boolean)
+   at Newtonsoft.Json.JsonSerializer.System.Object DeserializeInternal(Newtonsoft.Json.JsonReader, System.Type)
+   at Newtonsoft.Json.JsonConvert.System.Object DeserializeObject(System.String, System.Type, Newtonsoft.Json.JsonSerializerSettings)
+   at Newtonsoft.Json.JsonConvert.T DeserializeObject[T](System.String, Newtonsoft.Json.JsonSerializerSettings)
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 33
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:58:46 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserId(Int64) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 13
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 26
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:58:46 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserName(System.String) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 15
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 27
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:58:47 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserId(Int64) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 13
+   at Newtonsoft.Json.Serialization.ExpressionValueProvider.Void SetValue(System.Object, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Boolean SetPropertyValue(Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonConverter, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonReader, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object PopulateObject(System.Object, Newtonsoft.Json.JsonReader, Newtonsoft.Json.Serialization.JsonObjectContract, Newtonsoft.Json.Serialization.JsonProperty, System.String)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateObject(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateValueInternal(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object Deserialize(Newtonsoft.Json.JsonReader, System.Type, Boolean)
+   at Newtonsoft.Json.JsonSerializer.System.Object DeserializeInternal(Newtonsoft.Json.JsonReader, System.Type)
+   at Newtonsoft.Json.JsonConvert.System.Object DeserializeObject(System.String, System.Type, Newtonsoft.Json.JsonSerializerSettings)
+   at Newtonsoft.Json.JsonConvert.T DeserializeObject[T](System.String, Newtonsoft.Json.JsonSerializerSettings)
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 33
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+
+2022/11/20 20:58:47 [Log] - RefreshKeyName: 
+   at FoolishServer.Data.Entity.MajorEntity.Void OnNotifyPropertyModified(System.String, System.Object, System.Object) file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Data\Entity\MajorEntity.cs:line 57
+   at FoolishServer.Model.Test.Void set_UserName(System.String) file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\Model\Test.cs:line 15
+   at Newtonsoft.Json.Serialization.ExpressionValueProvider.Void SetValue(System.Object, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Boolean SetPropertyValue(Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonConverter, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.JsonReader, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object PopulateObject(System.Object, Newtonsoft.Json.JsonReader, Newtonsoft.Json.Serialization.JsonObjectContract, Newtonsoft.Json.Serialization.JsonProperty, System.String)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateObject(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object CreateValueInternal(Newtonsoft.Json.JsonReader, System.Type, Newtonsoft.Json.Serialization.JsonContract, Newtonsoft.Json.Serialization.JsonProperty, Newtonsoft.Json.Serialization.JsonContainerContract, Newtonsoft.Json.Serialization.JsonProperty, System.Object)
+   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.System.Object Deserialize(Newtonsoft.Json.JsonReader, System.Type, Boolean)
+   at Newtonsoft.Json.JsonSerializer.System.Object DeserializeInternal(Newtonsoft.Json.JsonReader, System.Type)
+   at Newtonsoft.Json.JsonConvert.System.Object DeserializeObject(System.String, System.Type, Newtonsoft.Json.JsonSerializerSettings)
+   at Newtonsoft.Json.JsonConvert.T DeserializeObject[T](System.String, Newtonsoft.Json.JsonSerializerSettings)
+   at FoolishServer.RuntimeMain.Void OnStartup() file D:\Projects\FoolishServer\Samples\GameServer\GameServer\FoolishServer\../Scripts\RuntimeMain.cs:line 33
+   at FoolishServer.Runtime.RuntimeHost.Void Startup() file D:\Projects\FoolishServer\Source\FoolishServer.Common\Sources\Runtime\RuntimeHost.cs:line 80
+   at FoolishServer.Program.Void Main(System.String[]) file D:\Projects\FoolishServer\Source\FoolishServer\Program.cs:line 16
+
+

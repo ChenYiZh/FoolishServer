@@ -39,17 +39,23 @@ namespace FoolishServer.Struct
         /// 上次修改的时间
         /// </summary>
         [NonSerialized]
-        private DateTime modifiedTime;
+        private DateTime modifiedTime = TimeLord.Now;
 
         /// <summary>
         /// 上次修改的时间
+        /// Set: 只在初始化时起作用
         /// </summary>        
         [ProtoMember(ushort.MaxValue), EntityField]
         public DateTime ModifiedTime
         {
             get { lock (SyncRoot) { return modifiedTime; } }
-            //加载的时候还原
-            internal set { modifiedTime = value; }
+            internal set
+            {
+                if (modifiedTime == DateTime.MinValue)
+                {
+                    modifiedTime = value;
+                }
+            }
         }
 
         /// <summary>
@@ -136,7 +142,9 @@ namespace FoolishServer.Struct
                 modifiedTime = TimeLord.Now;
             }
         }
-
+        /// <summary>
+        /// 重置修改的状态
+        /// </summary>
         internal virtual void ResetModifiedType()
         {
             lock (SyncRoot)

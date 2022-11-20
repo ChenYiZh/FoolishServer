@@ -1,0 +1,22 @@
+2022/11/20 19:14:57 [Log] - RuntimeMain OnStartup: True
+
+2022/11/20 19:14:57 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/20 19:14:57 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/20 19:14:57 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityList`1[FoolishServer.Model.Test2].
+
+2022/11/20 19:14:57 [Log] - {"UserId":12345678,"UserName":"Hello_World!","Password":null,"Tests":[{"TestId":"TestTest","ModifiedTime":"2022-11-20T19:14:57.3185496+08:00"}],"TestStr":0,"ModifiedTime":"2022-11-20T19:14:57.3188382+08:00"}
+
+2022/11/20 19:15:57 [TcpServer: 9001] - Socket connect status: Total Count = 0, Current Count = 0, Closed Count = 0, Rejected Count = 0
+
+2022/11/20 19:18:52 [Log] - RuntimeMain OnStartup: True
+
+2022/11/20 19:18:52 [Log] - Test.UserId: from 0, to 12345678.
+
+2022/11/20 19:18:52 [Log] - Test.UserName: from , to Hello_World!.
+
+2022/11/20 19:18:52 [Log] - Test.Tests: from , to FoolishServer.Collections.EntityDictionary`2[System.Int32,FoolishServer.Model.Test2].
+
+2022/11/20 19:18:52 [Log] - {"UserId":12345678,"UserName":"Hello_World!","Password":null,"Tests":{"1":{"TestId":"TestTest","ModifiedTime":"2022-11-20T19:18:52.0349444+08:00"}},"TestStr":0,"ModifiedTime":"2022-11-20T19:18:52.0354002+08:00"}
+

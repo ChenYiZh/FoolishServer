@@ -22,17 +22,7 @@ namespace FoolishServer.Data
             throw new NotImplementedException();
         }
 
-        public bool RemoveEntity(MajorEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool SaveOrAddEntity(MajorEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool ModifyEntitys(ICollection<MajorEntity> entities)
+        public bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions)
         {
             throw new NotImplementedException();
         }

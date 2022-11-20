@@ -57,7 +57,11 @@ namespace FoolishServer.Struct
                 propertyNameInParent = null;
             }
         }
-
+        /// <summary>
+        /// 通知修改
+        /// </summary>
+        /// <param name="modifiedType"></param>
+        /// <param name="propertyName"></param>
         internal override void NotifyModified(EModifyType modifiedType, string propertyName = null)
         {
             base.NotifyModified(modifiedType, propertyName);
