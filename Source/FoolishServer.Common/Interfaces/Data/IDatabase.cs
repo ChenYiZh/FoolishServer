@@ -29,5 +29,15 @@ namespace FoolishServer.Data
         /// 操作一堆数据
         /// </summary>
         bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions);
+
+        /// <summary>
+        /// 读取表中所有
+        /// </summary>
+        IEnumerable<T> LoadAll<T>() where T : MajorEntity, new();
+
+        /// <summary>
+        /// 通过EntityKey，查询某一条数据，没有就返回空
+        /// </summary>
+        T Find<T>(EntityKey key) where T : MajorEntity, new();
     }
 }

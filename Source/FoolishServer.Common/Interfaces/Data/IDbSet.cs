@@ -34,6 +34,14 @@ namespace FoolishServer.Data
         /// 非泛型修改数据通知，内部强制转换
         /// </summary>
         void OnModified(EntityKey key, MajorEntity entity);
+        /// <summary>
+        /// 重新拉取热数据
+        /// </summary>
+        void PullAllRawData();
+        /// <summary>
+        /// 将所有的缓存的热数据全部推送出去
+        /// </summary>
+        void PushAllRawData();
     }
 
     /// <summary>

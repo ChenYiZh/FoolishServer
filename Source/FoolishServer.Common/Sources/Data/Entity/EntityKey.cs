@@ -9,7 +9,7 @@ using System.Web;
 namespace FoolishServer.Data.Entity
 {
     /// <summary>
-    /// 主键管理类
+    /// 主键管理类，主要用于Redis
     /// </summary>
     public struct EntityKey : IEntityKey
     {
@@ -32,6 +32,16 @@ namespace FoolishServer.Data.Entity
         }
 
         /// <summary>
+        /// 表名
+        /// </summary>
+        private string tableName;
+
+        /// <summary>
+        /// 表名
+        /// </summary>
+        public string TableName { get { return tableName; } }
+
+        /// <summary>
         /// 主键
         /// </summary>
         internal object[] keys;
@@ -52,6 +62,11 @@ namespace FoolishServer.Data.Entity
         public string KeyName { get { return keyName; } }
 
         /// <summary>
+        /// 全名
+        /// </summary>
+        private string fullName;
+
+        /// <summary>
         /// 通过主键生成对象
         /// </summary>
         /// <param name="keys"></param>
@@ -59,7 +74,10 @@ namespace FoolishServer.Data.Entity
         {
             type = null;
             this.keys = keys;
-            keyName = MakeKeyName(type, keys);
+            keyName = null;
+            tableName = null;
+            fullName = null;
+            MakeKeyName();
         }
 
         /// <summary>
@@ -70,7 +88,10 @@ namespace FoolishServer.Data.Entity
         {
             this.type = type;
             this.keys = keys;
-            keyName = MakeKeyName(type, keys);
+            keyName = null;
+            tableName = null;
+            fullName = null;
+            MakeKeyName();
         }
 
         /// <summary>
@@ -78,20 +99,48 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal void RefreshKeyName()
         {
-            keyName = MakeKeyName(Type, keys);
+            MakeKeyName();
         }
 
         /// <summary>
         /// 生成Redis遍历主键
         /// </summary>
-        internal static string MakeKeyName(Type entityType, object[] keys)
+        private void MakeKeyName()
+        {
+            tableName = MakeTableName(type);
+            keyName = MakeKeyName(keys);
+            fullName = MakeFullName(type, keys);
+        }
+
+        /// <summary>
+        /// 生成Entity的KeyName
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        public static string MakeKeyName(object[] keys)
         {
             if (keys == null) { throw new ArgumentNullException("Entity Keys is null."); }
-            string entityKey = string.Join(Settings.SPLITE_KEY.ToString(), keys.Select(k =>
-            {
-                return k == null ? "" : HttpUtility.UrlEncode(k.ToString()).Replace(Settings.SPLITE_KEY.ToString(), "%" + (int)Settings.SPLITE_KEY);
-            }));
-            return entityType == null ? entityKey : entityType.FullName + Settings.SPLITE_KEY + entityKey;
+            return string.Join(Settings.SPLITE_KEY.ToString(), keys);
+            //string entityKey = string.Join(Settings.SPLITE_KEY.ToString(), keys.Select(k =>
+            //{
+            //    return k == null ? "" : HttpUtility.UrlEncode(k.ToString()).Replace(Settings.SPLITE_KEY.ToString(), "%" + (int)Settings.SPLITE_KEY);
+            //}));
+        }
+
+        /// <summary>
+        /// 生成Entity的Table名称
+        /// </summary>
+        public static string MakeTableName(Type type)
+        {
+            return type?.FullName;
+        }
+
+        /// <summary>
+        /// 生成完整名称
+        /// </summary>
+        public static string MakeFullName(Type type, object[] keys)
+        {
+            return type == null ? MakeKeyName(keys) : MakeTableName(type) + Settings.SPLITE_KEY + MakeKeyName(keys);
         }
 
         /// <summary>
@@ -99,7 +148,7 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public static bool operator ==(EntityKey key1, EntityKey key2)
         {
-            return key1.keyName == key2.keyName;
+            return key1.ToString() == key2.ToString();
         }
 
         /// <summary>
@@ -107,7 +156,7 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public static bool operator !=(EntityKey key1, EntityKey key2)
         {
-            return key1.keyName != key2.keyName;
+            return key1.ToString() != key2.ToString();
         }
 
         /// <summary>
@@ -119,7 +168,7 @@ namespace FoolishServer.Data.Entity
             {
                 return false;
             }
-            return keyName == obj.ToString();
+            return ToString() == obj.ToString();
         }
 
         /// <summary>
@@ -128,7 +177,7 @@ namespace FoolishServer.Data.Entity
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return keyName.GetHashCode();
+            return ToString().GetHashCode();
         }
 
         /// <summary>
@@ -137,7 +186,7 @@ namespace FoolishServer.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            return keyName.ToString();
+            return fullName;
         }
 
         /// <summary>
@@ -146,7 +195,7 @@ namespace FoolishServer.Data.Entity
         /// <param name="key"></param>
         public static implicit operator string(EntityKey key)
         {
-            return key.keyName;
+            return key.ToString();
         }
     }
 }

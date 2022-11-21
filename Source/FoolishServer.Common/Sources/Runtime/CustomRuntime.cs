@@ -14,6 +14,16 @@ namespace FoolishServer.Runtime
         /// </summary>
         public virtual void OnStartup() { }
         /// <summary>
+        /// 在数据库管理对象初始化完成时执行，
+        /// 并没有连接，也没有数据
+        /// </summary>
+        public virtual void OnDatebaseInitialized() { }
+        /// <summary>
+        /// 准备开始启动服务器时调用，
+        /// 数据库已经连接，并且热数据已经载入
+        /// </summary>
+        public virtual void ReadyToStartServers() { }
+        /// <summary>
         /// 服务器启动后执行
         /// </summary>
         public virtual void OnBegun() { }

@@ -71,7 +71,7 @@ namespace FoolishServer.Data.Entity
     /// String类型默认varchar(255),列表默认LongText
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class EntityFieldAttribute : Attribute, IEntityField
+    public sealed class EntityFieldAttribute : Attribute, IEntityField
     {
         /// <summary>
         /// 是否是主键

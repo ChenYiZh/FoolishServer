@@ -43,11 +43,19 @@ namespace FoolishServer.Data.Entity
         /// 当前实例的存储状态
         /// </summary>
         [JsonIgnore]
-        public EStorageState State
+        public override EStorageState State { get { lock (SyncRoot) { return state; } } }
+        /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        /// <param name="state"></param>
+        internal void SetState(EStorageState state)
         {
-            get { lock (SyncRoot) { return state; } }
-            internal set { lock (SyncRoot) { state = value; } }
+            lock (SyncRoot)
+            {
+                this.state = state;
+            }
         }
+
         /// <summary>
         /// 表名
         /// </summary>
@@ -89,15 +97,11 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal override void OnNotifyPropertyModified(string propertyName, object oldValue, object value)
         {
-            base.OnNotifyPropertyModified(propertyName, oldValue, value);
             if (TableScheme != null && TableScheme.Fields.ContainsKey(propertyName) && TableScheme.Fields[propertyName].IsKey)
             {
                 UpdateEntityKey(TableScheme.Fields[propertyName], value);
             }
-            if (State == EStorageState.Stored)
-            {
-                DataContext.EntityPool[TableScheme.Type].OnModified(GetEntityKey(), this);
-            }
+            base.OnNotifyPropertyModified(propertyName, oldValue, value);
             try
             {
                 OnPropertyModified?.Invoke(this, propertyName, oldValue, value);
@@ -132,6 +136,18 @@ namespace FoolishServer.Data.Entity
             }
             entityKey.keys[index] = value;
             entityKey.RefreshKeyName();
+        }
+
+        /// <summary>
+        /// 数据中心提交更新
+        /// </summary>
+        internal override void NotifyModified(EModifyType modifiedType, string propertyName = null)
+        {
+            base.NotifyModified(modifiedType, propertyName);
+            if (State == EStorageState.Stored)
+            {
+                DataContext.EntityPool[TableScheme.Type].OnModified(GetEntityKey(), this);
+            }
         }
 
         /// <summary>
@@ -175,11 +191,26 @@ namespace FoolishServer.Data.Entity
             RefreshEntityKey();
         }
 
+        /// <summary>
+        /// 刷新Key
+        /// </summary>
         internal void RefreshEntityKey()
         {
             lock (SyncRoot)
             {
                 oldEntityKey = entityKey;
+            }
+        }
+
+        /// <summary>
+        /// 数据数据库中拉取下来
+        /// </summary>
+        internal override void OnPulledFromDb()
+        {
+            base.OnPulledFromDb();
+            lock (SyncRoot)
+            {
+                state = EStorageState.Stored;
             }
         }
     }

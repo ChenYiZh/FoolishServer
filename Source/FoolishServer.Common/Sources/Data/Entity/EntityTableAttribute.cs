@@ -35,7 +35,7 @@ namespace FoolishServer.Data.Entity
     /// 实体表映射属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class EntityTableAttribute : Attribute, IEntityTable
+    public sealed class EntityTableAttribute : Attribute, IEntityTable
     {
         /// <summary>
         /// 数据库映射名称

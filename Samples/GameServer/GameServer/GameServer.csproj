@@ -42,6 +42,12 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>FoolishServer\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>FoolishServer\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net.Core">
+      <HintPath>FoolishServer\protobuf-net.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

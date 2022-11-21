@@ -61,9 +61,6 @@ namespace FoolishServer.Config
                 throw new Exception("Failed to load the assembly: " + Settings.AssemblyName);
             }
 
-            //数据库信息初始化
-            DataContext.Initialize();
-
             FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");
         }
     }

@@ -77,7 +77,7 @@ namespace FoolishServer.Data
         {
             try
             {
-                OnModified(key, (T)entity);
+                OnModified(key, entity as T);
             }
             catch (Exception e)
             {
@@ -90,29 +90,45 @@ namespace FoolishServer.Data
         /// </summary>
         public void OnModified(EntityKey key, T entity)
         {
+            //判空
             if (string.IsNullOrEmpty(key))
             {
                 FConsole.WriteExceptionWithCategory(Categories.ENTITY, new NullReferenceException("DbSet receive an empty-key entity!"));
                 return;
             }
-            if (string.IsNullOrEmpty(entity.GetEntityKey()))
-            {
-                if (entity.GetOldEntityKey() != entity.GetEntityKey())
-                {
-                    FConsole.WriteWarnFormatWithCategory(Categories.ENTITY, "DbSet<{0}> origin-key:{1} is using an empty key and old key will be removed.", FType<T>.Type.FullName, entity.GetOldEntityKey());
-                    Remove(entity.GetOldEntityKey());
-                }
-                return;
-            }
-            modifiedEntities[key] = entity;
+
+            //实例为空，就只做移除，通知事件在Remove里
             if (entity == null)
             {
                 Remove(key);
+                return;
             }
-            else
+
+            //判断Key是否发生变化
+            if (entity.KeyIsModified())
             {
-                Modify(entity);
+                //老Key有效的话移除
+                if (!string.IsNullOrEmpty(entity.GetOldEntityKey()))
+                {
+                    FConsole.WriteWarnFormatWithCategory(Categories.ENTITY, "DbSet<{0}>: A key of entity has been changed from {0} to {1}.", entity.GetOldEntityKey(), entity.GetEntityKey());
+                    Remove(entity.GetOldEntityKey());
+                }
             }
+
+            //刷新Key
+            entity.RefreshEntityKey();
+
+            //如果当前的Key为空，就不会加入更新列表
+            if (string.IsNullOrEmpty(entity.GetEntityKey()))
+            {
+                return;
+            }
+
+            //更新
+            modifiedEntities[key] = entity;
+
+            Modify(entity);
+            //通知事件
             OnDataModified?.Invoke(key, entity);
         }
 
@@ -125,14 +141,19 @@ namespace FoolishServer.Data
             T entity;
             if (rawEntities.TryGetValue(key, out entity))
             {
-                entity.State = EStorageState.Removed;
+                entity.SetState(EStorageState.Removed);
             }
             rawEntities.Remove(key);
             if (coldEntities.TryGetValue(key, out entity))
             {
-                entity.State = EStorageState.Removed;
+                entity.SetState(EStorageState.Removed);
             }
             coldEntities.Remove(key);
+
+            //提交更改
+            modifiedEntities[key] = null;
+            //通知
+            OnDataModified?.Invoke(key, null);
         }
 
         /// <summary>
@@ -158,17 +179,52 @@ namespace FoolishServer.Data
         /// </summary>
         public void CommitModifiedData()
         {
-            FConsole.Write(GetType().Name + " CommitModifiedData.");
-            if (modifiedEntities.Count > 0)
+            CommitModifiedEntitys(modifiedEntities, () => { modifiedEntities.Clear(); });
+        }
+
+        /// <summary>
+        /// 拉取所有热数据
+        /// </summary>
+        public void PullAllRawData()
+        {
+            IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
+            rawEntities.Clear();
+            foreach (T entity in iterator)
             {
-                List<DbCommition> entities = new List<DbCommition>();
-                foreach (KeyValuePair<EntityKey, T> kv in modifiedEntities)
+                entity.OnPulledFromDb();
+                rawEntities[entity.GetEntityKey()] = entity;
+            }
+        }
+
+        /// <summary>
+        /// 将所有的缓存的热数据全部推送出去
+        /// </summary>
+        public void PushAllRawData()
+        {
+            CommitModifiedEntitys(rawEntities);
+        }
+
+        /// <summary>
+        /// 推送集合中的数据
+        /// </summary>
+        private void CommitModifiedEntitys(ThreadSafeDictionary<EntityKey, T> entities, System.Action onCopied = null)
+        {
+            if (entities.Count > 0)
+            {
+                List<DbCommition> commitions = new List<DbCommition>();
+                Dictionary<EntityKey, T> dic = null;
+                lock (entities.SyncRoot)
                 {
-                    entities.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
-                    kv.Value.ResetModifiedType();
+                    //中间缓存池，防死锁
+                    dic = new Dictionary<EntityKey, T>(entities);
+                    onCopied?.Invoke();
                 }
-                modifiedEntities.Clear();
-                DataContext.Redis.CommitModifiedEntitys(entities);
+                foreach (KeyValuePair<EntityKey, T> kv in dic)
+                {
+                    commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
+                    kv.Value?.ResetModifiedType();
+                }                
+                DataContext.RawDatabase.CommitModifiedEntitys(commitions);
             }
         }
 

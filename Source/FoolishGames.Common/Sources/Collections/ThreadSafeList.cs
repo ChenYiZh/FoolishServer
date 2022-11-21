@@ -10,7 +10,7 @@ namespace FoolishGames.Collections
     {
         private List<T> _cache;
 
-        private readonly object syncRoot = new object();
+        public readonly object SyncRoot = new object();
 
         public ThreadSafeList()
         {
@@ -26,7 +26,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Count;
                 }
@@ -39,14 +39,14 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache[index];
                 }
             }
             set
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     _cache[index] = value;
                 }
@@ -55,7 +55,7 @@ namespace FoolishGames.Collections
 
         public int IndexOf(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.IndexOf(item);
             }
@@ -63,7 +63,7 @@ namespace FoolishGames.Collections
 
         public void Insert(int index, T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Insert(index, item);
             }
@@ -71,7 +71,7 @@ namespace FoolishGames.Collections
 
         public void RemoveAt(int index)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.RemoveAt(index);
             }
@@ -79,7 +79,7 @@ namespace FoolishGames.Collections
 
         public void Add(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Add(item);
             }
@@ -87,7 +87,7 @@ namespace FoolishGames.Collections
 
         public void Clear()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Clear();
             }
@@ -95,7 +95,7 @@ namespace FoolishGames.Collections
 
         public bool Contains(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Contains(item);
             }
@@ -103,7 +103,7 @@ namespace FoolishGames.Collections
 
         public bool Remove(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Remove(item);
             }
@@ -111,7 +111,7 @@ namespace FoolishGames.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -124,7 +124,7 @@ namespace FoolishGames.Collections
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.CopyTo(array, arrayIndex);
             }

@@ -1,4 +1,6 @@
-﻿using FoolishGames.Log;
+﻿using FoolishGames.Common;
+using FoolishGames.Log;
+using FoolishServer.Common;
 using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
@@ -8,14 +10,19 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FoolishServer.Data
 {
     /// <summary>
     /// Redis 链接池
     /// </summary>
-    public class RedisDatabase : IDatabase
+    public class RedisDatabase : IRawDatabase
     {
+        /// <summary>
+        /// 解析方案，默认Protobuff
+        /// </summary>
+        public IEntityConverter Converter { get; set; } = new EntityProtobufConverter();
         /// <summary>
         /// Redis连接池，这是一个池子
         /// </summary>
@@ -163,16 +170,111 @@ namespace FoolishServer.Data
             }
         }
 
+        int count = 0;
         /// <summary>
         /// 操作一堆数据
         /// </summary>
         public bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions)
         {
-            foreach (DbCommition commition in commitions)
+            try
             {
-                FConsole.Write(commition.Key + ": " + commition.ModifyType);
+                IBatch batch = Database.CreateBatch();
+                foreach (DbCommition commition in commitions)
+                {
+                    FConsole.Write(commition.Key.ToString() + ": " + commition.ModifyType);
+                    //FConsole.Write("Redis Count: " + Interlocked.Increment(ref count));
+                    if (commition.ModifyType == EModifyType.Remove || commition.Entity == null)
+                    {
+                        batch.HashDeleteAsync(commition.Key.TableName, commition.Key.KeyName);
+                    }
+                    else
+                    {
+                        RedisValue value = ConvertToValue(Converter.Type, commition.Entity);
+                        batch.HashSetAsync(commition.Key.TableName, commition.Key.KeyName, value);
+                    }
+                }
+                batch.Execute();
+                return true;
             }
-            return false;
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 读取表中所有
+        /// </summary>
+        public IEnumerable<T> LoadAll<T>() where T : MajorEntity, new()
+        {
+            Task<HashEntry[]> task = Database.HashGetAllAsync(EntityKey.MakeTableName(FType<T>.Type));
+            task.Wait();
+            HashEntry[] entries = task.Result;
+            T[] entities = new T[entries.Length];
+            for (int i = 0; i < entries.Length; i++)
+            {
+                entities[i] = ConvertToEntity<T>(Converter.Type, entries[i].Value);
+            }
+            return entities;
+        }
+
+        /// <summary>
+        /// 通过EntityKey，查询某一条数据，没有就返回空
+        /// </summary>
+        public T Find<T>(EntityKey key) where T : MajorEntity, new()
+        {
+            Task<RedisValue> task = Database.HashGetAsync(key.TableName, key.KeyName);
+            task.Wait();
+            if (task.Result.HasValue)
+            {
+                return ConvertToEntity<T>(Converter.Type, task.Result);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 数据解析
+        /// </summary>
+        private RedisValue ConvertToValue(EConvertType type, MajorEntity entity)
+        {
+            switch (type)
+            {
+                case EConvertType.Binary:
+                    {
+                        EntityConverter<byte[]> converter = (EntityConverter<byte[]>)Converter;
+                        return converter.Serialize(entity);
+                    }
+                case EConvertType.String:
+                    {
+                        EntityConverter<string> converter = (EntityConverter<string>)Converter;
+                        return converter.Serialize(entity);
+                    }
+                default:
+                    throw new Exception("The converter in RedisDatabase is an error type.");
+            }
+        }
+
+        /// <summary>
+        /// 数据转换
+        /// </summary>
+        private T ConvertToEntity<T>(EConvertType type, RedisValue value) where T : MajorEntity, new()
+        {
+            switch (type)
+            {
+                case EConvertType.Binary:
+                    {
+                        EntityConverter<byte[]> converter = (EntityConverter<byte[]>)Converter;
+                        return converter.Deserialize<T>(value);
+                    }
+                case EConvertType.String:
+                    {
+                        EntityConverter<string> converter = (EntityConverter<string>)Converter;
+                        return converter.Deserialize<T>(value);
+                    }
+                default:
+                    throw new Exception("The converter in RedisDatabase is an error type.");
+            }
         }
     }
 }

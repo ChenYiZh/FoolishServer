@@ -1,9 +1,12 @@
 ﻿using FoolishGames.Collections;
 using FoolishGames.Common;
+using FoolishGames.Log;
+using FoolishGames.Timer;
 using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
 using FoolishServer.Struct;
+using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +18,7 @@ namespace FoolishServer.Collections
     /// <summary>
     /// Model层使用的数据字典
     /// </summary>
+    [ProtoContract, Serializable]
     public sealed class EntityDictionary<TKey, TValue> : PropertyEntity, IThreadSafeDictionary<TKey, TValue> where TKey : struct
     {
         private bool isPropertyEntity = FType<TValue>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
@@ -42,7 +46,10 @@ namespace FoolishServer.Collections
                 {
                     Dictionary[key] = value;
                 }
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
@@ -66,13 +73,19 @@ namespace FoolishServer.Collections
                 {
                     Dictionary.Add(key, value);
                     (value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    lock (SyncRoot)
+                    {
+                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    }
                 }
             }
             else
             {
                 Dictionary.Add(key, value);
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
@@ -84,20 +97,29 @@ namespace FoolishServer.Collections
                 {
                     Dictionary.Add(item);
                     (item.Value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    lock (SyncRoot)
+                    {
+                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    }
                 }
             }
             else
             {
                 Dictionary.Add(item);
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
         public void Clear()
         {
             Dictionary.Clear();
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
@@ -133,14 +155,20 @@ namespace FoolishServer.Collections
         public bool Remove(TKey key)
         {
             bool result = Dictionary.Remove(key);
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
             return result;
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
             bool result = Dictionary.Remove(item);
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
             return result;
         }
 
@@ -152,6 +180,63 @@ namespace FoolishServer.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return Dictionary.GetEnumerator();
+        }
+
+        internal override void SetParent(Entity parent, string propertyName)
+        {
+            base.SetParent(parent, propertyName);
+            if (isPropertyEntity)
+            {
+                lock (SyncRoot)
+                {
+                    foreach (TValue child in Dictionary.Values)
+                    {
+                        PropertyEntity entity;
+                        if ((entity = child as PropertyEntity) != null)
+                        {
+                            entity.ModifiedTime = TimeLord.Now;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 修改已经提交时执行
+        /// </summary>
+        internal override void OnModificationCommitted()
+        {
+            base.OnModificationCommitted();
+            lock (SyncRoot)
+            {
+                foreach (TValue child in Dictionary.Values)
+                {
+                    PropertyEntity entity;
+                    if ((entity = child as PropertyEntity) != null)
+                    {
+                        entity.OnModificationCommitted();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 数据数据库中拉取下来
+        /// </summary>
+        internal override void OnPulledFromDb()
+        {
+            base.OnPulledFromDb();
+            lock (SyncRoot)
+            {
+                foreach (TValue child in Dictionary.Values)
+                {
+                    PropertyEntity entity;
+                    if ((entity = child as PropertyEntity) != null)
+                    {
+                        entity.OnPulledFromDb();
+                    }
+                }
+            }
         }
     }
 }

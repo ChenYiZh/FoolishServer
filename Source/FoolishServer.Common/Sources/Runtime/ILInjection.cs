@@ -241,9 +241,23 @@ namespace FoolishServer.Runtime
                 NotifyMethod = module.ImportReference(notifyMethod);
                 MethodInfo monitorEnterMethodInfo = null;
                 MethodInfo[] monitorMethods = typeof(System.Threading.Monitor).GetMethods();
+
+                //foreach (MethodInfo method in monitorMethods)
+                //{
+                //    if (method.Name == "TryEnter")
+                //    {
+                //        ParameterInfo[] paras = method.GetParameters();
+                //        if (paras.Length == 3 && paras[1].ParameterType == FType<int>.Type)
+                //        {
+                //            monitorEnterMethodInfo = method;
+                //            break;
+                //        }
+                //    }
+                //}
+
                 foreach (MethodInfo method in monitorMethods)
                 {
-                    if (method.Name == "Enter" && method.GetParameters().Length == 2)
+                    if (method.Name == "TryEnter" && method.GetParameters().Length == 2)
                     {
                         monitorEnterMethodInfo = method;
                         break;
@@ -251,7 +265,7 @@ namespace FoolishServer.Runtime
                 }
                 if (monitorEnterMethodInfo == null)
                 {
-                    throw new Exception("The method: System.Threading.Monitor.Enter(object obj, ref bool lockToken); was not found!");
+                    throw new Exception("The method: System.Threading.Monitor.TryEnter(object obj, int millisecondsTimeout, ref bool lockTaken); was not found!");
                 }
                 MonitorEnter = module.ImportReference(monitorEnterMethodInfo);
                 MonitorExit = module.ImportReference(typeof(System.Threading.Monitor).GetMethod("Exit", new Type[] { typeof(object) }));
@@ -301,7 +315,12 @@ namespace FoolishServer.Runtime
             Instruction IL_0008 = worker.Create(OpCodes.Ldc_I4_0);
             Instruction IL_0009 = worker.Create(OpCodes.Stloc_1);
 
+
             Instruction IL_000a = worker.Create(OpCodes.Ldloc_0);
+
+            //Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4_4, 0x3e8);
+
+
             Instruction IL_000b = worker.Create(OpCodes.Ldloca_S, V_1);
             Instruction IL_000d = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
 
@@ -369,7 +388,9 @@ namespace FoolishServer.Runtime
             setMethod.Body.Instructions.Add(IL_0007);
             setMethod.Body.Instructions.Add(IL_0008);
             setMethod.Body.Instructions.Add(IL_0009);
+            //setMethod.Body.Instructions.Add(IL_0009_1);
             setMethod.Body.Instructions.Add(IL_000a);
+            //setMethod.Body.Instructions.Add(IL_000a_1);
             setMethod.Body.Instructions.Add(IL_000b);
             setMethod.Body.Instructions.Add(IL_000d);
             setMethod.Body.Instructions.Add(IL_0012);
@@ -456,8 +477,12 @@ namespace FoolishServer.Runtime
             Instruction IL_0008 = worker.Create(OpCodes.Ldc_I4_0);
             Instruction IL_0009 = worker.Create(OpCodes.Stloc_1);
 
+           
 
             Instruction IL_000a = worker.Create(OpCodes.Ldloc_0);
+
+            //Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4_4, 0x3e8);
+
             Instruction IL_000b = worker.Create(OpCodes.Ldloca_S, V_1);
             Instruction IL_000d = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
 
@@ -494,7 +519,9 @@ namespace FoolishServer.Runtime
             getMethod.Body.Instructions.Add(IL_0007);
             getMethod.Body.Instructions.Add(IL_0008);
             getMethod.Body.Instructions.Add(IL_0009);
+            //getMethod.Body.Instructions.Add(IL_0009_1);
             getMethod.Body.Instructions.Add(IL_000a);
+            //getMethod.Body.Instructions.Add(IL_000a_1);
             getMethod.Body.Instructions.Add(IL_000b);
             getMethod.Body.Instructions.Add(IL_000d);
             getMethod.Body.Instructions.Add(IL_0012);

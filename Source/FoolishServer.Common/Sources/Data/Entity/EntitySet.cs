@@ -37,8 +37,16 @@ namespace FoolishServer.Data.Entity
         internal EntitySet(IDbSet<T> dbSet)
         {
             DbSet = dbSet;
-            Dictionary = new ThreadSafeDictionary<EntityKey, T>((IDictionary<EntityKey, T>)dbSet.RawEntities);
-            dbSet.OnDataModified += OnDbSetDataModified;
+            ThreadSafeDictionary<EntityKey, T> source = (ThreadSafeDictionary<EntityKey, T>)dbSet.RawEntities;
+
+            lock (source.SyncRoot)
+            {
+                Dictionary = new ThreadSafeDictionary<EntityKey, T>(source);
+            }
+            lock (dbSet.SyncRoot)
+            {
+                dbSet.OnDataModified += OnDbSetDataModified;
+            }
         }
 
         /// <summary>
@@ -112,14 +120,15 @@ namespace FoolishServer.Data.Entity
                 return false;
             }
             Dictionary[entity.GetEntityKey()] = entity;
-            entity.State = EStorageState.Stored;
+            entity.SetState(EStorageState.Stored);
             if (entity.ModifiedType == EModifyType.Modify && entity.KeyIsModified())
             {
                 FConsole.WriteWarnFormatWithCategory(Categories.ENTITY, "DbSet<{0}>: A key of entity has been changed from {0} to {1}.", entity.GetOldEntityKey(), entity.GetEntityKey());
                 Remove(entity.GetOldEntityKey());
             }
-            //通知数据中心更新数据
+            //刷新Key
             entity.RefreshEntityKey();
+            //通知数据中心更新数据
             DbSet.OnModified(entity.GetEntityKey(), entity);
             return true;
         }
@@ -169,7 +178,12 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public void LoadAll()
         {
-            Dictionary = new ThreadSafeDictionary<EntityKey, T>((IDictionary<EntityKey, T>)DbSet.LoadAll());
+            IReadOnlyDictionary<EntityKey, T> entities = DbSet.LoadAll();
+            Dictionary.Clear();
+            foreach (KeyValuePair<EntityKey, T> kv in entities)
+            {
+                Dictionary.Add(kv.Key, kv.Value);
+            }
         }
 
         /// <summary>
@@ -180,12 +194,12 @@ namespace FoolishServer.Data.Entity
             if (entity == null)
             {
                 Dictionary.Remove(key);
-                FConsole.Write("DbSet removed " + key + ".");
+                //FConsole.Write("DbSet removed " + key + ".");
             }
             else if (entity.ModifiedType != EModifyType.Remove)
             {
                 Dictionary[entity.GetEntityKey()] = entity;
-                FConsole.Write("DbSet modified " + key + ".");
+                //FConsole.Write("DbSet modified " + key + ".");
             }
         }
     }

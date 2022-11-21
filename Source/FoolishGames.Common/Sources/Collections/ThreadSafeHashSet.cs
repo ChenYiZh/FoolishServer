@@ -11,7 +11,7 @@ namespace FoolishGames.Collections
     {
         private HashSet<T> _cache;
 
-        private readonly object syncRoot = new object();
+        public readonly object SyncRoot = new object();
 
         public ThreadSafeHashSet()
         {
@@ -27,7 +27,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Count;
                 }
@@ -38,7 +38,7 @@ namespace FoolishGames.Collections
 
         public bool Add(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Add(item);
             }
@@ -46,7 +46,7 @@ namespace FoolishGames.Collections
 
         public void UnionWith(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.UnionWith(other);
             }
@@ -54,7 +54,7 @@ namespace FoolishGames.Collections
 
         public void IntersectWith(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.IntersectWith(other);
             }
@@ -62,7 +62,7 @@ namespace FoolishGames.Collections
 
         public void ExceptWith(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.ExceptWith(other);
             }
@@ -70,7 +70,7 @@ namespace FoolishGames.Collections
 
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.SymmetricExceptWith(other);
             }
@@ -78,7 +78,7 @@ namespace FoolishGames.Collections
 
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.IsSubsetOf(other);
             }
@@ -86,7 +86,7 @@ namespace FoolishGames.Collections
 
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.IsSupersetOf(other);
             }
@@ -94,7 +94,7 @@ namespace FoolishGames.Collections
 
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.IsProperSupersetOf(other);
             }
@@ -102,7 +102,7 @@ namespace FoolishGames.Collections
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.IsProperSubsetOf(other);
             }
@@ -110,7 +110,7 @@ namespace FoolishGames.Collections
 
         public bool Overlaps(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Overlaps(other);
             }
@@ -118,7 +118,7 @@ namespace FoolishGames.Collections
 
         public bool SetEquals(IEnumerable<T> other)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.SetEquals(other);
             }
@@ -126,7 +126,7 @@ namespace FoolishGames.Collections
 
         void ICollection<T>.Add(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Add(item);
             }
@@ -134,7 +134,7 @@ namespace FoolishGames.Collections
 
         public void Clear()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Clear();
             }
@@ -142,7 +142,7 @@ namespace FoolishGames.Collections
 
         public bool Contains(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Contains(item);
             }
@@ -150,7 +150,7 @@ namespace FoolishGames.Collections
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.CopyTo(array, arrayIndex);
             }
@@ -158,7 +158,7 @@ namespace FoolishGames.Collections
 
         public bool Remove(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Remove(item);
             }
@@ -166,7 +166,7 @@ namespace FoolishGames.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -179,7 +179,7 @@ namespace FoolishGames.Collections
 
         public void OnDeserialization(object sender)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.OnDeserialization(sender);
             }
@@ -187,7 +187,7 @@ namespace FoolishGames.Collections
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.GetObjectData(info, context);
             }

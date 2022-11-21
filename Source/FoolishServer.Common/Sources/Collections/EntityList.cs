@@ -1,9 +1,11 @@
 ﻿using FoolishGames.Collections;
 using FoolishGames.Common;
+using FoolishGames.Timer;
 using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
 using FoolishServer.Struct;
+using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +16,7 @@ namespace FoolishServer.Collections
     /// <summary>
     /// Model属性使用的列表
     /// </summary>
+    [ProtoContract, Serializable]
     public sealed class EntityList<T> : PropertyEntity, IThreadSafeList<T>
     {
         private bool isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
@@ -44,7 +47,10 @@ namespace FoolishServer.Collections
                 {
                     List[index] = value;
                 }
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
@@ -60,20 +66,29 @@ namespace FoolishServer.Collections
                 {
                     List.Add(item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    lock (SyncRoot)
+                    {
+                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    }
                 }
             }
             else
             {
                 List.Add(item);
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
         public void Clear()
         {
             List.Clear();
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
         }
 
         public bool Contains(T item)
@@ -104,32 +119,101 @@ namespace FoolishServer.Collections
                 {
                     List.Insert(index, item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    lock (SyncRoot)
+                    {
+                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                    }
                 }
             }
             else
             {
                 List.Insert(index, item);
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                lock (SyncRoot)
+                {
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
+                }
             }
         }
 
         public bool Remove(T item)
         {
             bool result = List.Remove(item);
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
             return result;
         }
 
         public void RemoveAt(int index)
         {
             List.RemoveAt(index);
-            NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            lock (SyncRoot)
+            {
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return List.GetEnumerator();
+        }
+
+        internal override void SetParent(Entity parent, string propertyName)
+        {
+            base.SetParent(parent, propertyName);
+            if (isPropertyEntity)
+            {
+                lock (SyncRoot)
+                {
+                    foreach (T child in List)
+                    {
+                        PropertyEntity entity;
+                        if ((entity = child as PropertyEntity) != null)
+                        {
+                            entity.ModifiedTime = TimeLord.Now;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 修改已经提交时执行
+        /// </summary>
+        internal override void OnModificationCommitted()
+        {
+            base.OnModificationCommitted();
+            lock (SyncRoot)
+            {
+                foreach (T child in List)
+                {
+                    PropertyEntity entity;
+                    if ((entity = child as PropertyEntity) != null)
+                    {
+                        entity.OnModificationCommitted();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 数据数据库中拉取下来
+        /// </summary>
+        internal override void OnPulledFromDb()
+        {
+            base.OnPulledFromDb();
+            lock (SyncRoot)
+            {
+                foreach (T child in List)
+                {
+                    PropertyEntity entity;
+                    if ((entity = child as PropertyEntity) != null)
+                    {
+                        entity.OnPulledFromDb();
+                    }
+                }
+            }
         }
     }
 }

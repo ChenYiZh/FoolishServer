@@ -9,7 +9,7 @@ namespace FoolishGames.Collections
     {
         private Queue<T> _cache;
 
-        private object syncRoot = new object();
+        public readonly object SyncRoot = new object();
 
         public int Count { get { return _cache.Count; } }
 
@@ -25,7 +25,7 @@ namespace FoolishGames.Collections
 
         public T Dequeue()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Dequeue();
             }
@@ -33,7 +33,7 @@ namespace FoolishGames.Collections
 
         public void Enqueue(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Enqueue(item);
             }
@@ -41,7 +41,7 @@ namespace FoolishGames.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -49,7 +49,7 @@ namespace FoolishGames.Collections
 
         public T Peek()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Peek();
             }
@@ -57,7 +57,7 @@ namespace FoolishGames.Collections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -65,7 +65,7 @@ namespace FoolishGames.Collections
 
         public void Clear()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Clear();
             }

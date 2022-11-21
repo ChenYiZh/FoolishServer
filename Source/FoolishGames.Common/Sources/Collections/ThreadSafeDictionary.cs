@@ -11,7 +11,7 @@ namespace FoolishGames.Collections
     {
         private Dictionary<TKey, TValue> _cache;
 
-        private readonly object syncRoot = new object();
+        public readonly object SyncRoot = new object();
 
         public ThreadSafeDictionary()
         {
@@ -32,7 +32,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Keys.ToList();
                 }
@@ -43,7 +43,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Values.ToList();
                 }
@@ -54,7 +54,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Count;
                 }
@@ -67,7 +67,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Keys;
                 }
@@ -78,7 +78,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Values;
                 }
@@ -89,14 +89,14 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache[key];
                 }
             }
             set
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     _cache[key] = value;
                 }
@@ -105,7 +105,7 @@ namespace FoolishGames.Collections
 
         public bool ContainsKey(TKey key)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.ContainsKey(key);
             }
@@ -113,7 +113,7 @@ namespace FoolishGames.Collections
 
         public void Add(TKey key, TValue value)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Add(key, value);
             }
@@ -121,7 +121,7 @@ namespace FoolishGames.Collections
 
         public bool Remove(TKey key)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Remove(key);
             }
@@ -129,7 +129,7 @@ namespace FoolishGames.Collections
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.TryGetValue(key, out value);
             }
@@ -137,7 +137,7 @@ namespace FoolishGames.Collections
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Add(item.Key, item.Value);
             }
@@ -145,7 +145,7 @@ namespace FoolishGames.Collections
 
         public void Clear()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Clear();
             }
@@ -153,7 +153,7 @@ namespace FoolishGames.Collections
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Contains(item);
             }
@@ -161,7 +161,7 @@ namespace FoolishGames.Collections
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Remove(item.Key);
             }
@@ -169,7 +169,7 @@ namespace FoolishGames.Collections
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -182,7 +182,7 @@ namespace FoolishGames.Collections
 
         public void OnDeserialization(object sender)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.OnDeserialization(sender);
             }
@@ -190,7 +190,7 @@ namespace FoolishGames.Collections
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.GetObjectData(info, context);
             }

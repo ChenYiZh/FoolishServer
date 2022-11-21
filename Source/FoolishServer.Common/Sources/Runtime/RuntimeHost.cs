@@ -89,6 +89,7 @@ namespace FoolishServer.Runtime
                 //初始化配置
                 Configeration.Initialize();
 
+                //创建自定义脚本
                 if (!string.IsNullOrEmpty(Settings.MainClass))
                 {
                     CustomRuntime = ObjectFactory.Create<IRuntime>(Settings.MainClass);
@@ -98,11 +99,26 @@ namespace FoolishServer.Runtime
                     }
                 }
 
+                //自定义脚本初始启动
                 if (CustomRuntime != null)
                 {
                     CustomRuntime.OnStartup();
                 }
 
+                //数据库信息初始化
+                DataContext.Initialize();
+                //自定义脚本初始启动
+                if (CustomRuntime != null)
+                {
+                    CustomRuntime.OnDatebaseInitialized();
+                }
+                //开始加载数据
+                DataContext.Start();
+                //准备起服
+                if (CustomRuntime != null)
+                {
+                    CustomRuntime.ReadyToStartServers();
+                }
                 //起服
                 foreach (IHostSetting setting in Settings.HostSettings)
                 {

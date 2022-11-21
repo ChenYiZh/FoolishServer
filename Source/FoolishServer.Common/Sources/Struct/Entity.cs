@@ -1,5 +1,7 @@
-﻿using FoolishGames.Log;
+﻿using FoolishGames.Collections;
+using FoolishGames.Log;
 using FoolishGames.Timer;
+using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
 using Newtonsoft.Json;
@@ -25,6 +27,12 @@ namespace FoolishServer.Struct
     public abstract class Entity : IEntity
     {
         /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        [JsonIgnore]
+        public abstract EStorageState State { get; }
+
+        /// <summary>
         /// 锁
         /// </summary>
         protected internal object SyncRoot = new object();
@@ -45,13 +53,13 @@ namespace FoolishServer.Struct
         /// 上次修改的时间
         /// Set: 只在初始化时起作用
         /// </summary>        
-        [ProtoMember(ushort.MaxValue), EntityField]
+        [EntityField, JsonProperty, ProtoMember(ushort.MaxValue)]
         public DateTime ModifiedTime
         {
             get { lock (SyncRoot) { return modifiedTime; } }
             internal set
             {
-                if (modifiedTime == DateTime.MinValue)
+                lock (SyncRoot)
                 {
                     modifiedTime = value;
                 }
@@ -70,6 +78,9 @@ namespace FoolishServer.Struct
         [JsonIgnore]
         public EModifyType ModifiedType { get { lock (SyncRoot) { return modifiedType; } } }
 
+        [JsonIgnore]
+        private ICollection<PropertyEntity> Children { get; set; } = new HashSet<PropertyEntity>();
+
         /// <summary>
         /// 注入时调用
         /// </summary>
@@ -79,7 +90,7 @@ namespace FoolishServer.Struct
         }
 
         /// <summary>
-        /// 属性调用的实现函数
+        /// 属性调用的实现函数,外部需要锁
         /// </summary>
         internal virtual void OnNotifyPropertyModified(string propertyName, object oldValue, object value)
         {
@@ -89,6 +100,19 @@ namespace FoolishServer.Struct
             if (property != null && oldValue == null)
             {
                 property.SetParent(this, propertyName);
+                Children.Add(property);
+
+                foreach (PropertyEntity child in Children)
+                {
+                    child.ModifiedTime = TimeLord.Now;
+                }
+                return;
+            }
+            property = oldValue as PropertyEntity;
+            if (property != null && value == null)
+            {
+                Children.Remove(property);
+                property.RemoveFromParent();
             }
         }
 
@@ -100,7 +124,10 @@ namespace FoolishServer.Struct
             lock (SyncRoot)
             {
                 NotifyModifiedType(modifiedType);
-                modifiedTime = TimeLord.Now;
+                if (State == EStorageState.Stored)
+                {
+                    modifiedTime = TimeLord.Now;
+                }
             }
         }
 
@@ -139,7 +166,26 @@ namespace FoolishServer.Struct
             lock (SyncRoot)
             {
                 ResetModifiedType();
-                modifiedTime = TimeLord.Now;
+                //modifiedTime = TimeLord.Now;
+                foreach (PropertyEntity child in Children)
+                {
+                    child.OnModificationCommitted();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 数据数据库中拉取下来
+        /// </summary>
+        internal virtual void OnPulledFromDb()
+        {
+            lock (SyncRoot)
+            {
+                ResetModifiedType();
+                foreach (PropertyEntity child in Children)
+                {
+                    child.OnPulledFromDb();
+                }
             }
         }
         /// <summary>

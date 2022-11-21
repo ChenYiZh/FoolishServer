@@ -22,6 +22,25 @@ namespace FoolishServer.Struct
         internal Entity Parent { get { lock (SyncRoot) { return parent; } } }
 
         /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        private EStorageState state = EStorageState.New;
+
+        /// <summary>
+        /// 当前实例的存储状态
+        /// </summary>
+        public override EStorageState State
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return parent == null ? state : parent.State;
+                }
+            }
+        }
+
+        /// <summary>
         /// 当前实例在父实例中的属性名称
         /// </summary>
         [NonSerialized]
@@ -37,12 +56,13 @@ namespace FoolishServer.Struct
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="propertyName"></param>
-        internal void SetParent(Entity parent, string propertyName)
+        internal virtual void SetParent(Entity parent, string propertyName)
         {
             lock (SyncRoot)
             {
                 this.parent = parent;
                 this.propertyNameInParent = propertyName;
+
             }
         }
 
@@ -55,6 +75,7 @@ namespace FoolishServer.Struct
             {
                 parent = null;
                 propertyNameInParent = null;
+                state = EStorageState.Removed;
             }
         }
         /// <summary>

@@ -26,5 +26,15 @@ namespace FoolishServer.Data
         {
             throw new NotImplementedException();
         }
+
+        public IEnumerable<T> LoadAll<T>() where T : MajorEntity, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public T Find<T>(EntityKey key) where T : MajorEntity, new()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace FoolishGames.Collections
     {
         private Stack<T> _cache;
 
-        private readonly object syncRoot = new object();
+        public readonly object SyncRoot = new object();
 
         public ThreadSafeStack()
         {
@@ -25,7 +25,7 @@ namespace FoolishGames.Collections
         {
             get
             {
-                lock (syncRoot)
+                lock (SyncRoot)
                 {
                     return _cache.Count;
                 }
@@ -34,7 +34,7 @@ namespace FoolishGames.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -42,7 +42,7 @@ namespace FoolishGames.Collections
 
         public T Peek()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Peek();
             }
@@ -50,7 +50,7 @@ namespace FoolishGames.Collections
 
         public T Pop()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.Pop();
             }
@@ -58,7 +58,7 @@ namespace FoolishGames.Collections
 
         public void Push(T item)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Push(item);
             }
@@ -66,7 +66,7 @@ namespace FoolishGames.Collections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 return _cache.GetEnumerator();
             }
@@ -74,7 +74,7 @@ namespace FoolishGames.Collections
 
         public void Clear()
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 _cache.Clear();
             }

@@ -23,7 +23,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// Redis管理类
         /// </summary>
-        public static IDatabase Redis { get; private set; }
+        public static IRawDatabase RawDatabase { get; set; }
 
         /// <summary>
         /// 连接着的数据库
@@ -65,7 +65,13 @@ namespace FoolishServer.Data
         /// </summary>
         public static IEntitySet<T> GetEntity<T>() where T : MajorEntity, new()
         {
-            IDbSet<T> dbSet = (IDbSet<T>)EntityPool[FType<T>.Type];
+            Type type = FType<T>.Type;
+            if (!EntityPool.ContainsKey(type))
+            {
+                FConsole.WriteErrorFormatWithCategory(Categories.ENTITY, "There is no EntitySet type of {0}.", type.FullName);
+                return null;
+            }
+            IDbSet<T> dbSet = (IDbSet<T>)EntityPool[type];
             return new EntitySet<T>(dbSet);
         }
 
@@ -98,7 +104,7 @@ namespace FoolishServer.Data
                 Type[] types = assembly.GetTypes();
                 foreach (Type type in types)
                 {
-                    if (type.IsSubclassOf(majorType))
+                    if (type.IsSubclassOf(majorType) && type.GetCustomAttribute<EntityTableAttribute>() != null)
                     {
                         InitializeDataContainer(type);
                     }
@@ -106,13 +112,31 @@ namespace FoolishServer.Data
             }
 
             //建立Redis连接
-            Redis = new RedisDatabase(Settings.RedisSetting);
-            Redis.Connect();
+            if (RawDatabase == null)
+            {
+                RawDatabase = new RedisDatabase(Settings.RedisSetting);
+            }
+        }
+
+        /// <summary>
+        /// 开始读取数据
+        /// </summary>
+        internal static void Start()
+        {
+            RawDatabase.Connect();
+            //加载所有热数据
+            foreach (IDbSet dbSet in entityPool.Values)
+            {
+                dbSet.PullAllRawData();
+            }
 
             //开启计时器
             Timer = new Timer(Tick, null, TIMER_INTERVAL, TIMER_INTERVAL);
         }
 
+        /// <summary>
+        /// 反射用的
+        /// </summary>
         private static Type DbSetType = typeof(DbSet<>);
         /// <summary>
         /// 初始化数据容器
@@ -127,20 +151,13 @@ namespace FoolishServer.Data
         }
 
         /// <summary>
-        /// 读取热数据
-        /// </summary>
-        private static void ReadRawData()
-        {
-
-        }
-
-        /// <summary>
         /// 计时器事件
         /// </summary>
         private static void Tick(object sender)
         {
             Parallel.ForEach(EntityPool.Values, (IDbSet dbSet) =>
             {
+                //FConsole.WriteWarn("Tick: ");
                 try
                 {
                     bool commit = false;
@@ -208,10 +225,28 @@ namespace FoolishServer.Data
                 }
             });
             //强制Redis落地
-            if (Redis != null)
+            if (RawDatabase != null)
             {
-                Redis.Close();
+                RawDatabase.Close();
             }
+        }
+
+        /// <summary>
+        /// 将缓存的数据全部提交
+        /// </summary>
+        public static void PushAllRawData()
+        {
+            Parallel.ForEach(EntityPool.Values, (IDbSet dbSet) =>
+            {
+                try
+                {
+                    dbSet.PushAllRawData();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
+                }
+            });
         }
     }
 }
