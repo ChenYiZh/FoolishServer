@@ -46,10 +46,7 @@ namespace FoolishServer.Collections
                 {
                     Dictionary[key] = value;
                 }
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
@@ -73,19 +70,13 @@ namespace FoolishServer.Collections
                 {
                     Dictionary.Add(key, value);
                     (value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    lock (SyncRoot)
-                    {
-                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                    }
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
                 Dictionary.Add(key, value);
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
@@ -97,29 +88,20 @@ namespace FoolishServer.Collections
                 {
                     Dictionary.Add(item);
                     (item.Value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    lock (SyncRoot)
-                    {
-                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                    }
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
                 Dictionary.Add(item);
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public void Clear()
         {
             Dictionary.Clear();
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
@@ -155,20 +137,14 @@ namespace FoolishServer.Collections
         public bool Remove(TKey key)
         {
             bool result = Dictionary.Remove(key);
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
             bool result = Dictionary.Remove(item);
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 

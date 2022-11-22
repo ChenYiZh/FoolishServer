@@ -36,14 +36,26 @@ namespace FoolishServer.Data
         public IReadOnlyDictionary<EntityKey, T> RawEntities { get { return rawEntities; } }
 
         /// <summary>
-        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送
+        /// 现在真在使用的修改缓存池id
         /// </summary>
-        private ThreadSafeDictionary<EntityKey, T> modifiedEntities = new ThreadSafeDictionary<EntityKey, T>();
+        private int modifiedEntitiesPoolIndex = 0;
 
         /// <summary>
-        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送
+        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
+        /// 防止多线程阻塞，所以使用集合池
         /// </summary>
-        public IReadOnlyDictionary<EntityKey, T> ModifiedEntities { get { return modifiedEntities; } }
+        private IReadOnlyDictionary<EntityKey, T>[] modifiedEntitiesPool = null;
+
+        /// <summary>
+        /// 现在真在使用的修改缓存池id
+        /// </summary>
+        public int ModifiedEntitiesPoolIndex { get { return modifiedEntitiesPoolIndex; } }
+
+        /// <summary>
+        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
+        /// 防止多线程阻塞，所以使用集合池
+        /// </summary>
+        public IReadOnlyList<IReadOnlyDictionary<EntityKey, T>> ModifiedEntitiesPool { get { return modifiedEntitiesPool; } }
 
         /// <summary>
         /// 冷数据
@@ -69,6 +81,28 @@ namespace FoolishServer.Data
         /// 用于锁的对象
         /// </summary>
         public object SyncRoot { get; private set; } = new object();
+
+        /// <summary>
+        /// 提交的线程管理
+        /// </summary>
+        internal Thread CommitThread { get; private set; }
+
+        /// <summary>
+        /// 提交判断标示
+        /// </summary>
+        private int commitFlag = 0;
+
+        public DbSet()
+        {
+            modifiedEntitiesPool = new IReadOnlyDictionary<EntityKey, T>[Settings.ModifiedCacheCount];
+            for (int i = 0; i < modifiedEntitiesPool.Length; i++)
+            {
+                modifiedEntitiesPool[i] = new ThreadSafeDictionary<EntityKey, T>();
+            }
+            //CommitThread = new Thread(OnCommitModifiedData);
+            //CommitThread.Priority = ThreadPriority.Highest;
+            //CommitThread.Start();
+        }
 
         /// <summary>
         /// 非泛型修改数据通知，内部强制转换
@@ -125,7 +159,7 @@ namespace FoolishServer.Data
             }
 
             //更新
-            modifiedEntities[key] = entity;
+           ((ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = entity;
 
             Modify(entity);
             //通知事件
@@ -151,7 +185,7 @@ namespace FoolishServer.Data
             coldEntities.Remove(key);
 
             //提交更改
-            modifiedEntities[key] = null;
+            ((ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = null;
             //通知
             OnDataModified?.Invoke(key, null);
         }
@@ -179,7 +213,72 @@ namespace FoolishServer.Data
         /// </summary>
         public void CommitModifiedData()
         {
-            CommitModifiedEntitys(modifiedEntities, () => { modifiedEntities.Clear(); });
+            OnCommitModifiedData(null);
+            //Interlocked.Exchange(ref commitFlag, 1);
+        }
+        /// <summary>
+        /// 提交操作
+        /// </summary>
+        /// <param name="state"></param>
+        private void OnCommitModifiedData(object state)
+        {
+            //while (true)
+            //{
+            //    if (commitFlag > 0)
+            //    {
+            //        Interlocked.Exchange(ref commitFlag, 0);
+                    try
+                    {
+                        int pushIndex = modifiedEntitiesPoolIndex - 1;
+                        if (pushIndex < 0)
+                        {
+                            pushIndex = Settings.ModifiedCacheCount - 1;
+                        }
+                        int nextIndex = modifiedEntitiesPoolIndex + 1;
+                        if (nextIndex >= Settings.ModifiedCacheCount)
+                        {
+                            nextIndex = 0;
+                        }
+                        Interlocked.Exchange(ref modifiedEntitiesPoolIndex, nextIndex);
+                        ThreadSafeDictionary<EntityKey, T> entities = (ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
+                        ForceCommitModifiedData(entities);
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
+                    }
+            //    }
+            //    Thread.Sleep(10);
+            //}
+        }
+
+        /// <summary>
+        /// 提交所有修改
+        /// </summary>
+        public void ForceCommitAllModifiedData()
+        {
+            lock (this)
+            {
+                foreach (ThreadSafeDictionary<EntityKey, T> entities in modifiedEntitiesPool)
+                {
+                    ForceCommitModifiedData(entities);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 强制提交修改
+        /// </summary>
+        private void ForceCommitModifiedData(ThreadSafeDictionary<EntityKey, T> entities)
+        {
+            try
+            {
+                CommitModifiedEntitys(entities, () => { entities.Clear(); });
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
+            }
         }
 
         /// <summary>
@@ -213,18 +312,33 @@ namespace FoolishServer.Data
             {
                 List<DbCommition> commitions = new List<DbCommition>();
                 Dictionary<EntityKey, T> dic = null;
-                lock (entities.SyncRoot)
+                bool lockToken = false;
+                try
                 {
-                    //中间缓存池，防死锁
-                    dic = new Dictionary<EntityKey, T>(entities);
-                    onCopied?.Invoke();
+                    Monitor.TryEnter(entities.SyncRoot, Settings.LockerTimeout, ref lockToken);
+                    if (lockToken)
+                    {
+                        //中间缓存池，防死锁
+                        dic = new Dictionary<EntityKey, T>(entities);
+                        onCopied?.Invoke();
+                    }
                 }
-                foreach (KeyValuePair<EntityKey, T> kv in dic)
+                finally
                 {
-                    commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
-                    kv.Value?.ResetModifiedType();
-                }                
-                DataContext.RawDatabase.CommitModifiedEntitys(commitions);
+                    if (lockToken)
+                    {
+                        Monitor.Exit(entities.SyncRoot);
+                    }
+                }
+                if (lockToken)
+                {
+                    foreach (KeyValuePair<EntityKey, T> kv in dic)
+                    {
+                        commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
+                        kv.Value?.ResetModifiedType();
+                    }
+                    DataContext.RawDatabase.CommitModifiedEntitys(commitions);
+                }
             }
         }
 
@@ -233,6 +347,14 @@ namespace FoolishServer.Data
             // TODO: LoadAll;
             ReleaseCountdown = Settings.DataReleasePeriod;
             return new Dictionary<EntityKey, T>();
+        }
+
+        /// <summary>
+        /// 执行释放
+        /// </summary>
+        public void Release()
+        {
+            //CommitThread.Abort();
         }
     }
 }

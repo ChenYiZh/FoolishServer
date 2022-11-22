@@ -41,17 +41,17 @@ namespace FoolishGames.Timer
             {
                 try
                 {
-                    lock (syncRoot)
+                    //lock (syncRoot)
+                    //{
+                    if (PacketWatch == null)
                     {
-                        if (PacketWatch == null)
-                        {
-                            return DateTime.Now;
-                        }
-                        else
-                        {
-                            return PacketWatch.Now;
-                        }
+                        return DateTime.Now;
                     }
+                    else
+                    {
+                        return PacketWatch.Now;
+                    }
+                    //}
                 }
                 catch (Exception e)
                 {
@@ -70,17 +70,17 @@ namespace FoolishGames.Timer
             {
                 try
                 {
-                    lock (syncRoot)
+                    //lock (syncRoot)
+                    //{
+                    if (PacketWatch == null)
                     {
-                        if (PacketWatch == null)
-                        {
-                            return DateTime.UtcNow;
-                        }
-                        else
-                        {
-                            return PacketWatch.UTC;
-                        }
+                        return DateTime.UtcNow;
                     }
+                    else
+                    {
+                        return PacketWatch.UTC;
+                    }
+                    //}
                 }
                 catch (Exception e)
                 {

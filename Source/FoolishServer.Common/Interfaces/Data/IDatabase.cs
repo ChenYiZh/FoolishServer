@@ -11,6 +11,11 @@ namespace FoolishServer.Data
     public interface IDatabase
     {
         /// <summary>
+        /// 是什么类型的数据库
+        /// </summary>
+        EDatabase Kind { get; }
+
+        /// <summary>
         /// 是否还连接着
         /// </summary>
         bool Connected { get; }

@@ -49,16 +49,22 @@ namespace FoolishServer.Data
         /// </summary>
         private StackExchange.Redis.IDatabase Database { get; set; }
 
+        /// <summary>
+        /// 什么类型的数据库
+        /// </summary>
+        public EDatabase Kind { get; private set; }
+
         public RedisDatabase(IRedisSetting setting)
         {
             Setting = setting;
+            Kind = EDatabase.Redis;
         }
         /// <summary>
         /// 关闭
         /// </summary>
         public void Close()
         {
-            FConsole.WriteWithCategory(Categories.REDIS, "Redis closing...");
+            FConsole.WriteWithCategory(Kind.ToString(), "Redis closing...");
             if (HeartbeatTime != null)
             {
                 try
@@ -67,7 +73,7 @@ namespace FoolishServer.Data
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
                 HeartbeatTime = null;
             }
@@ -82,7 +88,7 @@ namespace FoolishServer.Data
                     }
                     catch (Exception e)
                     {
-                        FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                        FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                     }
                 }
                 try
@@ -91,7 +97,7 @@ namespace FoolishServer.Data
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
                 Redis = null;
                 Redis = null;
@@ -104,7 +110,7 @@ namespace FoolishServer.Data
         /// <returns></returns>
         public bool Connect()
         {
-            FConsole.WriteInfoWithCategory(Categories.REDIS, "Redis connecting");
+            FConsole.WriteInfoWithCategory(Kind.ToString(), "Redis connecting...");
             ConfigurationOptions options = new ConfigurationOptions();
             options.get_EndPoints().Add(new IPEndPoint(IPAddress.Parse(Setting.Host), Setting.Port));
             options.Password = Setting.Password;
@@ -120,7 +126,7 @@ namespace FoolishServer.Data
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
             }
             else if (!Connected)
@@ -131,7 +137,7 @@ namespace FoolishServer.Data
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
                 try
                 {
@@ -139,7 +145,7 @@ namespace FoolishServer.Data
                 }
                 catch (Exception e)
                 {
-                    FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
             }
             if (Connected && HeartbeatTime == null)
@@ -150,7 +156,7 @@ namespace FoolishServer.Data
             {
                 RedisServer = Redis.GetServer(Setting.Host, Setting.Port);
                 Database = Redis.GetDatabase(Setting.DbIndex);
-                FConsole.WriteInfoFormatWithCategory(Categories.REDIS, "Redis[{0}] connected.", Setting.DbIndex);
+                FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "Redis[{0}] connected.", Setting.DbIndex);
             }
             return Connected;
         }
@@ -166,7 +172,7 @@ namespace FoolishServer.Data
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
             }
         }
 
@@ -198,7 +204,7 @@ namespace FoolishServer.Data
             }
             catch (Exception e)
             {
-                FConsole.WriteExceptionWithCategory(Categories.REDIS, e);
+                FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 return false;
             }
         }

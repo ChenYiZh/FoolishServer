@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 
 namespace FoolishServer.Struct
@@ -33,9 +35,24 @@ namespace FoolishServer.Struct
         {
             get
             {
-                lock (SyncRoot)
+                //lock (SyncRoot)
+                //{
+                //    return parent == null ? state : parent.State;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
                 {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                     return parent == null ? state : parent.State;
+
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
                 }
             }
         }
@@ -49,7 +66,31 @@ namespace FoolishServer.Struct
         /// <summary>
         /// 当前实例在父实例中的属性名称
         /// </summary>
-        internal string PropertyNameInParent { get { lock (SyncRoot) { return propertyNameInParent; } } }
+        internal string PropertyNameInParent
+        {
+            get
+            {
+                //lock (SyncRoot)
+                //{
+                //    return propertyNameInParent;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    return propertyNameInParent;
+
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 绑入父物体
@@ -58,11 +99,25 @@ namespace FoolishServer.Struct
         /// <param name="propertyName"></param>
         internal virtual void SetParent(Entity parent, string propertyName)
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    this.parent = parent;
+            //    this.propertyNameInParent = propertyName;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 this.parent = parent;
                 this.propertyNameInParent = propertyName;
-
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
 
@@ -71,11 +126,27 @@ namespace FoolishServer.Struct
         /// </summary>
         internal void RemoveFromParent()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    parent = null;
+            //    propertyNameInParent = null;
+            //    state = EStorageState.Removed;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 parent = null;
                 propertyNameInParent = null;
                 state = EStorageState.Removed;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
         /// <summary>

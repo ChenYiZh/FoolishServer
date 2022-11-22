@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -9,6 +10,114 @@ namespace FoolishGames.Collections
 {
     public class ThreadSafeDictionary<TKey, TValue> : IThreadSafeDictionary<TKey, TValue>
     {
+        #region ConcurrentDictionary 
+        //private ConcurrentDictionary<TKey, TValue> dictionary =  new ConcurrentDictionary<TKey, TValue>();
+
+        //public object SyncRoot { get { return this; } }
+
+        //public ThreadSafeDictionary()
+        //{
+        //    dictionary = new ConcurrentDictionary<TKey, TValue>();
+        //}
+
+        //public ThreadSafeDictionary(int capacity)
+        //{
+        //    dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
+        //}
+
+        //public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary)
+        //{
+        //    dictionary = new ConcurrentDictionary<TKey, TValue>(dictionary);
+        //}
+
+        //public TValue this[TKey key]
+        //{
+        //    get { return dictionary[key]; }
+        //    set { dictionary[key] = value; }
+        //}
+
+        //TValue IReadOnlyDictionary<TKey, TValue>.this[TKey key] { get { return dictionary[key]; } }
+
+        //public ICollection<TKey> Keys { get { return dictionary.Keys; } }
+
+        //public ICollection<TValue> Values { get { return dictionary.Values; } }
+
+        //public int Count { get { return dictionary.Count; } }
+
+        //public bool IsReadOnly { get { return false; } }
+
+        //IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys { get { return dictionary.Keys; } }
+
+        //IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values { get { return dictionary.Values; } }
+
+        //public void Add(TKey key, TValue value)
+        //{
+        //    dictionary.TryAdd(key, value);
+        //}
+
+        //public void Add(KeyValuePair<TKey, TValue> item)
+        //{
+        //    dictionary.TryAdd(item.Key, item.Value);
+        //}
+
+        //public void Clear()
+        //{
+        //    dictionary.Clear();
+        //}
+
+        //public bool Contains(KeyValuePair<TKey, TValue> item)
+        //{
+        //    return dictionary.Contains(item);
+        //}
+
+        //public bool ContainsKey(TKey key)
+        //{
+        //    return dictionary.ContainsKey(key);
+        //}
+
+        //public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        //{
+        //    return dictionary.GetEnumerator();
+        //}
+
+        //public void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public void OnDeserialization(object sender)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public bool Remove(TKey key)
+        //{
+        //    TValue value;
+        //    return dictionary.TryRemove(key, out value);
+        //}
+
+        //public bool Remove(KeyValuePair<TKey, TValue> item)
+        //{
+        //    TValue value;
+        //    return dictionary.TryRemove(item.Key, out value);
+        //}
+
+        //public bool TryGetValue(TKey key, out TValue value)
+        //{
+        //    return dictionary.TryGetValue(key, out value);
+        //}
+
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return dictionary.GetEnumerator();
+        //}
+        #endregion
+        #region Dictionary+Lock
         private Dictionary<TKey, TValue> _cache;
 
         public readonly object SyncRoot = new object();
@@ -200,5 +309,6 @@ namespace FoolishGames.Collections
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

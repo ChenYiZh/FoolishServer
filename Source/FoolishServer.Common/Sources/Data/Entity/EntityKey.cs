@@ -28,6 +28,7 @@ namespace FoolishServer.Data.Entity
             {
                 type = null;
                 RefreshKeyName();
+                CheckIsSingleKey();
             }
         }
 
@@ -72,6 +73,7 @@ namespace FoolishServer.Data.Entity
         /// <param name="keys"></param>
         public EntityKey(params object[] keys)
         {
+            IsSingleKey = false;
             type = null;
             this.keys = keys;
             keyName = null;
@@ -86,12 +88,32 @@ namespace FoolishServer.Data.Entity
         /// <param name="keys"></param>
         internal EntityKey(Type type, params object[] keys)
         {
+            IsSingleKey = false;
             this.type = type;
             this.keys = keys;
             keyName = null;
             tableName = null;
             fullName = null;
             MakeKeyName();
+            CheckIsSingleKey();
+        }
+
+        /// <summary>
+        /// 是否是主键，在作为字典Key时用来提升性能
+        /// </summary>
+        private bool IsSingleKey { get; set; }
+
+        /// <summary>
+        /// 判断是否是主键，在作为字典Key时用来提升性能
+        /// </summary>
+        private void CheckIsSingleKey()
+        {
+            IsSingleKey = false;
+            if (type != null)
+            {
+                TableScheme tableScheme = DataContext.GetTableScheme(type) as TableScheme;
+                IsSingleKey = tableScheme != null && tableScheme.KeyFields.Count == 1;
+            }
         }
 
         /// <summary>
@@ -148,6 +170,10 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public static bool operator ==(EntityKey key1, EntityKey key2)
         {
+            if (key1.IsSingleKey && key2.IsSingleKey)
+            {
+                return key1.Type == key2.Type && key1.keys[0] == key2.keys[0];
+            }
             return key1.ToString() == key2.ToString();
         }
 
@@ -156,7 +182,7 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public static bool operator !=(EntityKey key1, EntityKey key2)
         {
-            return key1.ToString() != key2.ToString();
+            return !(key1 == key2);
         }
 
         /// <summary>
@@ -164,9 +190,15 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj == null || string.IsNullOrEmpty(keyName))
+            EntityKey? other = obj as EntityKey?;
+            if (!other.HasValue)
             {
+                FConsole.Write("!other.HasValue");
                 return false;
+            }
+            if (IsSingleKey && other.Value.IsSingleKey)
+            {
+                return type == other.Value.type && keys[0].Equals(other.Value.keys[0]);
             }
             return ToString() == obj.ToString();
         }

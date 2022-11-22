@@ -2,6 +2,7 @@
 using FoolishGames.Log;
 using FoolishGames.Timer;
 using FoolishServer.Common;
+using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 using FoolishServer.Log;
 using Newtonsoft.Json;
@@ -41,7 +42,30 @@ namespace FoolishServer.Struct
         /// 是否已经发生变化
         /// </summary>
         [JsonIgnore]
-        public bool IsModified { get { lock (SyncRoot) { return ModifiedType != EModifyType.UnModified; } } }
+        public bool IsModified
+        {
+            get
+            {
+                //lock (SyncRoot)
+                //{
+                //    return ModifiedType != EModifyType.UnModified;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    return ModifiedType != EModifyType.UnModified;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 上次修改的时间
@@ -56,12 +80,46 @@ namespace FoolishServer.Struct
         [EntityField, JsonProperty, ProtoMember(ushort.MaxValue)]
         public DateTime ModifiedTime
         {
-            get { lock (SyncRoot) { return modifiedTime; } }
+            get
+            {
+                //lock (SyncRoot)
+                //{
+                //    return modifiedTime;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    return modifiedTime;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
             internal set
             {
-                lock (SyncRoot)
+                //lock (SyncRoot)
+                //{
+                //    modifiedTime = value;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
                 {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                     modifiedTime = value;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
                 }
             }
         }
@@ -76,7 +134,52 @@ namespace FoolishServer.Struct
         /// 操作类型
         /// </summary>
         [JsonIgnore]
-        public EModifyType ModifiedType { get { lock (SyncRoot) { return modifiedType; } } }
+        public EModifyType ModifiedType
+        {
+            get
+            {
+                //lock (SyncRoot)
+                //{
+                //    return modifiedType;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    return modifiedType;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+            //EntitySet调用
+            internal set
+            {
+                //lock (SyncRoot)
+                //{
+                //    modifiedType = value;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    modifiedType = value;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+        }
 
         [JsonIgnore]
         private ICollection<PropertyEntity> Children { get; set; } = new HashSet<PropertyEntity>();
@@ -96,23 +199,26 @@ namespace FoolishServer.Struct
         {
             NotifyModified(EModifyType.Modify, propertyName);
             //设置数据关联
-            PropertyEntity property = value as PropertyEntity;
-            if (property != null && oldValue == null)
+            lock (SyncRoot)
             {
-                property.SetParent(this, propertyName);
-                Children.Add(property);
-
-                foreach (PropertyEntity child in Children)
+                PropertyEntity property = value as PropertyEntity;
+                if (property != null && oldValue == null)
                 {
-                    child.ModifiedTime = TimeLord.Now;
+                    property.SetParent(this, propertyName);
+                    Children.Add(property);
+
+                    foreach (PropertyEntity child in Children)
+                    {
+                        child.ModifiedTime = TimeLord.Now;
+                    }
+                    return;
                 }
-                return;
-            }
-            property = oldValue as PropertyEntity;
-            if (property != null && value == null)
-            {
-                Children.Remove(property);
-                property.RemoveFromParent();
+                property = oldValue as PropertyEntity;
+                if (property != null && value == null)
+                {
+                    Children.Remove(property);
+                    property.RemoveFromParent();
+                }
             }
         }
 
@@ -163,9 +269,9 @@ namespace FoolishServer.Struct
         /// </summary>
         internal virtual void OnModificationCommitted()
         {
+            ResetModifiedType();
             lock (SyncRoot)
             {
-                ResetModifiedType();
                 //modifiedTime = TimeLord.Now;
                 foreach (PropertyEntity child in Children)
                 {
@@ -193,9 +299,23 @@ namespace FoolishServer.Struct
         /// </summary>
         internal virtual void ResetModifiedType()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    modifiedType = EModifyType.UnModified;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 modifiedType = EModifyType.UnModified;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
     }

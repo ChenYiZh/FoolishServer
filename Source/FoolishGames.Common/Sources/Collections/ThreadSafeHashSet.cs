@@ -9,6 +9,8 @@ namespace FoolishGames.Collections
 {
     public class ThreadSafeHashSet<T> : IThreadSafeHashSet<T>
     {
+
+        #region HashSet+Lock
         private HashSet<T> _cache;
 
         public readonly object SyncRoot = new object();
@@ -192,5 +194,6 @@ namespace FoolishGames.Collections
                 _cache.GetObjectData(info, context);
             }
         }
+        #endregion
     }
 }

@@ -143,12 +143,12 @@ namespace FoolishServer.RPC.Sockets
             //CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
 
             //对象池初始化
-            acceptEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxAcceptCapacity);
+            acceptEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>();
             for (int i = 0; i < setting.MaxAcceptCapacity; i++)
             {
                 acceptEventArgsPool.Push(CreateAcceptEventArgs());
             }
-            ioEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>(setting.MaxIOCapacity);
+            ioEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>();
             for (int i = 0; i < setting.MaxIOCapacity; i++)
             {
                 SocketAsyncEventArgs ioEventArgs = new SocketAsyncEventArgs();

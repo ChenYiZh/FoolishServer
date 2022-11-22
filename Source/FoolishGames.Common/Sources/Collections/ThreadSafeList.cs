@@ -8,6 +8,7 @@ namespace FoolishGames.Collections
 {
     public class ThreadSafeList<T> : IThreadSafeList<T>
     {
+        #region List+Lock
         private List<T> _cache;
 
         public readonly object SyncRoot = new object();
@@ -129,5 +130,6 @@ namespace FoolishGames.Collections
                 _cache.CopyTo(array, arrayIndex);
             }
         }
+        #endregion
     }
 }

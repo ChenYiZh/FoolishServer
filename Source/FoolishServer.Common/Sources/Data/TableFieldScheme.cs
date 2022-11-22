@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using FoolishGames.Common;
 using FoolishServer.Data.Entity;
 
 namespace FoolishServer.Data
@@ -29,6 +30,14 @@ namespace FoolishServer.Data
             Attribute = attribute;
             Type = property;
             PropertyName = property.Name;
+            if (Attribute.DefaultValue == null)
+            {
+                DefaultValue = FType.GetDefaultValueFromType(property.PropertyType);
+            }
+            else
+            {
+                DefaultValue = Attribute.DefaultValue;
+            }
         }
         /// <summary>
         /// 是否是主键
@@ -49,7 +58,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 默认补全值
         /// </summary>
-        public string DefaultValue { get { return Attribute.DefaultValue; } }
+        public object DefaultValue { get; private set; }
         /// <summary>
         /// 数据类型
         /// </summary>

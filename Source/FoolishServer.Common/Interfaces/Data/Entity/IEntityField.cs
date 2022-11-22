@@ -28,7 +28,7 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 默认补全值
         /// </summary>
-        string DefaultValue { get; }
+        object DefaultValue { get; }
         /// <summary>
         /// 数据类型
         /// </summary>

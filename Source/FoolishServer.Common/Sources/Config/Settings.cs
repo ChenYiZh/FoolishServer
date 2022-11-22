@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Common;
+using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace FoolishServer.Config
         /// <summary>
         /// 数据库连接信息
         /// </summary>
-        public static Dictionary<string, IDatabaseSetting> DatabaseSettings { get; private set; }
+        public static IReadOnlyDictionary<string, IDatabaseSetting> DatabaseSettings { get; private set; }
         /// <summary>
         /// Redis Key 分隔符
         /// </summary>
@@ -86,6 +87,14 @@ namespace FoolishServer.Config
         /// 每隔多少时间检测修改的数据并提交
         /// </summary>
         public static int DataCommitInterval { get; private set; }
+        /// <summary>
+        /// 线程锁的Timeout
+        /// </summary>
+        public static int LockerTimeout { get; private set; } = 100;
+        /// <summary>
+        /// 修改缓存池的数量，需要 >= 0
+        /// </summary>
+        public static int ModifiedCacheCount { get; private set; }
         /// <summary>
         /// 读取配置
         /// </summary>
@@ -108,9 +117,27 @@ namespace FoolishServer.Config
             //ModelNamespace = xml.SelectSingleNode("/configuration/script/model-namespace").GetValue("FoolishServer.Model");
             DataReleasePeriod = xml.SelectSingleNode("/configuration/settings/data-release-period").GetValue(15000);
             DataCommitInterval = xml.SelectSingleNode("/configuration/settings/data-commit-interval").GetValue(1000);
+            LockerTimeout = xml.SelectSingleNode("/configuration/settings/locker-timeout").GetValue(100);
+            ModifiedCacheCount = xml.SelectSingleNode("/configuration/settings/modified-cache-count").GetValue(3);
+            if (ModifiedCacheCount < 1) { ModifiedCacheCount = 3; }
             LoadHostSettings(xml);
             RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
-            // TODO: 读取DatabaseSettings
+
+            XmlNode dbNodes = xml.SelectSingleNode("/configuration/connections");
+            Dictionary<string, IDatabaseSetting> dbSettings = new Dictionary<string, IDatabaseSetting>();
+            DatabaseSettings = dbSettings;
+            foreach (XmlNode node in dbNodes)
+            {
+                DatabaseSetting setting = new DatabaseSetting(node);
+                if (setting.Kind != Data.EDatabase.Unknow)
+                {
+                    dbSettings.Add(setting.ConnectKey, setting);
+                }
+                else
+                {
+                    FConsole.WriteError("Fail to load db setting!");
+                }
+            }
         }
 
         private static void LoadHostSettings(XmlDocument xml)

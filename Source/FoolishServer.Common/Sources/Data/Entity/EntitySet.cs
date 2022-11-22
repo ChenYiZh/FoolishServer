@@ -27,9 +27,17 @@ namespace FoolishServer.Data.Entity
         public Type EntityType { get; private set; } = FType<T>.Type;
 
         /// <summary>
+        /// 全数据
+        /// </summary>
+        private ThreadSafeDictionary<EntityKey, T> FullData = null;
+
+        /// <summary>
         /// 这个类的缓存数据
         /// </summary>
-        private IDictionary<EntityKey, T> Dictionary { get; set; }
+        private ThreadSafeDictionary<EntityKey, T> Dictionary
+        {
+            get { return FullData != null ? FullData : (ThreadSafeDictionary<EntityKey, T>)DbSet.RawEntities; }
+        }
 
         /// <summary>
         /// 构造函数
@@ -41,8 +49,9 @@ namespace FoolishServer.Data.Entity
 
             lock (source.SyncRoot)
             {
-                Dictionary = new ThreadSafeDictionary<EntityKey, T>(source);
+                FullData = new ThreadSafeDictionary<EntityKey, T>(source);
             }
+
             lock (dbSet.SyncRoot)
             {
                 dbSet.OnDataModified += OnDbSetDataModified;
@@ -57,21 +66,17 @@ namespace FoolishServer.Data.Entity
             DbSet.OnDataModified -= OnDbSetDataModified;
         }
 
-        /// <summary>
-        /// 通过唯一主键查询
-        /// </summary>
-        /// <param name="entityId"></param>
-        /// <returns></returns>
-        public T Find(long entityId)
-        {
-            return Find(entityId);
-        }
+        ///// <summary>
+        ///// 通过唯一主键查询
+        ///// </summary>
+        //public T Find(long entityId)
+        //{
+        //    return Find(entityId);
+        //}
 
         /// <summary>
-        /// 符合主键查询
+        /// 主键查找，如果缓存中找不到，会从数据库中查询
         /// </summary>
-        /// <param name="keys"></param>
-        /// <returns></returns>
         public T Find(params object[] keys)
         {
             EntityKey entityKey = new EntityKey(EntityType, keys);
@@ -103,6 +108,7 @@ namespace FoolishServer.Data.Entity
                 FConsole.WriteWarnFormatWithCategory(Categories.ENTITY, "DbSet<{0}> add or update an empty data.", EntityType.FullName);
                 return false;
             }
+            entity.GetEntityKey().RefreshKeyName();
             if (string.IsNullOrEmpty(entity.GetEntityKey()))
             {
                 //当Key发生变化是，删除原数据
@@ -119,7 +125,19 @@ namespace FoolishServer.Data.Entity
                 Remove(entity);
                 return false;
             }
-            Dictionary[entity.GetEntityKey()] = entity;
+
+            ThreadSafeDictionary<EntityKey, T> dictionary = Dictionary;
+            lock (dictionary.SyncRoot)
+            {
+                EntityKey key = entity.GetEntityKey();
+                if (entity.ModifiedType == EModifyType.Add && dictionary.ContainsKey(key))
+                {
+                    entity.ModifiedType = dictionary[key].ModifiedType;
+                }
+                dictionary[key] = entity;
+            }
+            //Dictionary.Add(entity.GetEntityKey(), entity);
+
             entity.SetState(EStorageState.Stored);
             if (entity.ModifiedType == EModifyType.Modify && entity.KeyIsModified())
             {
@@ -178,11 +196,15 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         public void LoadAll()
         {
-            IReadOnlyDictionary<EntityKey, T> entities = DbSet.LoadAll();
-            Dictionary.Clear();
-            foreach (KeyValuePair<EntityKey, T> kv in entities)
+            lock (this)
             {
-                Dictionary.Add(kv.Key, kv.Value);
+                IReadOnlyDictionary<EntityKey, T> entities = DbSet.LoadAll();
+                //Dictionary.Clear();
+                //foreach (KeyValuePair<EntityKey, T> kv in entities)
+                //{
+                //    Dictionary.Add(kv.Key, kv.Value);
+                //}
+                FullData = new ThreadSafeDictionary<EntityKey, T>((IDictionary<EntityKey, T>)entities);
             }
         }
 

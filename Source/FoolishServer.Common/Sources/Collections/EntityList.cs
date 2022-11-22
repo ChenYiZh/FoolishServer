@@ -47,10 +47,7 @@ namespace FoolishServer.Collections
                 {
                     List[index] = value;
                 }
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
@@ -66,29 +63,20 @@ namespace FoolishServer.Collections
                 {
                     List.Add(item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    lock (SyncRoot)
-                    {
-                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                    }
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
                 List.Add(item);
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public void Clear()
         {
             List.Clear();
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         public bool Contains(T item)
@@ -119,39 +107,27 @@ namespace FoolishServer.Collections
                 {
                     List.Insert(index, item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
-                    lock (SyncRoot)
-                    {
-                        NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                    }
+                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
                 List.Insert(index, item);
-                lock (SyncRoot)
-                {
-                    NotifyModified(EModifyType.Modify, PropertyNameInParent);
-                }
+                NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public bool Remove(T item)
         {
             bool result = List.Remove(item);
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 
         public void RemoveAt(int index)
         {
             List.RemoveAt(index);
-            lock (SyncRoot)
-            {
-                NotifyModified(EModifyType.Modify, PropertyNameInParent);
-            }
+            NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

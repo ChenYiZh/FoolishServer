@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,6 +8,54 @@ namespace FoolishGames.Collections
 {
     public class ThreadSafeStack<T> : IThreadSafeStack<T>
     {
+        #region ConcurrentStack
+        //private ConcurrentStack<T> stack = null;
+
+        //public object SyncRoot { get { return this; } }
+
+        //public ThreadSafeStack()
+        //{
+        //    stack = new ConcurrentStack<T>();
+        //}
+
+        //public int Count { get { return stack.Count; } }
+
+        //public T Peek()
+        //{
+        //    T value;
+        //    stack.TryPeek(out value);
+        //    return value;
+        //}
+
+        //public T Pop()
+        //{
+        //    T value;
+        //    stack.TryPop(out value);
+        //    return value;
+        //}
+
+        //public void Push(T item)
+        //{
+        //    stack.Push(item);
+        //}
+
+        //public void Clear()
+        //{
+        //    stack.Clear();
+        //}
+
+        //public IEnumerator<T> GetEnumerator()
+        //{
+        //    return stack.GetEnumerator();
+        //}
+
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return stack.GetEnumerator();
+        //}
+        #endregion
+
+        #region Stack+Lock
         private Stack<T> _cache;
 
         public readonly object SyncRoot = new object();
@@ -79,5 +128,6 @@ namespace FoolishGames.Collections
                 _cache.Clear();
             }
         }
+        #endregion
     }
 }

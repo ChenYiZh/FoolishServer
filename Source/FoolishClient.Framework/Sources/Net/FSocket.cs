@@ -145,11 +145,11 @@ namespace FoolishClient.Net
         public virtual void ConnectAsync(Action<bool> callback = null)
         {
             IsRunning = true;
-            ThreadPool.QueueUserWorkItem((state) =>
+            ThreadPool.UnsafeQueueUserWorkItem((state) =>
             {
                 bool success = Connect();
-                callback?.Invoke(success);
-            });
+                (state as Action<bool>)?.Invoke(success);
+            }, callback);
         }
 
         /// <summary>

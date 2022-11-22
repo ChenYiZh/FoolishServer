@@ -12,13 +12,13 @@ namespace FoolishServer.Data.Entity
     /// <typeparam name="T"></typeparam>
     public interface IEntitySet<T> : IEnumerable<T> where T : MajorEntity, new()
     {
-        /// <summary>
-        /// 查找，如果缓存中找不到，会从数据库中查询
-        /// </summary>
-        T Find(long entityId);
+        ///// <summary>
+        ///// 查找，如果缓存中找不到，会从数据库中查询
+        ///// </summary>
+        //T Find(long entityId);
 
         /// <summary>
-        /// 复合主键查询
+        /// 主键查找，如果缓存中找不到，会从数据库中查询
         /// </summary>
         T Find(params object[] keys);
 

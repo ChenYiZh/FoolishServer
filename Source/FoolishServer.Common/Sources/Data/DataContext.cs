@@ -28,7 +28,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 连接着的数据库
         /// </summary>
-        public static IReadOnlyDictionary<string, IDatabase> Databases { get; private set; }
+        public static IReadOnlyDictionary<string, ISQLDatabase> Databases { get; private set; }
 
         /// <summary>
         /// 表结构
@@ -80,7 +80,11 @@ namespace FoolishServer.Data
         /// </summary>
         public static ITableScheme GetTableScheme(Type type)
         {
-            return tableSchemes[type];
+            if (tableSchemes.ContainsKey(type))
+            {
+                return tableSchemes[type];
+            }
+            return null;
         }
 
         /// <summary>
@@ -116,6 +120,24 @@ namespace FoolishServer.Data
             {
                 RawDatabase = new RedisDatabase(Settings.RedisSetting);
             }
+
+            //建立数据库连接
+
+            if (Databases == null)
+            {
+                Databases = new Dictionary<string, ISQLDatabase>();
+            }
+            IDictionary<string, ISQLDatabase> batabases = (IDictionary<string, ISQLDatabase>)Databases;
+            foreach (KeyValuePair<string, IDatabaseSetting> setting in Settings.DatabaseSettings)
+            {
+                if (batabases.ContainsKey(setting.Key))
+                {
+                    FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "The connectkey: '{0}' is exists, and database connection will not create.", setting.Key);
+                    continue;
+                }
+                batabases[setting.Key] = Database.Make(setting.Value);
+                batabases[setting.Key].CreateConnection(setting.Value);
+            }
         }
 
         /// <summary>
@@ -123,7 +145,15 @@ namespace FoolishServer.Data
         /// </summary>
         internal static void Start()
         {
+            // Redis 连接
             RawDatabase.Connect();
+
+            // 数据库连接
+            foreach (KeyValuePair<string, ISQLDatabase> database in Databases)
+            {
+                database.Value.Connect();
+            }
+
             //加载所有热数据
             foreach (IDbSet dbSet in entityPool.Values)
             {
@@ -155,7 +185,8 @@ namespace FoolishServer.Data
         /// </summary>
         private static void Tick(object sender)
         {
-            Parallel.ForEach(EntityPool.Values, (IDbSet dbSet) =>
+            //Parallel.ForEach(EntityPool.Values, (IDbSet dbSet) =>
+            foreach (IDbSet dbSet in EntityPool.Values)
             {
                 //FConsole.WriteWarn("Tick: ");
                 try
@@ -180,18 +211,23 @@ namespace FoolishServer.Data
                     }
                     if (commit)
                     {
-                        ThreadPool.QueueUserWorkItem((obj) => { dbSet.CommitModifiedData(); });
+                        ThreadPool.UnsafeQueueUserWorkItem((obj) =>
+                        {
+                            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                            dbSet.CommitModifiedData();
+                        }, null);
                     }
                     if (release)
                     {
-                        ThreadPool.QueueUserWorkItem((obj) => { dbSet.ReleaseColdEntities(); });
+                        ThreadPool.UnsafeQueueUserWorkItem((obj) => { dbSet.ReleaseColdEntities(); }, null);
                     }
                 }
                 catch (Exception e)
                 {
                     FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
                 }
-            });
+            }
+            //});
         }
 
         /// <summary>
@@ -217,7 +253,8 @@ namespace FoolishServer.Data
             {
                 try
                 {
-                    dbSet.CommitModifiedData();
+                    dbSet.ForceCommitAllModifiedData();
+                    dbSet.Release();
                 }
                 catch (Exception e)
                 {

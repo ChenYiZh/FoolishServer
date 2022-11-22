@@ -92,9 +92,9 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 默认补全值
         /// </summary>
-        public string DefaultValue { get; set; }
+        public object DefaultValue { get; set; }
         /// <summary>
-        /// 数据类新
+        /// 数据类型
         /// </summary>
         public ETableFieldType FieldType { get; set; } = ETableFieldType.Auto;
     }

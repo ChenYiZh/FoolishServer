@@ -15,4 +15,17 @@ namespace FoolishGames.Common
         /// </summary>
         public static Type Type { get; private set; } = typeof(T);
     }
+    /// <summary>
+    /// Type的一些操作
+    /// </summary>
+    public static class FType
+    {
+        /// <summary>
+        /// 根据Type，获取默认值
+        /// </summary>
+        public static object GetDefaultValueFromType(Type type)
+        {
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
+        }
+    }
 }

@@ -27,9 +27,13 @@ namespace FoolishServer.Data
         /// </summary>
         void ReleaseColdEntities();
         /// <summary>
-        /// 将所有修改过的数据进行提交
+        /// 将修改过的数据进行提交
         /// </summary>
         void CommitModifiedData();
+        /// <summary>
+        /// 将所有修改过的数据进行提交
+        /// </summary>
+        void ForceCommitAllModifiedData();
         /// <summary>
         /// 非泛型修改数据通知，内部强制转换
         /// </summary>
@@ -42,6 +46,10 @@ namespace FoolishServer.Data
         /// 将所有的缓存的热数据全部推送出去
         /// </summary>
         void PushAllRawData();
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        void Release();
     }
 
     /// <summary>
@@ -58,9 +66,14 @@ namespace FoolishServer.Data
         /// </summary>
         IReadOnlyDictionary<EntityKey, T> RawEntities { get; }
         /// <summary>
-        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送
+        /// 现在真在使用的修改缓存池id
         /// </summary>
-        IReadOnlyDictionary<EntityKey, T> ModifiedEntities { get; }
+        int ModifiedEntitiesPoolIndex { get; }
+        /// <summary>
+        /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
+        /// 防止多线程阻塞，所以使用集合池
+        /// </summary>
+        IReadOnlyList<IReadOnlyDictionary<EntityKey, T>> ModifiedEntitiesPool { get; }
         /// <summary>
         /// 冷数据
         /// </summary>

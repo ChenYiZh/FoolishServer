@@ -16,7 +16,7 @@ namespace FoolishServer.Model
         [EntityField(IsKey = true)]
         [JsonProperty, ProtoMember(1)]
         public long UserId { get; set; }
-        [EntityField(IsKey = true)]
+        [EntityField]
         [JsonProperty, ProtoMember(2)]
         public string UserName { get; set; }
         [EntityField]
@@ -31,23 +31,47 @@ namespace FoolishServer.Model
         {
             get
             {
-                lock (SyncRoot)
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
                 {
+                    Monitor.TryEnter(syncRoot, 1000, ref lockTaken);
                     return testStr;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
                 }
             }
             set
             {
-                bool locked = false;
-                Monitor.TryEnter(SyncRoot, 1000, ref locked);
-                lock (SyncRoot)
+                bool equals = true;
+                object oldValue = null;
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
                 {
-                    if (!object.Equals(testStr, value))
+                    Monitor.TryEnter(syncRoot, 1000, ref lockTaken);
+                    equals = object.Equals(testStr, value);
+                    if (!equals)
                     {
-                        object temp = (object)testStr;
+                        oldValue = testStr;
                         testStr = value;
-                        NotifyPropertyModified("testStr", temp, (object)testStr);
                     }
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+                if (!equals)
+                {
+                    NotifyPropertyModified("TestStr", oldValue, value);
                 }
             }
         }

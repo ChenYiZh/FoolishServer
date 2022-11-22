@@ -1,4 +1,5 @@
-﻿using FoolishGames.Common;
+﻿using FoolishGames;
+using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishServer.Common;
@@ -231,38 +232,48 @@ namespace FoolishServer.Runtime
             public MethodReference EqualsMethod { get; private set; }
 
             /// <summary>
+            /// 锁的Timeout
+            /// </summary>
+            public int MillisecondsTimeout { get; private set; }
+
+            /// <summary>
             /// 赋值
             /// </summary>
             public GlobalMethodTypes(ModuleDefinition module, FieldDefinition syncRootField, MethodDefinition notifyMethod)
             {
+                MillisecondsTimeout = 100;
+
                 BoolType = module.ImportReference(FType<bool>.Type);
                 ObjectType = module.ImportReference(FType<object>.Type);
                 SyncRootField = module.ImportReference(syncRootField);
                 NotifyMethod = module.ImportReference(notifyMethod);
+
+
                 MethodInfo monitorEnterMethodInfo = null;
                 MethodInfo[] monitorMethods = typeof(System.Threading.Monitor).GetMethods();
 
+                foreach (MethodInfo method in monitorMethods)
+                {
+                    if (method.Name == "TryEnter")
+                    {
+                        ParameterInfo[] paras = method.GetParameters();
+                        if (paras.Length == 3 && paras[1].ParameterType == FType<int>.Type)
+                        {
+                            monitorEnterMethodInfo = method;
+                            break;
+                        }
+                    }
+                }
+
                 //foreach (MethodInfo method in monitorMethods)
                 //{
-                //    if (method.Name == "TryEnter")
+                //    if (method.Name == "TryEnter" && method.GetParameters().Length == 2)
                 //    {
-                //        ParameterInfo[] paras = method.GetParameters();
-                //        if (paras.Length == 3 && paras[1].ParameterType == FType<int>.Type)
-                //        {
-                //            monitorEnterMethodInfo = method;
-                //            break;
-                //        }
+                //        monitorEnterMethodInfo = method;
+                //        break;
                 //    }
                 //}
 
-                foreach (MethodInfo method in monitorMethods)
-                {
-                    if (method.Name == "TryEnter" && method.GetParameters().Length == 2)
-                    {
-                        monitorEnterMethodInfo = method;
-                        break;
-                    }
-                }
                 if (monitorEnterMethodInfo == null)
                 {
                     throw new Exception("The method: System.Threading.Monitor.TryEnter(object obj, int millisecondsTimeout, ref bool lockTaken); was not found!");
@@ -298,147 +309,182 @@ namespace FoolishServer.Runtime
             //          bool V_2,
             //          object V_3)
             setMethod.Body.InitLocals = true;
-            VariableDefinition V_0 = new VariableDefinition(MethodTypes.ObjectType);
-            VariableDefinition V_1 = new VariableDefinition(MethodTypes.BoolType);
-            VariableDefinition V_2 = new VariableDefinition(MethodTypes.BoolType);
-            VariableDefinition V_3 = new VariableDefinition(MethodTypes.ObjectType);
+            VariableDefinition V_0 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_1 = new VariableDefinition(MethodTypes.ObjectType);
+            VariableDefinition V_2 = new VariableDefinition(MethodTypes.ObjectType);
+            VariableDefinition V_3 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_4 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_5 = new VariableDefinition(MethodTypes.BoolType);
             setMethod.Body.Variables.Add(V_0);
             setMethod.Body.Variables.Add(V_1);
             setMethod.Body.Variables.Add(V_2);
             setMethod.Body.Variables.Add(V_3);
+            setMethod.Body.Variables.Add(V_4);
+            setMethod.Body.Variables.Add(V_5);
 
             //生成 IL代码
             Instruction IL_0000 = worker.Create(OpCodes.Nop);
-            Instruction IL_0001 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0002 = worker.Create(OpCodes.Ldfld, MethodTypes.SyncRootField);
-            Instruction IL_0007 = worker.Create(OpCodes.Stloc_0);
-            Instruction IL_0008 = worker.Create(OpCodes.Ldc_I4_0);
-            Instruction IL_0009 = worker.Create(OpCodes.Stloc_1);
+            Instruction IL_0001 = worker.Create(OpCodes.Ldc_I4_1);
+            Instruction IL_0002 = worker.Create(OpCodes.Stloc_0);
+            Instruction IL_0003 = worker.Create(OpCodes.Ldnull);
+            Instruction IL_0004 = worker.Create(OpCodes.Stloc_1);
+            Instruction IL_0005 = worker.Create(OpCodes.Ldarg_0);
+            Instruction IL_0006 = worker.Create(OpCodes.Ldfld, MethodTypes.SyncRootField);
+            Instruction IL_000b = worker.Create(OpCodes.Stloc_2);
+            Instruction IL_000c = worker.Create(OpCodes.Ldc_I4_0);
+            Instruction IL_000d = worker.Create(OpCodes.Stloc_3);
 
 
-            Instruction IL_000a = worker.Create(OpCodes.Ldloc_0);
+            Instruction IL_000e_0 = worker.Create(OpCodes.Nop);
+            Instruction IL_000e = worker.Create(OpCodes.Ldloc_2);
+            Instruction IL_000e_1 = worker.Create(OpCodes.Ldc_I4, MethodTypes.MillisecondsTimeout);
+            Instruction IL_000f = worker.Create(OpCodes.Ldloca_S, V_3);
+            Instruction IL_0011 = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
 
-            //Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4_4, 0x3e8);
+            //Instruction IL_0016 = worker.Create(OpCodes.Nop);
+            Instruction IL_0017 = worker.Create(OpCodes.Nop);
+            Instruction IL_0018 = worker.Create(OpCodes.Ldarg_0);
+            Instruction IL_0019 = worker.Create(OpCodes.Ldfld, privateField);
+            Instruction IL_001e = worker.Create(OpCodes.Box, paramType);
+            Instruction IL_0023 = worker.Create(OpCodes.Ldarg_1);
+            Instruction IL_0024 = worker.Create(OpCodes.Box, paramType);
+            Instruction IL_0029 = worker.Create(OpCodes.Call, MethodTypes.EqualsMethod);
 
+            Instruction IL_002e = worker.Create(OpCodes.Stloc_0);
+            Instruction IL_002f = worker.Create(OpCodes.Ldloc_0);
+            Instruction IL_0030 = worker.Create(OpCodes.Ldc_I4_0);
+            Instruction IL_0031 = worker.Create(OpCodes.Ceq);
+            Instruction IL_0033 = worker.Create(OpCodes.Stloc_S, V_4);
+            Instruction IL_0035 = worker.Create(OpCodes.Ldloc_S, V_4);
 
-            Instruction IL_000b = worker.Create(OpCodes.Ldloca_S, V_1);
-            Instruction IL_000d = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
+            Instruction IL_004e = worker.Create(OpCodes.Nop);
 
-            Instruction IL_0012 = worker.Create(OpCodes.Nop);
-            Instruction IL_0013 = worker.Create(OpCodes.Nop);
-            Instruction IL_0014 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0015 = worker.Create(OpCodes.Ldfld, privateField);
-            Instruction IL_0015_1 = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_001a = worker.Create(OpCodes.Ldarg_1);
-            Instruction IL_001a_1 = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_001b = worker.Create(OpCodes.Call, MethodTypes.EqualsMethod);
+            Instruction IL_0037 = worker.Create(OpCodes.Brfalse_S, IL_004e);
+            Instruction IL_0039 = worker.Create(OpCodes.Nop);
+            Instruction IL_003a = worker.Create(OpCodes.Ldarg_0);
+            Instruction IL_003b = worker.Create(OpCodes.Ldfld, privateField);
+            Instruction IL_0040 = worker.Create(OpCodes.Box, paramType);
+            Instruction IL_0045 = worker.Create(OpCodes.Stloc_1);
+            Instruction IL_0046 = worker.Create(OpCodes.Ldarg_0);
+            Instruction IL_0047 = worker.Create(OpCodes.Ldarg_1);
+            Instruction IL_0048 = worker.Create(OpCodes.Stfld, privateField);
+            Instruction IL_004d = worker.Create(OpCodes.Nop);
 
-            Instruction IL_0020 = worker.Create(OpCodes.Ldc_I4_0);
-            Instruction IL_0021 = worker.Create(OpCodes.Ceq);
-            Instruction IL_0023 = worker.Create(OpCodes.Stloc_2);
-            Instruction IL_0024 = worker.Create(OpCodes.Ldloc_2);
+            //IL_004e
 
-
-            Instruction IL_004a = worker.Create(OpCodes.Nop);
-
-            Instruction IL_0025 = worker.Create(OpCodes.Brfalse_S, IL_004a);
-            Instruction IL_0027 = worker.Create(OpCodes.Nop);
-            Instruction IL_0028 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0029 = worker.Create(OpCodes.Ldfld, privateField);
-            Instruction IL_0029_1 = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_002e = worker.Create(OpCodes.Stloc_3);
-
-            Instruction IL_002f = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0030 = worker.Create(OpCodes.Ldarg_1);
-            Instruction IL_0031 = worker.Create(OpCodes.Stfld, privateField);
-
-            Instruction IL_0036 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0037 = worker.Create(OpCodes.Ldstr, propertyName);
-            Instruction IL_003c = worker.Create(OpCodes.Ldloc_3);
-            Instruction IL_003d = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_003e = worker.Create(OpCodes.Ldfld, privateField);
-            Instruction IL_003e_1 = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_0043 = worker.Create(OpCodes.Call, MethodTypes.NotifyMethod);
+            Instruction IL_005c = worker.Create(OpCodes.Ldloc_0);
 
 
-            Instruction IL_0048 = worker.Create(OpCodes.Nop);
-            Instruction IL_0049 = worker.Create(OpCodes.Nop);
+            Instruction IL_004f = worker.Create(OpCodes.Leave_S, IL_005c);
 
+            Instruction IL_0051 = worker.Create(OpCodes.Ldloc_3);
 
-            Instruction IL_0058 = worker.Create(OpCodes.Ret);
+            Instruction IL_005b = worker.Create(OpCodes.Endfinally);
 
-            Instruction IL_004b = worker.Create(OpCodes.Leave_S, IL_0058);
+            Instruction IL_0052 = worker.Create(OpCodes.Brfalse_S, IL_005b);
+            Instruction IL_0054 = worker.Create(OpCodes.Ldloc_2);
+            Instruction IL_0055 = worker.Create(OpCodes.Call, MethodTypes.MonitorExit);
+            Instruction IL_005a = worker.Create(OpCodes.Nop);
 
-            Instruction IL_004d = worker.Create(OpCodes.Ldloc_1);
+            //IL_005a
+            //IL_005c
 
+            Instruction IL_005d = worker.Create(OpCodes.Ldc_I4_0);
+            Instruction IL_005e = worker.Create(OpCodes.Ceq);
+            Instruction IL_0060 = worker.Create(OpCodes.Stloc_S, V_5);
+            Instruction IL_0062 = worker.Create(OpCodes.Ldloc_S, V_5);
 
-            Instruction IL_0057 = worker.Create(OpCodes.Endfinally);
+            Instruction IL_007b = worker.Create(OpCodes.Ret);
 
-            Instruction IL_004e = worker.Create(OpCodes.Brfalse_S, IL_0057);
-            Instruction IL_0050 = worker.Create(OpCodes.Ldloc_0);
-            Instruction IL_0051 = worker.Create(OpCodes.Call, MethodTypes.MonitorExit);
+            Instruction IL_0064 = worker.Create(OpCodes.Brfalse_S, IL_007b);
+            Instruction IL_0066 = worker.Create(OpCodes.Nop);
+            Instruction IL_0067 = worker.Create(OpCodes.Ldarg_0);
+            Instruction IL_0068 = worker.Create(OpCodes.Ldstr, propertyName);
+            Instruction IL_006d = worker.Create(OpCodes.Ldloc_1);
+            Instruction IL_006e = worker.Create(OpCodes.Ldarg_1);
+            Instruction IL_006f = worker.Create(OpCodes.Box, paramType);
+            Instruction IL_0074 = worker.Create(OpCodes.Call, MethodTypes.NotifyMethod);
 
-            Instruction IL_0056 = worker.Create(OpCodes.Nop);
+            Instruction IL_0079 = worker.Create(OpCodes.Nop);
+            Instruction IL_007a = worker.Create(OpCodes.Nop);
+
+            //IL_007b
+
 
             //注入
             setMethod.Body.Instructions.Clear();
             setMethod.Body.Instructions.Add(IL_0000);
             setMethod.Body.Instructions.Add(IL_0001);
             setMethod.Body.Instructions.Add(IL_0002);
-            setMethod.Body.Instructions.Add(IL_0007);
-            setMethod.Body.Instructions.Add(IL_0008);
-            setMethod.Body.Instructions.Add(IL_0009);
-            //setMethod.Body.Instructions.Add(IL_0009_1);
-            setMethod.Body.Instructions.Add(IL_000a);
-            //setMethod.Body.Instructions.Add(IL_000a_1);
+            setMethod.Body.Instructions.Add(IL_0003);
+            setMethod.Body.Instructions.Add(IL_0004);
+            setMethod.Body.Instructions.Add(IL_0005);
+            setMethod.Body.Instructions.Add(IL_0006);
             setMethod.Body.Instructions.Add(IL_000b);
+            setMethod.Body.Instructions.Add(IL_000c);
             setMethod.Body.Instructions.Add(IL_000d);
-            setMethod.Body.Instructions.Add(IL_0012);
-            setMethod.Body.Instructions.Add(IL_0013);
-            setMethod.Body.Instructions.Add(IL_0014);
-            setMethod.Body.Instructions.Add(IL_0015);
-            setMethod.Body.Instructions.Add(IL_0015_1);
-            setMethod.Body.Instructions.Add(IL_001a);
-            setMethod.Body.Instructions.Add(IL_001a_1);
-            setMethod.Body.Instructions.Add(IL_001b);
-            setMethod.Body.Instructions.Add(IL_0020);
-            setMethod.Body.Instructions.Add(IL_0021);
+            setMethod.Body.Instructions.Add(IL_000e_0);
+            setMethod.Body.Instructions.Add(IL_000e);
+            setMethod.Body.Instructions.Add(IL_000e_1);
+            setMethod.Body.Instructions.Add(IL_000f);
+            setMethod.Body.Instructions.Add(IL_0011);
+            //setMethod.Body.Instructions.Add(IL_0016);
+            setMethod.Body.Instructions.Add(IL_0017);
+            setMethod.Body.Instructions.Add(IL_0018);
+            setMethod.Body.Instructions.Add(IL_0019);
+            setMethod.Body.Instructions.Add(IL_001e);
             setMethod.Body.Instructions.Add(IL_0023);
             setMethod.Body.Instructions.Add(IL_0024);
-            setMethod.Body.Instructions.Add(IL_0025);
-            setMethod.Body.Instructions.Add(IL_0027);
-            setMethod.Body.Instructions.Add(IL_0028);
             setMethod.Body.Instructions.Add(IL_0029);
-            setMethod.Body.Instructions.Add(IL_0029_1);
             setMethod.Body.Instructions.Add(IL_002e);
             setMethod.Body.Instructions.Add(IL_002f);
             setMethod.Body.Instructions.Add(IL_0030);
             setMethod.Body.Instructions.Add(IL_0031);
-            setMethod.Body.Instructions.Add(IL_0036);
+            setMethod.Body.Instructions.Add(IL_0033);
+            setMethod.Body.Instructions.Add(IL_0035);
             setMethod.Body.Instructions.Add(IL_0037);
-            setMethod.Body.Instructions.Add(IL_003c);
-            setMethod.Body.Instructions.Add(IL_003d);
-            setMethod.Body.Instructions.Add(IL_003e);
-            setMethod.Body.Instructions.Add(IL_003e_1);
-            setMethod.Body.Instructions.Add(IL_0043);
+            setMethod.Body.Instructions.Add(IL_0039);
+            setMethod.Body.Instructions.Add(IL_003a);
+            setMethod.Body.Instructions.Add(IL_003b);
+            setMethod.Body.Instructions.Add(IL_0040);
+            setMethod.Body.Instructions.Add(IL_0045);
+            setMethod.Body.Instructions.Add(IL_0046);
+            setMethod.Body.Instructions.Add(IL_0047);
             setMethod.Body.Instructions.Add(IL_0048);
-            setMethod.Body.Instructions.Add(IL_0049);
-            setMethod.Body.Instructions.Add(IL_004a);
-            setMethod.Body.Instructions.Add(IL_004b);
             setMethod.Body.Instructions.Add(IL_004d);
             setMethod.Body.Instructions.Add(IL_004e);
-            setMethod.Body.Instructions.Add(IL_0050);
+            setMethod.Body.Instructions.Add(IL_004f);
             setMethod.Body.Instructions.Add(IL_0051);
-            setMethod.Body.Instructions.Add(IL_0056);
-            setMethod.Body.Instructions.Add(IL_0057);
-            setMethod.Body.Instructions.Add(IL_0058);
+            setMethod.Body.Instructions.Add(IL_0052);
+            setMethod.Body.Instructions.Add(IL_0054);
+            setMethod.Body.Instructions.Add(IL_0055);
+            setMethod.Body.Instructions.Add(IL_005a);
+            setMethod.Body.Instructions.Add(IL_005b);
+            setMethod.Body.Instructions.Add(IL_005c);
+            setMethod.Body.Instructions.Add(IL_005d);
+            setMethod.Body.Instructions.Add(IL_005e);
+            setMethod.Body.Instructions.Add(IL_0060);
+            setMethod.Body.Instructions.Add(IL_0062);
+            setMethod.Body.Instructions.Add(IL_0064);
+            setMethod.Body.Instructions.Add(IL_0066);
+            setMethod.Body.Instructions.Add(IL_0067);
+            setMethod.Body.Instructions.Add(IL_0068);
+            setMethod.Body.Instructions.Add(IL_006d);
+            setMethod.Body.Instructions.Add(IL_006e);
+            setMethod.Body.Instructions.Add(IL_006f);
+            setMethod.Body.Instructions.Add(IL_0074);
+            setMethod.Body.Instructions.Add(IL_0079);
+            setMethod.Body.Instructions.Add(IL_007a);
+            setMethod.Body.Instructions.Add(IL_007b);
+
+
 
             //try-catch注入
             ExceptionHandler exceptionHandler = new ExceptionHandler(ExceptionHandlerType.Finally);
-            exceptionHandler.TryStart = IL_000a;
-            exceptionHandler.TryEnd = IL_004d;
-            exceptionHandler.HandlerStart = IL_004d;
-            exceptionHandler.HandlerEnd = IL_0058;
+            exceptionHandler.TryStart = IL_000e_0;
+            exceptionHandler.TryEnd = IL_0051;
+            exceptionHandler.HandlerStart = IL_0051;
+            exceptionHandler.HandlerEnd = IL_005c;
 
             setMethod.Body.ExceptionHandlers.Clear();
             setMethod.Body.ExceptionHandlers.Add(exceptionHandler);
@@ -465,9 +511,11 @@ namespace FoolishServer.Runtime
             VariableDefinition V_0 = new VariableDefinition(MethodTypes.ObjectType);
             VariableDefinition V_1 = new VariableDefinition(MethodTypes.BoolType);
             VariableDefinition V_2 = new VariableDefinition(getMethod.ReturnType);
+            VariableDefinition V_3 = new VariableDefinition(MethodTypes.BoolType);
             getMethod.Body.Variables.Add(V_0);
             getMethod.Body.Variables.Add(V_1);
             getMethod.Body.Variables.Add(V_2);
+            getMethod.Body.Variables.Add(V_3);
 
             //生成 IL代码
             Instruction IL_0000 = worker.Create(OpCodes.Nop);
@@ -477,16 +525,19 @@ namespace FoolishServer.Runtime
             Instruction IL_0008 = worker.Create(OpCodes.Ldc_I4_0);
             Instruction IL_0009 = worker.Create(OpCodes.Stloc_1);
 
-           
 
+
+            Instruction IL_000a_0 = worker.Create(OpCodes.Nop);
             Instruction IL_000a = worker.Create(OpCodes.Ldloc_0);
+
+            Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4, MethodTypes.MillisecondsTimeout);
 
             //Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4_4, 0x3e8);
 
             Instruction IL_000b = worker.Create(OpCodes.Ldloca_S, V_1);
             Instruction IL_000d = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
 
-            Instruction IL_0012 = worker.Create(OpCodes.Nop);
+            //Instruction IL_0012 = worker.Create(OpCodes.Nop);
             Instruction IL_0013 = worker.Create(OpCodes.Nop);
             Instruction IL_0014 = worker.Create(OpCodes.Ldarg_0);
             Instruction IL_0015 = worker.Create(OpCodes.Ldfld, privateField);
@@ -519,12 +570,12 @@ namespace FoolishServer.Runtime
             getMethod.Body.Instructions.Add(IL_0007);
             getMethod.Body.Instructions.Add(IL_0008);
             getMethod.Body.Instructions.Add(IL_0009);
-            //getMethod.Body.Instructions.Add(IL_0009_1);
+            getMethod.Body.Instructions.Add(IL_000a_0);
             getMethod.Body.Instructions.Add(IL_000a);
-            //getMethod.Body.Instructions.Add(IL_000a_1);
+            getMethod.Body.Instructions.Add(IL_000a_1);
             getMethod.Body.Instructions.Add(IL_000b);
             getMethod.Body.Instructions.Add(IL_000d);
-            getMethod.Body.Instructions.Add(IL_0012);
+            //getMethod.Body.Instructions.Add(IL_0012);
             getMethod.Body.Instructions.Add(IL_0013);
             getMethod.Body.Instructions.Add(IL_0014);
             getMethod.Body.Instructions.Add(IL_0015);
@@ -542,7 +593,7 @@ namespace FoolishServer.Runtime
 
             //try-catch注入
             ExceptionHandler exceptionHandler = new ExceptionHandler(ExceptionHandlerType.Finally);
-            exceptionHandler.TryStart = IL_000a;
+            exceptionHandler.TryStart = IL_000a_0;
             exceptionHandler.TryEnd = IL_001d;
             exceptionHandler.HandlerStart = IL_001d;
             exceptionHandler.HandlerEnd = IL_0028;

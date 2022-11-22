@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace FoolishServer.Data.Entity
@@ -43,16 +44,53 @@ namespace FoolishServer.Data.Entity
         /// 当前实例的存储状态
         /// </summary>
         [JsonIgnore]
-        public override EStorageState State { get { lock (SyncRoot) { return state; } } }
+        public override EStorageState State
+        {
+            get
+            {
+                //lock (SyncRoot)
+                //{
+                //    return state;
+                //}
+                object syncRoot = SyncRoot;
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
+                    return state;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+        }
         /// <summary>
         /// 当前实例的存储状态
         /// </summary>
         /// <param name="state"></param>
         internal void SetState(EStorageState state)
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    this.state = state;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 this.state = state;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
 
@@ -79,10 +117,11 @@ namespace FoolishServer.Data.Entity
         {
             Type type = GetType();
             TableScheme = DataContext.GetTableScheme(type);
-            object[] keys = new object[((TableScheme)TableScheme).KeyFields.Count];
+            IReadOnlyList<ITableFieldScheme> keyFields = ((TableScheme)TableScheme).KeyFields;
+            object[] keys = new object[keyFields.Count];
             for (int i = 0; i < keys.Length; i++)
             {
-                keys[i] = null;
+                keys[i] = keyFields[i].DefaultValue;
             }
             oldEntityKey = entityKey = new EntityKey(type, keys);
         }
@@ -156,9 +195,23 @@ namespace FoolishServer.Data.Entity
         /// <returns></returns>
         public EntityKey GetEntityKey()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    return entityKey;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 return entityKey;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
         /// <summary>
@@ -167,9 +220,23 @@ namespace FoolishServer.Data.Entity
         /// <returns></returns>
         internal EntityKey GetOldEntityKey()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    return oldEntityKey;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 return oldEntityKey;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
         /// <summary>
@@ -177,9 +244,23 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal bool KeyIsModified()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    return !string.IsNullOrEmpty(oldEntityKey) && oldEntityKey != entityKey;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 return !string.IsNullOrEmpty(oldEntityKey) && oldEntityKey != entityKey;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
         /// <summary>
@@ -196,9 +277,23 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal void RefreshEntityKey()
         {
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    oldEntityKey = entityKey;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 oldEntityKey = entityKey;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
 
@@ -208,9 +303,23 @@ namespace FoolishServer.Data.Entity
         internal override void OnPulledFromDb()
         {
             base.OnPulledFromDb();
-            lock (SyncRoot)
+            //lock (SyncRoot)
+            //{
+            //    state = EStorageState.Stored;
+            //}
+            object syncRoot = SyncRoot;
+            bool lockTaken = false;
+            try
             {
+                Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
                 state = EStorageState.Stored;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(syncRoot);
+                }
             }
         }
     }

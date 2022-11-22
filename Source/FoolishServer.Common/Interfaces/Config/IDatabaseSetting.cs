@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoolishServer.Data;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,5 +24,10 @@ namespace FoolishServer.Config
         /// 连接字符串
         /// </summary>
         string ConnectionString { get; }
+
+        /// <summary>
+        /// 是什么类型的数据库
+        /// </summary>
+        EDatabase Kind { get; }
     }
 }
