@@ -19,7 +19,11 @@ namespace FoolishServer.Data
         /// <summary>
         /// 先建立连接
         /// </summary>
-        /// <param name="setting"></param>
         void CreateConnection(IDatabaseSetting setting);
+
+        /// <summary>
+        /// 对表结构进行调整或创建
+        /// </summary>
+        void GenerateOrUpdateTableScheme(ITableScheme table);
     }
 }

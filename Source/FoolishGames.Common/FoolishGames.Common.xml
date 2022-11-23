@@ -1,0 +1,1307 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FoolishGames.Common</name>
+    </assembly>
+    <members>
+        <member name="T:FoolishGames.Action.IAction">
+            <summary>
+            消息处理类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.IAction.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.IAction.ActionId">
+            <summary>
+            ActionId
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.IAction.AnalysisTime">
+            <summary>
+            是否统计时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.IAction.AlertTimeout">
+            <summary>
+            警告超时时间，0为全部统计
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.IAction.Awake">
+            <summary>
+            刚创建时处理，所有参数都还没有赋值
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.IAction.SetReader(FoolishGames.IO.IMessageReader)">
+            <summary>
+            预处理数据在所有操作之前
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:FoolishGames.Action.IAction.Check">
+            <summary>
+            判断有效性
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.IAction.TakeAction(FoolishGames.IO.IMessageReader)">
+            <summary>
+            处理操作
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Action.GameAction">
+            <summary>
+            消息基类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.ActionId">
+            <summary>
+            ActionId
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.AnalysisTime">
+            <summary>
+            是否统计时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.AlertTimeout">
+            <summary>
+            警告超时时间毫秒，0为全部统计
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Action.GameAction.watch">
+            <summary>
+            计时器
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.IsTiming">
+            <summary>
+            是否在计时
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.Reader">
+            <summary>
+            接收到的消息
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.GameAction.Awake">
+            <summary>
+            刚创建时处理，所有参数都还没有赋值
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Action.GameAction.typeName">
+            <summary>
+            类名
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Action.GameAction.TypeName">
+            <summary>
+            类名
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.GameAction.Work(System.Int32,FoolishGames.IO.IMessageReader)">
+            <summary>
+            工作函数
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:FoolishGames.Action.GameAction.Check">
+            <summary>
+            判断有效性
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.GameAction.SetReader(FoolishGames.IO.IMessageReader)">
+            <summary>
+            消息预处理
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.ICompression">
+            <summary>
+            压缩接口
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.ICompression.Compress(System.Byte[])">
+            <summary>
+            压缩
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.ICompression.Uncompress(System.Byte[])">
+            <summary>
+            解压缩
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.IMessageHeader">
+            <summary>
+            消息构造接口
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.OpCode">
+            <summary>
+            操作码
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.ActionId">
+            <summary>
+            通讯协议Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.Compress">
+            <summary>
+            是否数据压缩
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.Secret">
+            <summary>
+            是否加密
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.IsError">
+            <summary>
+            是否有报错
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.Error">
+            <summary>
+            错误信息
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageHeader.GetPacketLength">
+            <summary>
+            包体长度
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageHeader.GetContext">
+            <summary>
+            内容信息
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageHeader.ContextLength">
+            <summary>
+            内容长度
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.IMessageReader">
+            <summary>
+            通讯数据读取
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadBool">
+            <summary>
+            读取Boolean
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadChar">
+            <summary>
+            读取Char
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadFloat">
+            <summary>
+            读取Float
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadDouble">
+            <summary>
+            读取Double
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadDecimal">
+            <summary>
+            读取Decimal
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadSByte">
+            <summary>
+            读取SByte
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadShort">
+            <summary>
+            读取Short
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadInt">
+            <summary>
+            读取Int
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadLong">
+            <summary>
+            读取Long
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadByte">
+            <summary>
+            读取Byte
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadUShort">
+            <summary>
+            读取UShort
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadUInt">
+            <summary>
+            读取UInt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadULong">
+            <summary>
+            读取ULong
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadDateTime">
+            <summary>
+            读取时间
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageReader.ReadString">
+            <summary>
+            读取字符串
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.IO.IMessageWriter">
+            <summary>
+            数据写入
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageWriter.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageWriter.OpCode">
+            <summary>
+            操作码
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.IMessageWriter.ActionId">
+            <summary>
+            通讯协议Id
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteHeader(System.Byte[],System.Int32)">
+            <summary>
+            写入消息头数据
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteBool(System.Boolean)">
+            <summary>
+            写入Boolean
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteChar(System.Char)">
+            <summary>
+            写入Char
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteFloat(System.Single)">
+            <summary>
+            写入Float
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteDouble(System.Double)">
+            <summary>
+            写入Double
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteDecimal(System.Decimal)">
+            <summary>
+            写入Decimal
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteSByte(System.SByte)">
+            <summary>
+            写入SByte
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteShort(System.Int16)">
+            <summary>
+            写入Short
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteInt(System.Int32)">
+            <summary>
+            写入Int
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteLong(System.Int64)">
+            <summary>
+            写入Long
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteByte(System.Byte)">
+            <summary>
+            写入Byte
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteUShort(System.UInt16)">
+            <summary>
+            写入UShort
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteUInt(System.UInt32)">
+            <summary>
+            写入UInt
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteULong(System.UInt64)">
+            <summary>
+            写入ULong
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteDateTime(System.DateTime)">
+            <summary>
+            写入时间
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.IMessageWriter.WriteString(System.String)">
+            <summary>
+            写入字符串
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.FPath">
+            <summary>
+            路径管理类
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.FPath.GetFullPath(System.String)">
+            <summary>
+            路径补全
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.GZipCompression">
+            <summary>
+            gzip压缩
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.GZipCompression.CompressionLevel">
+            <summary>
+            压缩级别
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.GZipCompression.Compress(System.Byte[])">
+            <summary>
+            压缩
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.GZipCompression.Uncompress(System.Byte[])">
+            <summary>
+            解压
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.MessageInfo">
+            <summary>
+            包含通讯协议的一些内部数据
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageInfo.HeaderLength">
+            <summary>
+            消息的头数据大小
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageInfo.#cctor">
+            <summary>
+            静态构造函数
+            </summary>
+        </member>
+        <member name="T:FoolishGames.IO.MessageReader">
+            <summary>
+            通讯包解析
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.OpCode">
+            <summary>
+            操作码
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.ActionId">
+            <summary>
+            通讯协议Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.Compress">
+            <summary>
+            是否数据压缩
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.Secret">
+            <summary>
+            是否加密
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.IsError">
+            <summary>
+            是否有报错
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.Error">
+            <summary>
+            错误信息
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageReader.ContextLength">
+            <summary>
+            内容长度
+            </summary>
+        </member>
+        <member name="F:FoolishGames.IO.MessageReader.readIndex">
+            <summary>
+            读取的数据指针
+            </summary>
+        </member>
+        <member name="F:FoolishGames.IO.MessageReader.context">
+            <summary>
+            通信包内容
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.GetContext">
+            <summary>
+            内容信息
+            </summary>
+        </member>
+        <member name="F:FoolishGames.IO.MessageReader.packetLength">
+            <summary>
+            包体长度
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.GetPacketLength">
+            <summary>
+            包体长度
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.#ctor(System.Byte[],System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="package"></param>
+            <param name="offset"></param>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadHeader(System.Byte[],System.Int32)">
+            <summary>
+            消息的基本数据读取
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadBool">
+            <summary>
+            读取Boolean
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadByte">
+            <summary>
+            读取Byte
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadChar">
+            <summary>
+            读取Char
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadDateTime">
+            <summary>
+            读取时间
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadDecimal">
+            <summary>
+            读取Decimal
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadDouble">
+            <summary>
+            读取Double
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadFloat">
+            <summary>
+            读取Float
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadInt">
+            <summary>
+            读取Int
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadLong">
+            <summary>
+            读取Long
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadSByte">
+            <summary>
+            读取SByte
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadShort">
+            <summary>
+            读取Short
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadString">
+            <summary>
+            读取字符串
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadUInt">
+            <summary>
+            读取UInt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadULong">
+            <summary>
+            读取ULong
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.IO.MessageReader.ReadUShort">
+            <summary>
+            读取UShort
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.IO.MessageWriter">
+            <summary>
+            通讯数据构建
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.MsgId">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.OpCode">
+            <summary>
+            操作码
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.ActionId">
+            <summary>
+            通讯协议Id
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.Compress">
+            <summary>
+            是否数据压缩
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.Secret">
+            <summary>
+            是否加密
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.IsError">
+            <summary>
+            是否有报错
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.Error">
+            <summary>
+            错误信息
+            </summary>
+        </member>
+        <member name="P:FoolishGames.IO.MessageWriter.ContextLength">
+            <summary>
+            内容长度
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.GetPacketLength">
+            <summary>
+            包体长度
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.GetContext">
+            <summary>
+            内容信息
+            </summary>
+        </member>
+        <member name="F:FoolishGames.IO.MessageWriter.stream">
+            <summary>
+            缓存池
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.Finalize">
+            <summary>
+            析构函数
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteHeader(System.Byte[],System.Int32)">
+            <summary>
+            写入消息头数据
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteBool(System.Boolean)">
+            <summary>
+            写入Boolean
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteByte(System.Byte)">
+            <summary>
+            写入Byte
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteChar(System.Char)">
+            <summary>
+            写入Char
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteDateTime(System.DateTime)">
+            <summary>
+            写入时间
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteDecimal(System.Decimal)">
+            <summary>
+            写入Decimal
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteDouble(System.Double)">
+            <summary>
+            写入Double
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteFloat(System.Single)">
+            <summary>
+            写入Float
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteInt(System.Int32)">
+            <summary>
+            写入Int
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteLong(System.Int64)">
+            <summary>
+            写入Long
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteSByte(System.SByte)">
+            <summary>
+            写入SByte
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteShort(System.Int16)">
+            <summary>
+            写入Short
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteString(System.String)">
+            <summary>
+            写入字符串
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteUInt(System.UInt32)">
+            <summary>
+            写入UInt
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteULong(System.UInt64)">
+            <summary>
+            写入ULong
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteUShort(System.UInt16)">
+            <summary>
+            写入UShort
+            </summary>
+        </member>
+        <member name="M:FoolishGames.IO.MessageWriter.WriteBytes(System.Byte[])">
+            <summary>
+            写入字节流
+            </summary>
+            <param name="bytes"></param>
+        </member>
+        <member name="T:FoolishGames.Log.ILogger">
+            <summary>
+            日志保存接口
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.ILogger.SaveLog(System.String,System.String)">
+            <summary>
+            保存日志
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="T:FoolishGames.Log.FConsole">
+            <summary>
+            输出类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Log.FConsole.LogStackTracker">
+            <summary>
+            是否输出堆栈
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Log.FConsole.CATEGORY">
+            <summary>
+            默认类别名称
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Log.FConsole.LogStackLevels">
+            <summary>
+            需要输出堆栈的Level
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Log.FConsole.Loggers">
+            <summary>
+            已注册的Logger
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.RegistLogger(FoolishGames.Log.ILogger)">
+            <summary>
+            注册Logger
+            </summary>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.RemoveLogger(FoolishGames.Log.ILogger)">
+            <summary>
+            移除Logger
+            </summary>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.Write(System.Object)">
+            <summary>
+            输出到Debug目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteWithCategory(System.String,System.Object)">
+            <summary>
+            输出到Debug目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteFormat(System.String,System.Object[])">
+            <summary>
+            输出到Debug目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteFormatWithCategory(System.String,System.String,System.Object[])">
+            <summary>
+            输出到Debug目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteInfo(System.Object)">
+            <summary>
+            输出到Info目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteInfoWithCategory(System.String,System.Object)">
+            <summary>
+            输出到Info目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteInfoFormat(System.String,System.Object[])">
+            <summary>
+            输出到Info目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteInfoFormatWithCategory(System.String,System.String,System.Object[])">
+            <summary>
+            输出到Info目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteWarn(System.Object)">
+            <summary>
+            输出到Warn目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteWarnWithCategory(System.String,System.Object)">
+            <summary>
+            指定类别输出到Warn目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteWarnFormat(System.String,System.Object[])">
+            <summary>
+            输出到Warn目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteWarnFormatWithCategory(System.String,System.String,System.Object[])">
+            <summary>
+            指定类别输出到Warn目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteError(System.Object)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteErrorWithCategory(System.String,System.Object)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteErrorFormat(System.String,System.Object[])">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteErrorFormatWithCategory(System.String,System.String,System.Object[])">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteException(System.Exception)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteException(System.String,System.Exception)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteExceptionWithCategory(System.String,System.Exception)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteExceptionWithCategory(System.String,System.String,System.Exception)">
+            <summary>
+            输出到Exception目录
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteTo(System.String,System.String,System.String,System.Object[])">
+            <summary>
+            输出到指定类别
+            </summary>
+            <param name="level">日志等级</param>
+            <param name="category">日志类别</param>
+            <param name="message">日志内容</param>
+            <param name="args"></param>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteLine(System.String,System.String,System.String)">
+            <summary>
+            服务器内部输出
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Log.FConsole.WriteLine(System.String,System.String)">
+            <summary>
+            服务器内部输出
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Proxy.ISupervisor">
+            <summary>
+            工头
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Proxy.ISupervisor.CheckIn(FoolishGames.Proxy.IWorker)">
+            <summary>
+            工人加入
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Proxy.IWorker">
+            <summary>
+            工人
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Proxy.IWorker.Work">
+            <summary>
+            工作
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Proxy.ActionBoss">
+            <summary>
+            Action的老板
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Proxy.ActionBoss.Exploit(FoolishGames.Action.GameAction,System.Int32,FoolishGames.IO.IMessageReader)">
+            <summary>
+            剥削劳动力
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Security.ICryptoProvider">
+            <summary>
+            加密类
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Security.ICryptoProvider.Encrypt(System.Byte[])">
+            <summary>
+            加密
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Security.ICryptoProvider.Decrypt(System.Byte[])">
+            <summary>
+            解密
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Security.AESCryptoProvider">
+            <summary>
+            AES加密
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.security.cryptography.aescryptoserviceprovider?view=netstandard-2.0</para>
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Security.AESCryptoProvider.#ctor(System.String,System.String)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="key"></param>
+            <param name="iv"></param>
+        </member>
+        <member name="M:FoolishGames.Security.AESCryptoProvider.Encrypt(System.Byte[])">
+            <summary>
+            加密
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Security.AESCryptoProvider.Decrypt(System.Byte[])">
+            <summary>
+            解密
+            </summary>
+            <param name="buffer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.Security.RSACryptoProvider">
+            <summary>
+            RSA加密类
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.security.cryptography.rsacryptoserviceprovider?view=netstandard-2.0</para>
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Security.RSACryptoProvider.OAEP">
+            <summary>
+            非对称性填充
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Security.RSACryptoProvider.RSAKeyInfo">
+            <summary>
+            密钥
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Security.RSACryptoProvider.#ctor(System.String,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="key">密钥</param>
+            <param name="oaep">非对称性填充</param>
+        </member>
+        <member name="M:FoolishGames.Security.RSACryptoProvider.Encrypt(System.Byte[])">
+            <summary>
+            加密
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Security.RSACryptoProvider.Decrypt(System.Byte[])">
+            <summary>
+            解密
+            </summary>
+            <param name="buffer"></param>
+            <returns></returns>
+        </member>
+        <member name="P:FoolishGames.Timer.IPacketWatch.Now">
+            <summary>
+            获取当前时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.IPacketWatch.UTC">
+            <summary>
+            获取UTC时间
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Timer.TimeLord">
+            <summary>
+            时间管理类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeLord.PacketWatch">
+            <summary>
+            当前使用的计时控件
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.TimeLord.syncRoot">
+            <summary>
+            锁
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeLord.SetPacketWatch(FoolishGames.Timer.IPacketWatch)">
+            <summary>
+            设置时间控件
+            </summary>
+            <param name="watch"></param>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeLord.Now">
+            <summary>
+            获取当前时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeLord.UTC">
+            <summary>
+            获取当前时间
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.AssemblyService">
+            <summary>
+            程序集管理类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.AssemblyService.Assemblies">
+            <summary>
+            已加载的程序集
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.AssemblyService.Load(System.String)">
+            <summary>
+            读取程序集
+            </summary>
+            <param name="dllPath"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.Common.ByteUtil">
+            <summary>
+            字节流处理
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.ByteUtil.ONE">
+            <summary>
+            1字节
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.ByteUtil.ZERO">
+            <summary>
+            0字节
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.FType`1">
+            <summary>
+            Type缓存类，防止多次调用GetType或者typeof
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:FoolishGames.Common.FType`1.Type">
+            <summary>
+            获取泛型的Type
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.FType">
+            <summary>
+            Type的一些操作
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.FType.GetDefaultValueFromType(System.Type)">
+            <summary>
+            根据Type，获取默认值
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.EMessageType">
+            <summary>
+            消息类型
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.NoProcess">
+            <summary>
+            什么都不处理
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.OnlyCompress">
+            <summary>
+            压缩过
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.OnlyCrypto">
+            <summary>
+            加密过
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.CompressAndCrypto">
+            <summary>
+            解压+加密
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.PackageFactory">
+            <summary>
+            消息处理类
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.Pack(FoolishGames.IO.IMessageWriter,System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            打包
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.Unpack(System.Byte[],System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            解包
+            </summary>
+            <returns>返回剩余字节位置</returns>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.GetTotalLength(System.Byte[],System.Int32)">
+            <summary>
+            预解析整体包体大小
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.Singleton`1">
+            <summary>
+            单例类
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:FoolishGames.Common.Singleton`1.Instance">
+            <summary>
+            单例
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.Singleton`1.Reset">
+            <summary>
+            重置
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.StringFactory">
+            <summary>
+            string转换
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.StringFactory.Make(System.Exception)">
+            <summary>
+            从Exception转成字符串
+            </summary>
+            <param name="exception"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Common.StringFactory.Make(System.String,System.Exception)">
+            <summary>
+            从Exception转成字符串
+            </summary>
+            <param name="exception"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.Sources.Common.RandomUtil">
+            <summary>
+            随机数管理
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Sources.Common.RandomUtil.Seed">
+            <summary>
+            种子
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Sources.Common.RandomUtil.RandomByte">
+            <summary>
+            随机一个字节
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Sources.Common.RandomUtil.RandomRange(System.Int32,System.Int32)">
+            <summary>
+            范围随机
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Sources.Common.RandomUtil.RandomRange(System.Single,System.Single)">
+            <summary>
+            范围随机
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Sources.Common.RandomUtil.RandomRange(System.Double,System.Double)">
+            <summary>
+            范围随机
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Sources.Common.RandomUtil.Random">
+            <summary>
+            随机数
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Reflection.ObjectFactory">
+            <summary>
+            反射创建对象
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Reflection.ObjectFactory.types">
+            <summary>
+            缓存池
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Reflection.ObjectFactory.Create``1(System.String,System.Object[])">
+            <summary>
+            自动通过程序集搜索创建
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Reflection.ObjectFactory.CreateSimply``1(System.String,System.Object[])">
+            <summary>
+            直接反射创建对象
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Reflection.ObjectFactory.CreateForce``1(System.Reflection.Assembly,System.String,System.Object[])">
+            <summary>
+            通过程序集创建对象
+            </summary>
+        </member>
+        <member name="T:FoolishGames.RPC.EOpCode">
+            <summary>
+            操作码
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Empty">
+            <summary>
+            空数据
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Text">
+            <summary>
+            文本数据
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Binary">
+            <summary>
+            二进制数据
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Close">
+            <summary>
+            关闭操作数据
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Ping">
+            <summary>
+            Ping数据
+            </summary>
+        </member>
+        <member name="F:FoolishGames.RPC.EOpCode.Pong">
+            <summary>
+            Pong数据
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -44,7 +44,9 @@ namespace FoolishServer.Data
         /// </summary>
         public DbConnection Connection { get; private set; }
 
-
+        /// <summary>
+        /// 先建立连接
+        /// </summary>
         public void CreateConnection(IDatabaseSetting setting)
         {
             if (setting == null)
@@ -55,8 +57,19 @@ namespace FoolishServer.Data
             Connection = CreateDbConnection(setting);
         }
 
+        /// <summary>
+        /// 创建连接对象
+        /// </summary>
         protected abstract DbConnection CreateDbConnection(IDatabaseSetting setting);
 
+        /// <summary>
+        /// 对表结构进行调整或创建
+        /// </summary>
+        public abstract void GenerateOrUpdateTableScheme(ITableScheme table);
+
+        /// <summary>
+        /// 建立连接
+        /// </summary>
         public void Close()
         {
             if (Connection != null)
@@ -73,6 +86,9 @@ namespace FoolishServer.Data
             }
         }
 
+        /// <summary>
+        /// 开始连接
+        /// </summary>
         public bool Connect()
         {
             FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "{0}[{1}] is connecting...", Kind.ToString(), Setting.ConnectKey);

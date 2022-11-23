@@ -11,6 +11,10 @@
     <Win32Resource />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Projects\FoolishServer\Source\FoolishGames.Compiler.CSharp\FoolishGames.Compiler.CSharp.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Interfaces\" />
   </ItemGroup>
@@ -24,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="FoolishGames.Compiler.CSharp.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="FoolishGames.CSharp.Ignored.References.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -10,8 +10,18 @@
     <Copyright>Copyright ©2022-2030 ChenYiZh and Shanghai YueYin Tech, Inc. All rights reserved.</Copyright>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Projects\FoolishServer\Source\FoolishServer\FoolishServer.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\FoolishServer.Common\FoolishServer.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="FoolishServer.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

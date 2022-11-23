@@ -10,6 +10,10 @@
     <Copyright>Copyright ©2022-2030 ChenYiZh and Shanghai YueYin Tech, Inc. All rights reserved.</Copyright>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Projects\FoolishServer\Source\FoolishServer.Framework\FoolishServer.Framework.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Interfaces\Runtime\" />
     <Folder Include="Sources\Config\" />
@@ -18,6 +22,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoolishGames.Common\FoolishGames.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="FoolishServer.Framework.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

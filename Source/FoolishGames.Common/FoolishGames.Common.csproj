@@ -13,4 +13,14 @@
     <Copyright>Copyright © 2022-2030 ChenYiZh and Shanghai YueYin Tech, Inc. All rights reserved.</Copyright>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Projects\FoolishServer\Source\FoolishGames.Common\FoolishGames.Common.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="FoolishGames.Common.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
