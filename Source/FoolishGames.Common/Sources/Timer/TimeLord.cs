@@ -18,7 +18,7 @@ namespace FoolishGames.Timer
         /// <summary>
         /// 锁
         /// </summary>
-        private static object syncRoot = new object();
+        private static readonly object syncRoot = new object();
 
         /// <summary>
         /// 设置时间控件

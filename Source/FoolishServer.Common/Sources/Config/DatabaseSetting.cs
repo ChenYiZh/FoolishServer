@@ -33,6 +33,13 @@ namespace FoolishServer.Config
         /// </summary>
         public EDatabase Kind { get; private set; }
 
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        public string Database { get; private set; }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public DatabaseSetting(XmlNode node)
         {
             ConnectKey = node.GetValue("key", "default");
@@ -42,6 +49,19 @@ namespace FoolishServer.Config
             {
                 case "mysqldataprovider": Kind = EDatabase.MySQL; break;
                 default: Kind = EDatabase.Unknow; break;
+            }
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                string[] values = ConnectionString.Split(';');
+                foreach (string value in values)
+                {
+                    string[] data = value.Split('=');
+                    if (data.Length == 2 && data[0].ToLower().Contains("database"))
+                    {
+                        Database = data[1].Trim();
+                        break;
+                    }
+                }
             }
         }
     }

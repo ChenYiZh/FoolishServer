@@ -37,7 +37,7 @@ namespace FoolishGames.Log
         /// </summary>
         public static IReadOnlyCollection<ILogger> Loggers { get { return loggers; } }
 
-        private static Object SyncRoot = new Object();
+        private static readonly object SyncRoot = new Object();
 
         //static FConsole()
         //{

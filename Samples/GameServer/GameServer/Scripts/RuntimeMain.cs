@@ -1,4 +1,6 @@
-﻿using FoolishGames.Log;
+﻿using FoolishGames.Common;
+using FoolishGames.Log;
+using FoolishServer.Collections;
 using FoolishServer.Common;
 using FoolishServer.Config;
 using FoolishServer.Data;
@@ -24,6 +26,9 @@ namespace FoolishServer
             //FConsole.LogStackLevels.Add(LogLevel.WARN);
             base.OnStartup();
             FConsole.Write("RuntimeMain OnStartup: " + Settings.IsDebug);
+
+            FConsole.Write(FType<EntityDictionary<int, Test2>>.Type.IsSubInterfaceOf(typeof(IDictionary<,>)));
+            return;
         }
 
         public override void OnDatebaseInitialized()

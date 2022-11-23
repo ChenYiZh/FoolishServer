@@ -36,7 +36,7 @@ namespace FoolishServer.Data
         bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions);
 
         /// <summary>
-        /// 读取表中所有
+        /// 读取表中所有数据
         /// </summary>
         IEnumerable<T> LoadAll<T>() where T : MajorEntity, new();
 

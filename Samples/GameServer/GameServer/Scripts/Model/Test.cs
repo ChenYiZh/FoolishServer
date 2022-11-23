@@ -10,21 +10,24 @@ using System.Threading;
 namespace FoolishServer.Model
 {
     [Serializable, JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ProtoContract, EntityTable]
+    [ProtoContract, EntityTable("default", "{0}_{1:MMdd}")]
     public class Test : MajorEntity
     {
         [EntityField(IsKey = true)]
         [JsonProperty, ProtoMember(1)]
         public long UserId { get; set; }
-        [EntityField]
+        [EntityField(IsKey = true)]
         [JsonProperty, ProtoMember(2)]
         public string UserName { get; set; }
-        [EntityField]
+        [EntityField(IsIndex = true)]
         [JsonProperty, ProtoMember(3)]
         public string Password { get; set; }
         [EntityField]
         [JsonProperty, ProtoMember(4)]
         public EntityDictionary<int, Test2> Tests { get; set; }
+        [EntityField(Nullable = false, DefaultValue = 5)]
+        [JsonProperty, ProtoMember(5)]
+        public long TestID { get; set; }
 
         private long testStr;
         public long TestStr

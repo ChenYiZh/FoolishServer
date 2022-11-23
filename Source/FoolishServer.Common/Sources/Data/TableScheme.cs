@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Log;
+using FoolishGames.Timer;
 using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 using System;
@@ -16,11 +17,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 私有属性
         /// </summary>
-        private EntityTableAttribute EntityTable { get; set; }
-        /// <summary>
-        /// Attribute信息
-        /// </summary>
-        public IEntityTable Attribute { get; private set; }
+        public IEntityTable EntityTable { get; private set; }
         /// <summary>
         /// 结构类型
         /// </summary>
@@ -42,11 +39,7 @@ namespace FoolishServer.Data
             {
                 entityTable = new EntityTableAttribute();
             }
-            if (string.IsNullOrEmpty(entityTable.TableName))
-            {
-                entityTable.TableName = type.Name.EndsWith("s") ? type.Name : (type.Name + "s"); ;
-            }
-            Attribute = entityTable;
+            EntityTable = entityTable;
 
             //读取列信息
             Dictionary<string, ITableFieldScheme> fields = new Dictionary<string, ITableFieldScheme>();
@@ -91,18 +84,65 @@ namespace FoolishServer.Data
         /// <summary>
         /// 表名
         /// </summary>
-        public string TableName { get { return EntityTable.TableName; } }
+        public string TableName { get { return GetTableName(); } }
         /// <summary>
-        /// 表名的格式
+        /// {0}为数据库名称，{1:MMdd}为之间名称
         /// </summary>
         public string TableNameFormat { get { return EntityTable.TableNameFormat; } }
         /// <summary>
-        /// 是否从不过期,模式True
+        ///  是否从不过期,判断是否产生冷数据，默认false
         /// </summary>
         public bool NeverExpired { get { return EntityTable.NeverExpired; } }
         /// <summary>
-        /// 存储方案，默认Redis和db都读写
+        /// 存储方案(位运算)
+        /// <para>默认 StorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb</para>
         /// </summary>
         public EStorageType StorageType { get { return EntityTable.StorageType; } }
+        /// <summary>
+        /// 缓存的临时表名
+        /// </summary>
+        private string PrivateTempTableName;
+        /// <summary>
+        /// 缓存全局表名
+        /// </summary>
+        private string PrivateGlobalTableName;
+        /// <summary>
+        /// 用于存数据库的表名
+        /// </summary>
+        public string GetTableName()
+        {
+            string tableName = Type.Name.EndsWith("s") ? Type.Name : Type.Name + "s";
+            if (!string.IsNullOrWhiteSpace(EntityTable.TableName))
+            {
+                tableName = EntityTable.TableName;
+            }
+            string format = EntityTable.TableNameFormat;
+            if (string.IsNullOrEmpty(EntityTable.TableNameFormat) || !EntityTable.TableNameFormat.Contains("{0}"))
+            {
+                format = "{0}";
+            }
+            tableName = string.Format(format, tableName, TimeLord.Now);
+            return tableName;
+            if (PrivateTempTableName != tableName)
+            {
+                PrivateTempTableName = tableName;
+                string lowTableName = tableName.ToLower();
+                PrivateGlobalTableName = "";
+                for (int i = 0; i < lowTableName.Length; i++)
+                {
+                    char lc = lowTableName[i];
+                    char c = PrivateTempTableName[i];
+                    if (lc == c)
+                    {
+                        PrivateGlobalTableName += lc;
+                    }
+                    else
+                    {
+                        PrivateGlobalTableName += "_" + lc;
+                    }
+                }
+            }
+            return PrivateGlobalTableName;
+        }
     }
 }

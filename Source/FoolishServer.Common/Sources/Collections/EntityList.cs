@@ -19,7 +19,7 @@ namespace FoolishServer.Collections
     [ProtoContract, Serializable]
     public sealed class EntityList<T> : PropertyEntity, IThreadSafeList<T>
     {
-        private bool isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
+        private readonly bool isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
 
         private ThreadSafeList<T> List = new ThreadSafeList<T>();
 

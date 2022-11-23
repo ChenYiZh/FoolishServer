@@ -54,6 +54,22 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         Long = 14,
         /// <summary>
+        /// TINYINT unsigned/SMALLINT
+        /// </summary>
+        SByte = 15,
+        /// <summary>
+        /// SMALLINT unsigned/SMALLINT
+        /// </summary>
+        UShort = 16,
+        /// <summary>
+        /// INT  unsigned/INT
+        /// </summary>
+        UInt = 17,
+        /// <summary>
+        /// BIGINT unsigned/BIGINT
+        /// </summary>
+        ULong = 18,
+        /// <summary>
         /// FLOAT/float(24)
         /// </summary>
         Float = 20,
@@ -65,6 +81,10 @@ namespace FoolishServer.Data.Entity
         /// DATETIME
         /// </summary>
         DateTime = 30,
+        /// <summary>
+        /// 错误类型，无法解析，也无法保存
+        /// </summary>
+        Error = 255,
     }
     /// <summary>
     /// 属性字段

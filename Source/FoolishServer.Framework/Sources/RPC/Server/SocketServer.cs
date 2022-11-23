@@ -258,8 +258,7 @@ namespace FoolishServer.RPC.Server
         {
             try
             {
-                GameSession session = GameSession.Get(args.Socket?.HashCode) as GameSession;
-                if (session != null)
+                if (GameSession.Get(args.Socket?.HashCode) is GameSession session)
                 {
                     session.Refresh();
                     OnSessionHeartbeat(session);

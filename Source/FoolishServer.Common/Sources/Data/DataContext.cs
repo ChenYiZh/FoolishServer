@@ -122,7 +122,6 @@ namespace FoolishServer.Data
             }
 
             //建立数据库连接
-
             if (Databases == null)
             {
                 Databases = new Dictionary<string, ISQLDatabase>();
@@ -141,6 +140,26 @@ namespace FoolishServer.Data
         }
 
         /// <summary>
+        /// 检查数据库结构是否变更
+        /// </summary>
+        public static void CheckTableSchemes()
+        {
+            FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Check whether tables in the dbs have been changed...");
+            foreach (ITableScheme tableScheme in tableSchemes.Values)
+            {
+                ISQLDatabase database;
+                if (Databases.TryGetValue(tableScheme.ConnectKey, out database))
+                {
+                    database.GenerateOrUpdateTableScheme(tableScheme);
+                }
+                else
+                {
+                    FConsole.WriteErrorFormat("No database of '{0}' exists.", tableScheme.ConnectKey);
+                }
+            }
+        }
+
+        /// <summary>
         /// 开始读取数据
         /// </summary>
         internal static void Start()
@@ -154,7 +173,11 @@ namespace FoolishServer.Data
                 database.Value.Connect();
             }
 
+            //检查数据库结构是否变更
+            CheckTableSchemes();
+
             //加载所有热数据
+            FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Start loading hot data...");
             foreach (IDbSet dbSet in entityPool.Values)
             {
                 dbSet.PullAllRawData();

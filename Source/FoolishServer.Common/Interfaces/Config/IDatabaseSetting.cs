@@ -26,6 +26,11 @@ namespace FoolishServer.Config
         string ConnectionString { get; }
 
         /// <summary>
+        /// 数据库名
+        /// </summary>
+        string Database { get; }
+
+        /// <summary>
         /// 是什么类型的数据库
         /// </summary>
         EDatabase Kind { get; }

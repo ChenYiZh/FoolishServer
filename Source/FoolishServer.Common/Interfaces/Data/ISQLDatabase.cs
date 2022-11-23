@@ -14,7 +14,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 连接器
         /// </summary>
-        DbConnection Connection { get; }
+        DbConnection GetConnection();
 
         /// <summary>
         /// 先建立连接
@@ -26,4 +26,15 @@ namespace FoolishServer.Data
         /// </summary>
         void GenerateOrUpdateTableScheme(ITableScheme table);
     }
+    /// <summary>
+    /// SQL标准数据库
+    /// </summary>
+    public interface ISQLDatabase<out T> : ISQLDatabase where T : DbConnection
+    {
+        /// <summary>
+        /// 连接器
+        /// </summary>
+        T Connection { get; }
+
+}
 }

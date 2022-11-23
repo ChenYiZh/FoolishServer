@@ -30,6 +30,7 @@ namespace FoolishServer.Data
             Attribute = attribute;
             Type = property;
             PropertyName = property.Name;
+            Name = string.IsNullOrWhiteSpace(attribute.Name) ? property.Name : attribute.Name;
             if (Attribute.DefaultValue == null)
             {
                 DefaultValue = FType.GetDefaultValueFromType(property.PropertyType);
@@ -46,7 +47,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 在数据库中列名
         /// </summary>
-        public string Name { get { return Attribute.Name; } }
+        public string Name { get; private set; }
         /// <summary>
         /// 是否可为空
         /// </summary>
@@ -54,7 +55,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 是否建立索引，只在主表下有用
         /// </summary>
-        public bool IsIndex { get { return Attribute.IsIndex; } }
+        public bool IsIndex { get { return IsKey || Attribute.IsIndex; } }
         /// <summary>
         /// 默认补全值
         /// </summary>

@@ -27,5 +27,24 @@ namespace FoolishGames.Common
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
+        /// <summary>
+        /// 判断是否实现某个泛型接口，少用
+        /// </summary>
+        public static bool IsSubInterfaceOf(this Type type, Type interfaceType)
+        {
+            if (type == null)
+            {
+                return false;
+            }
+            Type[] types = type.GetInterfaces();
+            foreach (Type t in types)
+            {
+                if (t.IsGenericType ? t.GetGenericTypeDefinition() == interfaceType : t == interfaceType)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

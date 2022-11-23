@@ -13,7 +13,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// Attribute信息
         /// </summary>
-        IEntityTable Attribute { get; }
+        IEntityTable EntityTable { get; }
 
         /// <summary>
         /// 结构类型
@@ -24,5 +24,10 @@ namespace FoolishServer.Data
         /// 列信息
         /// </summary>
         IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; }
+
+        /// <summary>
+        /// 用于存数据库的表名
+        /// </summary>
+        string GetTableName();
     }
 }

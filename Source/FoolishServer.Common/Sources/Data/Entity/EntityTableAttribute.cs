@@ -48,12 +48,12 @@ namespace FoolishServer.Data.Entity
         public string TableName { get; set; }
 
         /// <summary>
-        /// 表名的格式
+        /// {0}为数据库名称，{1:MMdd}为之间名称
         /// </summary>
         public string TableNameFormat { get; set; }
 
         /// <summary>
-        /// 是否从不过期,模式True
+        /// 是否从不过期,判断是否产生冷数据，默认false
         /// </summary>
         public bool NeverExpired { get; set; } = false;
 
