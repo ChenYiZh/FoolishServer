@@ -23,7 +23,7 @@ namespace FoolishServer.Data
         /// </summary>
         public Type Type { get; private set; }
         /// <summary>
-        /// 列信息
+        /// 列信息，Key: PropertyName
         /// </summary>
         public IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; private set; }
         /// <summary>

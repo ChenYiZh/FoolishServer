@@ -21,7 +21,7 @@ namespace FoolishServer.Data
         Type Type { get; }
 
         /// <summary>
-        /// 列信息
+        /// 列信息，Key: PropertyName
         /// </summary>
         IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; }
 

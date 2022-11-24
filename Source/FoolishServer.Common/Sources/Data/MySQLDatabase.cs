@@ -26,11 +26,11 @@ namespace FoolishServer.Data
         {
             return new MySqlConnection(setting.ConnectionString);
         }
-
+        #region CheckTableSchema
         /// <summary>
         /// 解析数据库属性字段
         /// </summary>
-        private struct FieldInfo : IEntityField
+        private class FieldInfo : IEntityField
         {
             /// <summary>
             /// 是否是主键
@@ -87,7 +87,6 @@ namespace FoolishServer.Data
         public override void GenerateOrUpdateTableScheme(ITableScheme table)
         {
             string tableName = table.TableName;
-            FConsole.WriteFormat("TableName: {0}", tableName);
             string returnColumns = string.Join(", ", ColumnReadInfo);
             string sql = $"SELECT {returnColumns} " +
                 $"FROM `{INFORMATION_SCHEMA}`.`COLUMNS` AS IC " +
@@ -127,7 +126,30 @@ namespace FoolishServer.Data
             }
             else
             {
-                FConsole.Write(string.Join("\r\n", tableFields.Select(f => f.ToString())));
+                //进行判断
+                Dictionary<string, FieldInfo> dbFields = tableFields.ToDictionary(f => f.Name.ToLower(), f => f);
+                List<TableFieldComparor> comparors = new List<TableFieldComparor>();
+                foreach (ITableFieldScheme field in table.Fields.Values)
+                {
+                    FieldInfo fieldInfo = null;
+                    if (dbFields.ContainsKey(field.Name.ToLower()))
+                    {
+                        fieldInfo = dbFields[field.Name.ToLower()];
+                        dbFields.Remove(field.Name.ToLower());
+                    }
+                    comparors.Add(new TableFieldComparor(field, fieldInfo));
+                }
+                foreach (FieldInfo fieldInfo in dbFields.Values)
+                {
+                    comparors.Add(new TableFieldComparor(null, fieldInfo));
+                }
+                dbFields.Clear();
+
+                //判断结构处理
+                foreach (TableFieldComparor comparor in comparors)
+                {
+                    FConsole.Write(comparor.Operation.ToString());
+                }
             }
             if (!string.IsNullOrEmpty(sql))
             {
@@ -137,7 +159,7 @@ namespace FoolishServer.Data
                 }
             }
         }
-
+        #endregion
         /// <summary>
         /// 通过MySqlDataReader解析数据
         /// </summary>

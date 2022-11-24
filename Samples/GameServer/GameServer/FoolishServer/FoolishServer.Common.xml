@@ -1210,7 +1210,7 @@
         </member>
         <member name="P:FoolishServer.Data.ITableScheme.Fields">
             <summary>
-            列信息
+            列信息，Key: PropertyName
             </summary>
         </member>
         <member name="M:FoolishServer.Data.ITableScheme.GetTableName">
@@ -1859,6 +1859,68 @@
             数据转换
             </summary>
         </member>
+        <member name="T:FoolishServer.Data.TableFieldComparor">
+            <summary>
+            表的列表判断是否更改
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Data.TableFieldComparor.EOperation">
+            <summary>
+            需要执行的操作
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableFieldComparor.EOperation.UnModified">
+            <summary>
+            不需要操作
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableFieldComparor.EOperation.Modified">
+            <summary>
+            只需要修改字段属性
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableFieldComparor.EOperation.DeleteThenInsert">
+            <summary>
+            先删除后添加
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableFieldComparor.EOperation.ToInsert">
+            <summary>
+            添加新列
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableFieldComparor.EOperation.Deleted">
+            <summary>
+            删除列
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.Operation">
+            <summary>
+            需要做的操作
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.TableField">
+            <summary>
+            缓存中的结构
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.DbFieldInfo">
+            <summary>
+            数据库中的结构
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.TableFieldComparor.#ctor(FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.Entity.IEntityField)">
+            <summary>
+            判断两个结构是否需要进行操作
+            </summary>
+            <param name="tableField">缓存中的结构</param>
+            <param name="dbFieldInfo">数据库中的结构</param>
+        </member>
+        <member name="M:FoolishServer.Data.TableFieldComparor.Compare(FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.Entity.IEntityField)">
+            <summary>
+            判断两个结构是否需要进行操作
+            </summary>
+        </member>
         <member name="T:FoolishServer.Data.TableFieldScheme">
             <summary>
             表中的列结构
@@ -1926,7 +1988,7 @@
         </member>
         <member name="P:FoolishServer.Data.TableScheme.Fields">
             <summary>
-            列信息
+            列信息，Key: PropertyName
             </summary>
         </member>
         <member name="P:FoolishServer.Data.TableScheme.KeyFields">
