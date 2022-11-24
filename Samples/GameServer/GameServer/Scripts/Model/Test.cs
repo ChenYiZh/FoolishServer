@@ -22,10 +22,10 @@ namespace FoolishServer.Model
         [EntityField(IsIndex = true)]
         [JsonProperty, ProtoMember(3)]
         public string Password { get; set; }
-        [EntityField]
+        [EntityField(FieldType = ETableFieldType.Text)]
         [JsonProperty, ProtoMember(4)]
         public EntityDictionary<int, Test2> Tests { get; set; }
-        [EntityField(Nullable = false, DefaultValue = 5)]
+        [EntityField(Nullable = false, DefaultValue = 100)]
         [JsonProperty, ProtoMember(5)]
         public long TestID { get; set; }
 

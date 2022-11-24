@@ -1,4 +1,6 @@
-﻿using FoolishServer.Data.Entity;
+﻿using FoolishGames.Common;
+using FoolishServer.Common;
+using FoolishServer.Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -37,6 +39,24 @@ namespace FoolishServer.Data
             Deleted = 20,
         }
         /// <summary>
+        /// 列名
+        /// </summary>
+        public string FieldName
+        {
+            get
+            {
+                if (TableField != null)
+                {
+                    return TableField.Name;
+                }
+                if (DbFieldInfo != null)
+                {
+                    return DbFieldInfo.Name;
+                }
+                throw new NullReferenceException("TableFieldComparor can not compare two null values.");
+            }
+        }
+        /// <summary>
         /// 需要做的操作
         /// </summary>
         public EOperation Operation { get; private set; }
@@ -49,6 +69,18 @@ namespace FoolishServer.Data
         /// </summary>
         public IEntityField DbFieldInfo { get; private set; }
         /// <summary>
+        /// 是不是只有主键判断进行了修改
+        /// </summary>
+        public bool OnlyIsKeyChanged { get; private set; }
+        /// <summary>
+        /// 是不是只有索引进行了修改
+        /// </summary>
+        public bool OnlyIsIndexChanged { get; private set; }
+        /// <summary>
+        /// 判断是否成功
+        /// </summary>
+        public bool IsError { get; private set; }
+        /// <summary>
         /// 判断两个结构是否需要进行操作
         /// </summary>
         /// <param name="tableField">缓存中的结构</param>
@@ -58,14 +90,128 @@ namespace FoolishServer.Data
             Operation = EOperation.UnModified;
             TableField = tableField;
             DbFieldInfo = dbFieldInfo;
-            Operation = Compare(tableField, dbFieldInfo);
+            IsError = false;
+            OnlyIsKeyChanged = false;
+            OnlyIsIndexChanged = false;
+            bool onlyIsIndexChanged, onlyIsKeyChanged;
+            EOperation operation;
+            IsError = !Compare(tableField, dbFieldInfo, out operation, out onlyIsKeyChanged, out onlyIsIndexChanged);
+            Operation = operation;
+            OnlyIsKeyChanged = onlyIsKeyChanged;
+            OnlyIsIndexChanged = onlyIsIndexChanged;
         }
         /// <summary>
         /// 判断两个结构是否需要进行操作
         /// </summary>
-        public static EOperation Compare(IEntityField tableField, IEntityField dbFieldInfo)
+        public static bool Compare(IEntityField tableField, IEntityField dbFieldInfo, out EOperation operation, out bool onlyIsKeyChanged, out bool onlyIsIndexChanged)
         {
-            return EOperation.UnModified;
+            onlyIsKeyChanged = onlyIsIndexChanged = false;
+            operation = EOperation.UnModified;
+            if (tableField == null && dbFieldInfo == null)
+            {
+                throw new NullReferenceException("TableFieldComparor can not compare two null values.");
+            }
+            if (tableField == null)
+            {
+                operation = EOperation.Deleted;
+                return true;
+            }
+            if (dbFieldInfo == null)
+            {
+                operation = EOperation.ToInsert;
+                return true;
+            }
+            onlyIsKeyChanged = tableField.IsKey != dbFieldInfo.IsKey;
+            onlyIsIndexChanged = tableField.IsIndex != dbFieldInfo.IsIndex;
+            if (tableField.IsIndex != dbFieldInfo.IsIndex)
+            {
+                onlyIsKeyChanged = false;
+                operation = EOperation.Modified;
+            }
+            if (tableField.IsKey != dbFieldInfo.IsKey)
+            {
+                onlyIsIndexChanged = false;
+                operation = EOperation.Modified;
+            }
+            if (tableField.DefaultValue.GetString() != dbFieldInfo.DefaultValue.GetString()
+                || tableField.Nullable != dbFieldInfo.Nullable)
+            {
+                onlyIsIndexChanged = false;
+                operation = EOperation.Modified;
+            }
+            if (tableField.FieldType != dbFieldInfo.FieldType)
+            {
+                onlyIsIndexChanged = false;
+                switch (tableField.FieldType)
+                {
+                    case ETableFieldType.Blob:
+                    case ETableFieldType.LongBlob:
+                        {
+                            operation = EOperation.Modified;
+                            if (dbFieldInfo.FieldType != ETableFieldType.Blob
+                                && dbFieldInfo.FieldType != ETableFieldType.LongBlob)
+                            {
+                                return false;
+                            }
+                        }
+                        break;
+
+                    case ETableFieldType.Byte:
+                    case ETableFieldType.UShort:
+                    case ETableFieldType.UInt:
+                    case ETableFieldType.ULong:
+                    case ETableFieldType.SByte:
+                    case ETableFieldType.Short:
+                    case ETableFieldType.Int:
+                    case ETableFieldType.Long:
+                        {
+                            operation = EOperation.Modified;
+                            if (dbFieldInfo.FieldType != ETableFieldType.Byte
+                                && dbFieldInfo.FieldType != ETableFieldType.UShort
+                                && dbFieldInfo.FieldType != ETableFieldType.UInt
+                                && dbFieldInfo.FieldType != ETableFieldType.ULong
+                                && dbFieldInfo.FieldType != ETableFieldType.SByte
+                                && dbFieldInfo.FieldType != ETableFieldType.Short
+                                && dbFieldInfo.FieldType != ETableFieldType.Int
+                                && dbFieldInfo.FieldType != ETableFieldType.Long)
+                            {
+                                return false;
+                            }
+                        }
+                        break;
+
+                    case ETableFieldType.Float:
+                    case ETableFieldType.Double:
+                        {
+                            operation = EOperation.Modified;
+                            if (dbFieldInfo.FieldType != ETableFieldType.Float
+                                && dbFieldInfo.FieldType != ETableFieldType.Double)
+                            {
+                                return false;
+                            }
+                        }
+                        break;
+                    case ETableFieldType.String:
+                    case ETableFieldType.Text:
+                    case ETableFieldType.LongText:
+                        {
+                            operation = EOperation.Modified;
+                            if (dbFieldInfo.FieldType != ETableFieldType.String
+                                && dbFieldInfo.FieldType != ETableFieldType.Text
+                                && dbFieldInfo.FieldType != ETableFieldType.LongText)
+                            {
+                                return false;
+                            }
+                        }
+                        break;
+                    case ETableFieldType.Auto:
+                    case ETableFieldType.Bit:
+                    case ETableFieldType.DateTime:
+                    case ETableFieldType.Error:
+                    default: return false;
+                }
+            }
+            return true;
         }
     }
 }

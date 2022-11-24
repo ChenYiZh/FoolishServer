@@ -225,6 +225,17 @@ namespace FoolishGames.Log
         /// <param name="level">日志等级</param>
         /// <param name="category">日志类别</param>
         /// <param name="message">日志内容</param>
+        public static void WriteTo(string level, string category, string message)
+        {
+            SendMessage(level, category, message, true);
+        }
+
+        /// <summary>
+        /// 输出到指定类别
+        /// </summary>
+        /// <param name="level">日志等级</param>
+        /// <param name="category">日志类别</param>
+        /// <param name="message">日志内容</param>
         /// <param name="args"></param>
         public static void WriteTo(string level, string category, string message, params object[] args)
         {

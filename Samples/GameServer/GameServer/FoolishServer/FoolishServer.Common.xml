@@ -1675,9 +1675,40 @@
             mysql连接管理
             </summary>
         </member>
+        <member name="F:FoolishServer.Data.MySQLDatabase.CommitionPool">
+            <summary>
+            事务队列
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.MySQLDatabase.SyncRoot">
+            <summary>
+            读写时用的互斥锁
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.MySQLDatabase.CommitionPoolIndex">
+            <summary>
+            事务锁
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.MySQLDatabase.PushThread">
+            <summary>
+            推送线程
+            </summary>
+        </member>
         <member name="M:FoolishServer.Data.MySQLDatabase.CreateDbConnection(FoolishServer.Config.IDatabaseSetting)">
             <summary>
             创建连接对象
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.PushingCommitions(System.Object)">
+            <summary>
+            业务处理线程
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.Close">
+            <summary>
+            关闭时执行
             </summary>
         </member>
         <member name="T:FoolishServer.Data.MySQLDatabase.FieldInfo">
@@ -1735,17 +1766,15 @@
             对表结构进行调整或创建
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.MySQLDatabase.Query``1(System.String,System.Func{MySql.Data.MySqlClient.MySqlDataReader,``0})">
+        <member name="M:FoolishServer.Data.MySQLDatabase.Query``2(System.String,System.Func{MySql.Data.MySqlClient.MySqlDataReader,``1},System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}})">
             <summary>
             通过MySqlDataReader解析数据
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.MySQLDatabase.Query(System.String)">
+        <member name="M:FoolishServer.Data.MySQLDatabase.Query(System.String,System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}})">
             <summary>
             只执行SQL
             </summary>
-            <param name="sql"></param>
-            <returns></returns>
         </member>
         <member name="M:FoolishServer.Data.MySQLDatabase.ConvertFromString(System.String)">
             <summary>
@@ -1770,6 +1799,11 @@
         <member name="M:FoolishServer.Data.MySQLDatabase.Find``1(FoolishServer.Data.Entity.EntityKey)">
             <summary>
             通过EntityKey，查询某一条数据，没有就返回空
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.GenerateModifySql(FoolishServer.Data.DbCommition)">
+            <summary>
+            执行修改操作
             </summary>
         </member>
         <member name="T:FoolishServer.Data.RedisDatabase">
@@ -1894,6 +1928,11 @@
             删除列
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.FieldName">
+            <summary>
+            列名
+            </summary>
+        </member>
         <member name="P:FoolishServer.Data.TableFieldComparor.Operation">
             <summary>
             需要做的操作
@@ -1909,6 +1948,21 @@
             数据库中的结构
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.OnlyIsKeyChanged">
+            <summary>
+            是不是只有主键判断进行了修改
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.OnlyIsIndexChanged">
+            <summary>
+            是不是只有索引进行了修改
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.TableFieldComparor.IsError">
+            <summary>
+            判断是否成功
+            </summary>
+        </member>
         <member name="M:FoolishServer.Data.TableFieldComparor.#ctor(FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.Entity.IEntityField)">
             <summary>
             判断两个结构是否需要进行操作
@@ -1916,7 +1970,7 @@
             <param name="tableField">缓存中的结构</param>
             <param name="dbFieldInfo">数据库中的结构</param>
         </member>
-        <member name="M:FoolishServer.Data.TableFieldComparor.Compare(FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.Entity.IEntityField)">
+        <member name="M:FoolishServer.Data.TableFieldComparor.Compare(FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.Entity.IEntityField,FoolishServer.Data.TableFieldComparor.EOperation@,System.Boolean@,System.Boolean@)">
             <summary>
             判断两个结构是否需要进行操作
             </summary>
@@ -2449,6 +2503,13 @@
             数据数据库中拉取下来
             </summary>
         </member>
+        <member name="M:FoolishServer.Common.ConverterExtensions.GetString(System.Object)">
+            <summary>
+            自动判断空的ToString
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
         <member name="T:FoolishServer.Common.JsonUtility">
             <summary>
             Json处理中心
@@ -2574,6 +2635,18 @@
             获取TimeSpan
             </summary>
         </member>
+        <member name="T:FoolishServer.Common.StringConverter">
+            <summary>
+            字符串操作
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.StringConverter.ToLowerWithDownLine(System.String)">
+            <summary>
+            变小写，并且大写字母前加下划线
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
         <member name="T:FoolishServer.Common.TableFieldConverter">
             <summary>
             数据表类型转换
@@ -2584,6 +2657,13 @@
             转换成枚举
             </summary>
             <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Common.TableFieldConverter.GetString(FoolishServer.Data.Entity.IEntityField)">
+            <summary>
+            打出日志
+            </summary>
+            <param name="field"></param>
             <returns></returns>
         </member>
         <member name="T:FoolishServer.Log.Categories">

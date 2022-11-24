@@ -1,5 +1,6 @@
 ﻿using FoolishGames.Log;
 using FoolishGames.Timer;
+using FoolishServer.Common;
 using FoolishServer.Config;
 using FoolishServer.Data.Entity;
 using System;
@@ -122,25 +123,11 @@ namespace FoolishServer.Data
                 format = "{0}";
             }
             tableName = string.Format(format, tableName, TimeLord.Now);
-            return tableName;
+            //return tableName;
             if (PrivateTempTableName != tableName)
             {
                 PrivateTempTableName = tableName;
-                string lowTableName = tableName.ToLower();
-                PrivateGlobalTableName = "";
-                for (int i = 0; i < lowTableName.Length; i++)
-                {
-                    char lc = lowTableName[i];
-                    char c = PrivateTempTableName[i];
-                    if (lc == c)
-                    {
-                        PrivateGlobalTableName += lc;
-                    }
-                    else
-                    {
-                        PrivateGlobalTableName += "_" + lc;
-                    }
-                }
+                PrivateGlobalTableName = StringConverter.ToLowerWithDownLine(tableName);
             }
             return PrivateGlobalTableName;
         }

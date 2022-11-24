@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using FoolishGames.Common;
+using FoolishServer.Common;
 using FoolishServer.Data.Entity;
 
 namespace FoolishServer.Data
@@ -31,14 +32,19 @@ namespace FoolishServer.Data
             Type = property;
             PropertyName = property.Name;
             Name = string.IsNullOrWhiteSpace(attribute.Name) ? property.Name : attribute.Name;
+            Name = StringConverter.ToLowerWithDownLine(Name);
             if (Attribute.DefaultValue == null)
             {
-                DefaultValue = FType.GetDefaultValueFromType(property.PropertyType);
+                if (!Nullable)
+                {
+                    DefaultValue = FType.GetDefaultValueFromType(property.PropertyType);
+                }
             }
             else
             {
                 DefaultValue = Attribute.DefaultValue;
             }
+            FieldType = attribute.FieldType != ETableFieldType.Auto ? attribute.FieldType : TableFieldConverter.ConvertFromType(property.PropertyType); ;
         }
         /// <summary>
         /// 是否是主键
@@ -51,7 +57,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 是否可为空
         /// </summary>
-        public bool Nullable { get { return Attribute.Nullable; } }
+        public bool Nullable { get { return IsKey ? false : Attribute.Nullable; } }
         /// <summary>
         /// 是否建立索引，只在主表下有用
         /// </summary>
@@ -63,6 +69,6 @@ namespace FoolishServer.Data
         /// <summary>
         /// 数据类型
         /// </summary>
-        public ETableFieldType FieldType { get { return Attribute.FieldType; } }
+        public ETableFieldType FieldType { get; private set; }
     }
 }

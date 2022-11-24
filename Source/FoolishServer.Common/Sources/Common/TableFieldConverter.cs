@@ -93,5 +93,14 @@ namespace FoolishServer.Common
             }
             return ETableFieldType.Error;
         }
+        /// <summary>
+        /// 打出日志
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static string GetString(this IEntityField field)
+        {
+            return $"{field.Name} [{field.FieldType.ToString()}]: IsKey: {field.IsKey}, IsIndex: {field.IsIndex}, Nullable: {field.Nullable}, DefaultValue: {field.DefaultValue}";
+        }
     }
 }

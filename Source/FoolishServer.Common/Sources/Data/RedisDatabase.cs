@@ -176,7 +176,6 @@ namespace FoolishServer.Data
             }
         }
 
-        int count = 0;
         /// <summary>
         /// 操作一堆数据
         /// </summary>
@@ -187,7 +186,7 @@ namespace FoolishServer.Data
                 IBatch batch = Database.CreateBatch();
                 foreach (DbCommition commition in commitions)
                 {
-                    FConsole.Write(commition.Key.ToString() + ": " + commition.ModifyType);
+                    //FConsole.Write(commition.Key.ToString() + ": " + commition.ModifyType);
                     //FConsole.Write("Redis Count: " + Interlocked.Increment(ref count));
                     if (commition.ModifyType == EModifyType.Remove || commition.Entity == null)
                     {

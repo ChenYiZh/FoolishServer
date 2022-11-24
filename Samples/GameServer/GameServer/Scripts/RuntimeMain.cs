@@ -55,7 +55,7 @@ namespace FoolishServer
             var set = DataContext.GetEntity<Test>();
             stopwatch.Stop();
             FConsole.Write(stopwatch.Elapsed);
-            return;
+            //return;
             int number = 1000000;
             Parallel.For(0, number / 5000, (i) =>
              {

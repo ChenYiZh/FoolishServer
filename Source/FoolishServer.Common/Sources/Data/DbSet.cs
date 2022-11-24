@@ -227,26 +227,26 @@ namespace FoolishServer.Data
             //    if (commitFlag > 0)
             //    {
             //        Interlocked.Exchange(ref commitFlag, 0);
-                    try
-                    {
-                        int pushIndex = modifiedEntitiesPoolIndex - 1;
-                        if (pushIndex < 0)
-                        {
-                            pushIndex = Settings.ModifiedCacheCount - 1;
-                        }
-                        int nextIndex = modifiedEntitiesPoolIndex + 1;
-                        if (nextIndex >= Settings.ModifiedCacheCount)
-                        {
-                            nextIndex = 0;
-                        }
-                        Interlocked.Exchange(ref modifiedEntitiesPoolIndex, nextIndex);
-                        ThreadSafeDictionary<EntityKey, T> entities = (ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
-                        ForceCommitModifiedData(entities);
-                    }
-                    catch (Exception e)
-                    {
-                        FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
-                    }
+            try
+            {
+                int pushIndex = modifiedEntitiesPoolIndex - 1;
+                if (pushIndex < 0)
+                {
+                    pushIndex = Settings.ModifiedCacheCount - 1;
+                }
+                int nextIndex = modifiedEntitiesPoolIndex + 1;
+                if (nextIndex >= Settings.ModifiedCacheCount)
+                {
+                    nextIndex = 0;
+                }
+                Interlocked.Exchange(ref modifiedEntitiesPoolIndex, nextIndex);
+                ThreadSafeDictionary<EntityKey, T> entities = (ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
+                ForceCommitModifiedData(entities);
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
+            }
             //    }
             //    Thread.Sleep(10);
             //}
@@ -332,12 +332,17 @@ namespace FoolishServer.Data
                 }
                 if (lockToken)
                 {
+                    string database = DataContext.GetTableScheme<T>().ConnectKey;
                     foreach (KeyValuePair<EntityKey, T> kv in dic)
                     {
                         commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
                         kv.Value?.ResetModifiedType();
                     }
                     DataContext.RawDatabase.CommitModifiedEntitys(commitions);
+                    if (!string.IsNullOrEmpty(database) && DataContext.Databases.ContainsKey(database))
+                    {
+                        DataContext.Databases[database].CommitModifiedEntitys(commitions);
+                    }
                 }
             }
         }
