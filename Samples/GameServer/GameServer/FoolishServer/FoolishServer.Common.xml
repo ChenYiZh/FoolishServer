@@ -1710,6 +1710,11 @@
             默认补全值
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.MySQLDatabase.FieldInfo.DbFieldType">
+            <summary>
+            数据库中的类型
+            </summary>
+        </member>
         <member name="P:FoolishServer.Data.MySQLDatabase.FieldInfo.FieldType">
             <summary>
             数据类型
@@ -2425,6 +2430,86 @@
         <member name="M:FoolishServer.Common.MonoReflectionExtensions.ContainsAttribute(Mono.Cecil.PropertyDefinition,System.String)">
             <summary>
             属性中是否包含Atrribute
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Common.MySqlDataReaderExtionsions">
+            <summary>
+            MySqlDataReader拓展防空
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetFieldValue``1(MySql.Data.MySqlClient.MySqlDataReader,System.String,``0)">
+            <summary>
+            泛型获取数据
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetString(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.String)">
+            <summary>
+            获取字符串
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetBoolean(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Boolean)">
+            <summary>
+            获取bool
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetByte(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Byte)">
+            <summary>
+            获取byte
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetInt16(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Int16)">
+            <summary>
+            获取short
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetInt32(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Int32)">
+            <summary>
+            获取int
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetInt64(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Int64)">
+            <summary>
+            获取long
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetSByte(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.SByte)">
+            <summary>
+            获取sbyte
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetUInt16(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.UInt16)">
+            <summary>
+            获取ushort
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetUInt32(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.UInt32)">
+            <summary>
+            获取uint
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetUInt64(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.UInt64)">
+            <summary>
+            获取ulong
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetFloat(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Single)">
+            <summary>
+            获取float
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetDouble(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.Double)">
+            <summary>
+            获取double
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetDateTime(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.DateTime)">
+            <summary>
+            获取DateTime
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Common.MySqlDataReaderExtionsions.GetTimeSpan(MySql.Data.MySqlClient.MySqlDataReader,System.String,System.TimeSpan)">
+            <summary>
+            获取TimeSpan
             </summary>
         </member>
         <member name="T:FoolishServer.Common.TableFieldConverter">

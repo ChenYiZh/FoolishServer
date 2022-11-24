@@ -79,6 +79,10 @@ namespace FoolishServer.Common
             {
                 return ETableFieldType.Long;
             }
+            else if (type == FType<byte[]>.Type)
+            {
+                return ETableFieldType.Blob;
+            }
             else if (type.IsSubInterfaceOf(typeof(IList<>)))
             {
                 return ETableFieldType.LongText;

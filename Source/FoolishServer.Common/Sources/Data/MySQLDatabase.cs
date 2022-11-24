@@ -53,9 +53,18 @@ namespace FoolishServer.Data
             /// </summary>
             public object DefaultValue { get; set; }
             /// <summary>
+            /// 数据库中的类型
+            /// </summary>
+            public string DbFieldType { get; set; }
+            /// <summary>
             /// 数据类型
             /// </summary>
             public ETableFieldType FieldType { get; set; }
+
+            public override string ToString()
+            {
+                return $"{Name} [{DbFieldType}, {FieldType.ToString()}]: IsKey: {IsKey}, IsIndex: {IsIndex}, Nullable: {Nullable}, DefaultValue: {DefaultValue}";
+            }
         }
 
         /// <summary>
@@ -90,14 +99,19 @@ namespace FoolishServer.Data
 
             FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), sql);
 
-            List<FieldInfo> tableFields = Query(sql, (reader) => new FieldInfo()
+            List<FieldInfo> tableFields = Query(sql, (reader) =>
             {
-                IsKey = reader.GetInt32("IS_KEY") == 1,
-                Name = reader.GetString("COLUMN_NAME"),
-                Nullable = reader.GetInt32("NULLABLE") == 1,
-                IsIndex = reader.GetInt32("IS_INDEX") == 1,
-                DefaultValue = reader.GetString("COLUMN_DEFAULT"),
-                FieldType = ConvertFromString(reader.GetString("COLUMN_TYPE")),
+                string fieldType = reader.GetString("COLUMN_TYPE", null);
+                return new FieldInfo()
+                {
+                    IsKey = reader.GetInt32("IS_KEY") == 1,
+                    Name = reader.GetString("COLUMN_NAME"),
+                    Nullable = reader.GetInt32("NULLABLE", 0) == 1,
+                    IsIndex = reader.GetInt32("IS_INDEX", 0) == 1,
+                    DefaultValue = reader.GetString("COLUMN_DEFAULT", null),
+                    DbFieldType = fieldType,
+                    FieldType = ConvertFromString(fieldType),
+                };
             });
 
             sql = null;
@@ -113,7 +127,7 @@ namespace FoolishServer.Data
             }
             else
             {
-                FConsole.Write(string.Join(",", tableFields.Select(f => $"{f.Name}: {f.FieldType.ToString()}")));
+                FConsole.Write(string.Join("\r\n", tableFields.Select(f => f.ToString())));
             }
             if (!string.IsNullOrEmpty(sql))
             {
@@ -241,7 +255,7 @@ namespace FoolishServer.Data
                     return ETableFieldType.Int;
                 }
             }
-            else if (sqlType.StartsWith("long"))
+            else if (sqlType.StartsWith("bigint"))
             {
                 if (sqlType.Contains("unsigned"))
                 {
