@@ -48,14 +48,20 @@ namespace FoolishServer.Data
         /// 连接中的数据库
         /// </summary>
         private StackExchange.Redis.IDatabase Database { get; set; }
-
+        /// <summary>
+        /// 判断是否正在事务处理
+        /// </summary>
+        private int isExecuting = 0;
         /// <summary>
         /// 什么类型的数据库
         /// </summary>
         public EDatabase Kind { get; private set; }
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public RedisDatabase(IRedisSetting setting)
         {
+            isExecuting = 0;
             Setting = setting;
             Kind = EDatabase.Redis;
         }
@@ -76,6 +82,19 @@ namespace FoolishServer.Data
                     FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
                 HeartbeatTime = null;
+            }
+            //如果有正在执行的事务，等待处理完
+            bool executing = false;
+            while (isExecuting > 0)
+            {
+                executing = true;
+                Console.Write("\r" + FConsole.FormatCustomMessage(Kind.ToString(), "Redis is saving data..."));
+                Thread.Sleep(Settings.LockerTimeout);
+            }
+            if (executing)
+            {
+                Console.WriteLine();
+                Console.WriteLine();
             }
             if (Redis != null)
             {
@@ -111,6 +130,30 @@ namespace FoolishServer.Data
         public bool Connect()
         {
             FConsole.WriteInfoWithCategory(Kind.ToString(), "Redis connecting...");
+            Reconnect();
+            if (Connected && HeartbeatTime == null)
+            {
+                HeartbeatTime = new Timer(Ping, this, 60000, 60000);
+            }
+            return Connected;
+        }
+
+        /// <summary>
+        /// 检查连接状态
+        /// </summary>
+        private void CheckRedis()
+        {
+            if (!Connected)
+            {
+                Reconnect();
+            }
+        }
+
+        /// <summary>
+        /// 重新连接
+        /// </summary>
+        public void Reconnect()
+        {
             ConfigurationOptions options = new ConfigurationOptions();
             options.get_EndPoints().Add(new IPEndPoint(IPAddress.Parse(Setting.Host), Setting.Port));
             options.Password = Setting.Password;
@@ -148,17 +191,12 @@ namespace FoolishServer.Data
                     FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
             }
-            if (Connected && HeartbeatTime == null)
-            {
-                HeartbeatTime = new Timer(Ping, this, 60000, 60000);
-            }
             if (Connected)
             {
                 RedisServer = Redis.GetServer(Setting.Host, Setting.Port);
                 Database = Redis.GetDatabase(Setting.DbIndex);
                 FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "Redis[{0}] connected.", Setting.DbIndex);
             }
-            return Connected;
         }
         /// <summary>
         /// 心跳检测
@@ -173,6 +211,7 @@ namespace FoolishServer.Data
             catch (Exception e)
             {
                 FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
+                CheckRedis();
             }
         }
 
@@ -181,6 +220,8 @@ namespace FoolishServer.Data
         /// </summary>
         public bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions)
         {
+            Interlocked.Increment(ref isExecuting);
+            CheckRedis();
             try
             {
                 IBatch batch = Database.CreateBatch();
@@ -206,6 +247,10 @@ namespace FoolishServer.Data
                 FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 return false;
             }
+            finally
+            {
+                Interlocked.Decrement(ref isExecuting);
+            }
         }
 
         /// <summary>
@@ -213,6 +258,7 @@ namespace FoolishServer.Data
         /// </summary>
         public IEnumerable<T> LoadAll<T>() where T : MajorEntity, new()
         {
+            CheckRedis();
             Task<HashEntry[]> task = Database.HashGetAllAsync(EntityKey.MakeTableName(FType<T>.Type));
             task.Wait();
             HashEntry[] entries = task.Result;
@@ -229,6 +275,7 @@ namespace FoolishServer.Data
         /// </summary>
         public T Find<T>(EntityKey key) where T : MajorEntity, new()
         {
+            CheckRedis();
             Task<RedisValue> task = Database.HashGetAsync(key.TableName, key.KeyName);
             task.Wait();
             if (task.Result.HasValue)

@@ -55,24 +55,12 @@ namespace FoolishServer.Data
         /// <summary>
         /// 判断连接状态
         /// </summary>
-        public virtual bool Connected
-        {
-            get
-            {
-                DbConnection connection = GetConnection();
-                return connection.State == System.Data.ConnectionState.Connecting || connection.State == System.Data.ConnectionState.Executing;
-            }
-        }
+        public abstract bool Connected { get; protected set; }
 
         /// <summary>
-        /// 连接器
+        /// 设置配置文件，初始化时执行
         /// </summary>
-        public abstract DbConnection GetConnection();
-
-        /// <summary>
-        /// 先建立连接
-        /// </summary>
-        public virtual void CreateConnection(IDatabaseSetting setting)
+        public virtual void SetSettings(IDatabaseSetting setting)
         {
             if (setting == null)
             {
@@ -94,13 +82,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 开始连接
         /// </summary>
-        public bool Connect()
-        {
-            FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "{0}[{1}] is connecting...", Kind.ToString(), Setting.ConnectKey);
-            GetConnection().Open();
-            FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "{0}[{1}] connected.", Kind.ToString(), Setting.ConnectKey);
-            return true;
-        }
+        public virtual bool Connect() { return false; }
 
         /// <summary>
         /// 操作一堆数据
@@ -131,58 +113,6 @@ namespace FoolishServer.Data
                     {
                         throw new NotSupportedException("The database of '" + setting.Kind.ToString() + "' is not realized.");
                     }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 数据库操作
-    /// </summary>
-    public abstract class Database<T> : Database, ISQLDatabase<T> where T : DbConnection
-    {
-        /// <summary>
-        /// 连接器
-        /// </summary>
-        public sealed override DbConnection GetConnection()
-        {
-            return Connection;
-        }
-
-        /// <summary>
-        /// 连接器
-        /// </summary>
-        public T Connection { get; private set; }
-
-        /// <summary>
-        /// 先建立连接
-        /// </summary>
-        public sealed override void CreateConnection(IDatabaseSetting setting)
-        {
-            base.CreateConnection(setting);
-            Connection = CreateDbConnection(setting);
-        }
-
-        /// <summary>
-        /// 创建连接对象
-        /// </summary>
-        protected abstract T CreateDbConnection(IDatabaseSetting setting);
-
-        /// <summary>
-        /// 断开连接
-        /// </summary>
-        public override void Close()
-        {
-            if (GetConnection() != null)
-            {
-                try
-                {
-                    GetConnection().Close();
-                }
-                catch (Exception e)
-                {
-                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
-                }
-                Connection = null;
             }
         }
     }

@@ -55,22 +55,30 @@ namespace FoolishServer
             var set = DataContext.GetEntity<Test>();
             stopwatch.Stop();
             FConsole.Write(stopwatch.Elapsed);
-            //return;
+
+            var result = set.Find(99999999, "Good");
+            FConsole.Write("result: " + result.TestID);
+
+            return;
+            stopwatch.Restart();
+            FConsole.WriteWarn(DateTime.Now);
             int number = 1000000;
-            Parallel.For(0, number / 5000, (i) =>
+            Parallel.For(0, number / 500, (i) =>
              {
                  //var set = DataContext.GetEntity<Test>();
-                 int startIndex = i * 5000;
-                 for (int index = startIndex; index < startIndex + 5000; index++)
+                 int startIndex = i * 500;
+                 for (int index = startIndex; index < startIndex + 500; index++)
                  {
                      //var set = DataContext.GetEntity<Test>();
                      NewTest(set, index);
-                     if (index % 1000 == 0)
-                     {
-                         Thread.Sleep(100);
-                     }
+                     //if (index % 1000 == 0)
+                     //{
+                     //    Thread.Sleep(100);
+                     //}
                  }
              });
+            stopwatch.Stop();
+            FConsole.Write(number + ": " + stopwatch.Elapsed);
             return;
             //Parallel.For(0, number, (index) =>
             //{
@@ -124,7 +132,7 @@ namespace FoolishServer
             //string json = JsonUtility.ToJson(a);
             a.Password = "asdsad";
 
-            FConsole.Write(Interlocked.Increment(ref count));
+            //FConsole.Write(Interlocked.Increment(ref count));
             //FConsole.Write("Time:" + b.ModifiedTime);
         }
 

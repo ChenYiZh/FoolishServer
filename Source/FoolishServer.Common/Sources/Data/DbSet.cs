@@ -68,9 +68,14 @@ namespace FoolishServer.Data
         public IReadOnlyDictionary<EntityKey, T> ColdEntities { get { return coldEntities; } }
 
         /// <summary>
+        /// 原子锁
+        /// </summary>
+        private int releaseCountdown = 0;
+
+        /// <summary>
         /// 卸载冷数据倒计时
         /// </summary>
-        public int ReleaseCountdown { get; set; }
+        public int ReleaseCountdown { get { return releaseCountdown; } set { Interlocked.Exchange(ref releaseCountdown, value); } }
 
         /// <summary>
         /// 推送倒计时
@@ -204,8 +209,12 @@ namespace FoolishServer.Data
         /// </summary>
         public void ReleaseColdEntities()
         {
-            coldEntities.Clear();
-            FConsole.Write(GetType().Name + " ReleaseColdEntities.");
+            Thread.Sleep(100);
+            if (ReleaseCountdown <= 0)
+            {
+                coldEntities.Clear();
+                FConsole.Write(GetType().Name + " ReleaseColdEntities.");
+            }
         }
 
         /// <summary>
@@ -346,12 +355,53 @@ namespace FoolishServer.Data
                 }
             }
         }
-
+        /// <summary>
+        /// 执行读取全部数据的函数锁
+        /// </summary>
+        private readonly object loadingAllFlag = new object();
+        /// <summary>
+        /// 读取全部数据，只要有一个查询其他全部等待，只为了合批只做一次查询
+        /// </summary>
         public IReadOnlyDictionary<EntityKey, T> LoadAll()
         {
-            // TODO: LoadAll;
-            ReleaseCountdown = Settings.DataReleasePeriod;
-            return new Dictionary<EntityKey, T>();
+            Dictionary<EntityKey, T> result;
+            // LoadAll;
+            lock (loadingAllFlag)
+            {
+                //还未卸载直接加载
+                if (releaseCountdown <= 0 || ColdEntities.Count == 0)
+                {
+                    //数据库加载
+                    coldEntities.Clear();
+                    ITableScheme tableScheme = DataContext.GetTableScheme<T>();
+                    if (!DataContext.Databases.ContainsKey(tableScheme.ConnectKey)) { return coldEntities; }
+                    IEnumerable<T> data = DataContext.Databases[tableScheme.ConnectKey].LoadAll<T>();
+                    foreach (T entity in data)
+                    {
+                        EntityKey key = entity.GetEntityKey();
+                        T value;
+                        if (RawEntities.TryGetValue(key, out value))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            coldEntities[key] = entity;
+                        }
+                    }
+                }
+
+                result = new Dictionary<EntityKey, T>(coldEntities);
+                ReleaseCountdown = Settings.DataReleasePeriod;
+            }
+            lock (rawEntities.SyncRoot)
+            {
+                foreach (KeyValuePair<EntityKey, T> kv in rawEntities)
+                {
+                    result[kv.Key] = kv.Value;
+                }
+            }
+            return result;
         }
 
         /// <summary>

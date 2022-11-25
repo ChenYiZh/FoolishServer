@@ -136,9 +136,9 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal override void OnNotifyPropertyModified(string propertyName, object oldValue, object value)
         {
-            if (TableScheme != null && TableScheme.Fields.ContainsKey(propertyName) && TableScheme.Fields[propertyName].IsKey)
+            if (TableScheme != null && TableScheme.FieldsByProperty.ContainsKey(propertyName) && TableScheme.FieldsByProperty[propertyName].IsKey)
             {
-                UpdateEntityKey(TableScheme.Fields[propertyName], value);
+                UpdateEntityKey(TableScheme.FieldsByProperty[propertyName], value);
             }
             base.OnNotifyPropertyModified(propertyName, oldValue, value);
             try

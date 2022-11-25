@@ -26,7 +26,11 @@ namespace FoolishServer.Data
         /// <summary>
         /// 列信息，Key: PropertyName
         /// </summary>
-        public IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; private set; }
+        public IReadOnlyDictionary<string, ITableFieldScheme> FieldsByProperty { get; private set; }
+        /// <summary>
+        /// 列信息，Key: Name
+        /// </summary>
+        public IReadOnlyDictionary<string, ITableFieldScheme> FieldsByName { get; private set; }
         /// <summary>
         /// 主键列
         /// </summary>
@@ -43,8 +47,10 @@ namespace FoolishServer.Data
             EntityTable = entityTable;
 
             //读取列信息
-            Dictionary<string, ITableFieldScheme> fields = new Dictionary<string, ITableFieldScheme>();
-            Fields = fields;
+            Dictionary<string, ITableFieldScheme> fieldsByProperty = new Dictionary<string, ITableFieldScheme>();
+            Dictionary<string, ITableFieldScheme> fieldsByName = new Dictionary<string, ITableFieldScheme>();
+            FieldsByProperty = fieldsByProperty;
+            FieldsByName = fieldsByName;
             List<ITableFieldScheme> keys = new List<ITableFieldScheme>();
             KeyFields = keys;
 
@@ -58,7 +64,8 @@ namespace FoolishServer.Data
                 EntityFieldAttribute attribute = property.GetCustomAttribute<EntityFieldAttribute>();
                 if (attribute == null) continue;
                 TableFieldScheme field = new TableFieldScheme(property, attribute);
-                fields.Add(field.PropertyName, field);
+                fieldsByProperty.Add(field.PropertyName, field);
+                fieldsByName.Add(field.Name, field);
                 if (firstAttribute == null)
                 {
                     firstAttribute = attribute;

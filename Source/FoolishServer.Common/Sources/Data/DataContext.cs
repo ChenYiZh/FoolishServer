@@ -135,7 +135,7 @@ namespace FoolishServer.Data
                     continue;
                 }
                 batabases[setting.Key] = Database.Make(setting.Value);
-                batabases[setting.Key].CreateConnection(setting.Value);
+                batabases[setting.Key].SetSettings(setting.Value);
             }
         }
 
@@ -178,10 +178,10 @@ namespace FoolishServer.Data
 
             //加载所有热数据
             FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Start loading hot data...");
-            foreach (IDbSet dbSet in entityPool.Values)
+            Parallel.ForEach(entityPool.Values, (IDbSet dbSet) =>
             {
-                dbSet.PullAllRawData();
-            }
+               dbSet.PullAllRawData();
+            });
 
             //开启计时器
             Timer = new Timer(Tick, null, TIMER_INTERVAL, TIMER_INTERVAL);
@@ -288,6 +288,10 @@ namespace FoolishServer.Data
             if (RawDatabase != null)
             {
                 RawDatabase.Close();
+            }
+            foreach (ISQLDatabase database in Databases.Values)
+            {
+                database.Close();
             }
         }
 

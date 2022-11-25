@@ -244,7 +244,7 @@ namespace FoolishGames.Log
 
         private static void SendMessage(string level, string category, string message, bool track)
         {
-            message = $"{TimeLord.Now.ToString()} [{category}] - " + message;
+            message = FormatCustomMessage(category, message);
             if (LogStackTracker && track && LogStackLevels.Contains(level))
             {
                 const string stackIndent = "  ";
@@ -268,21 +268,31 @@ namespace FoolishGames.Log
             }
             SendMessage(level, message);
         }
+
         /// <summary>
-        /// 服务器内部输出
+        /// 用输出格式格式化自定义数据
         /// </summary>
-        public static void WriteLine(string level, string category, string message)
+        /// <returns></returns>
+        public static string FormatCustomMessage(string category, string message)
         {
-            message = $"{TimeLord.Now.ToString()} [{category}] - " + message;
-            WriteLine(level, message);
+            return $"{TimeLord.Now.ToString()} [{category}] - " + message;
         }
-        /// <summary>
-        /// 服务器内部输出
-        /// </summary>
-        public static void WriteLine(string level, string message)
-        {
-            SendMessage(level, message);
-        }
+
+        ///// <summary>
+        ///// 服务器内部输出
+        ///// </summary>
+        //public static void WriteLine(string level, string category, string message)
+        //{
+        //    message = FormatCustomMessage(category, message);
+        //    WriteLine(level, message);
+        //}
+        ///// <summary>
+        ///// 服务器内部输出
+        ///// </summary>
+        //public static void WriteLine(string level, string message)
+        //{
+        //    SendMessage(level, message);
+        //}
 
         private static void SendMessage(string level, string message)
         {

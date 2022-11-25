@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -20,93 +21,213 @@ namespace FoolishServer.Data
 {
     /// <summary>
     /// mysql连接管理
+    /// set global max_allowed_packet = 1073741824;
     /// </summary>
-    public sealed class MySQLDatabase : Database<MySqlConnection>
+    public sealed class MySQLDatabase : Database
     {
         /// <summary>
         /// 事务队列
         /// </summary>
-        private ThreadSafeQueue<DbCommition>[] CommitionPool = new ThreadSafeQueue<DbCommition>[3];
+        private CachePool<DbCommition> CommitionPool;
+
+        ///// <summary>
+        ///// 通讯连接池
+        ///// </summary>
+        //private ThreadSafeHashSet<MySqlConnection> Connections;
 
         /// <summary>
-        /// 读写时用的互斥锁
+        /// 读写连接
         /// </summary>
-        private object SyncRoot = new object();
+        private MySqlConnection writeConnection, readConnection;
 
         /// <summary>
-        /// 事务锁
+        /// 是否正在事务处理
         /// </summary>
-        private int CommitionPoolIndex = 0;
+        private int isExecuting = 0;
 
         /// <summary>
-        /// 推送线程
+        /// 准备关闭
         /// </summary>
-        private Thread PushThread;
+        private int isClosed = 0;
 
         /// <summary>
-        /// 创建连接对象
+        /// 判断连接状态
         /// </summary>
-        protected override MySqlConnection CreateDbConnection(IDatabaseSetting setting)
+        public override bool Connected
         {
-            for (int i = 0; i < CommitionPool.Length; i++)
+            get
             {
-                CommitionPool[i] = new ThreadSafeQueue<DbCommition>();
+                //if (Connections != null && Connections.Count > 0)
+                //{
+                //    lock (Connections.SyncRoot)
+                //    {
+                //        return Connections.All(c => c.State == ConnectionState.Connecting || c.State == ConnectionState.Executing);
+                //    }
+                //}
+                //return false;
+                return IsConnected(writeConnection) && IsConnected(readConnection);
             }
-            //如果有二进制保存 + ";Allow User Variables=True"
-            MySqlConnection connection = new MySqlConnection(setting.ConnectionString);
-            PushThread = new Thread(PushingCommitions);
-            PushThread.Start();
+            protected set { }
+        }
+
+        private bool IsConnected(MySqlConnection connection)
+        {
+            return connection != null && (connection.State != ConnectionState.Broken && connection.State != ConnectionState.Closed);
+        }
+
+        /// <summary>
+        /// 创建连接，多并发事务处理使用
+        /// </summary>
+        /// <returns></returns>
+        private MySqlConnection CreateConnection()
+        {
+            FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "MySQL[{0}] start connecting...", Setting.ConnectKey);
+            MySqlConnection connection = new MySqlConnection(Setting.ConnectionString);
+            //Connections.Add(connection);
+            connection.Open();
+            FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "MySQL[{0}] is opened.", Setting.ConnectKey);
             return connection;
         }
 
         /// <summary>
+        /// 判断状态并且获取写入的连接对象
+        /// </summary>
+        private MySqlConnection GetWriteConnection()
+        {
+            if (!IsConnected(writeConnection))
+            {
+                if (writeConnection != null)
+                {
+                    Close(writeConnection);
+                }
+                writeConnection = CreateConnection();
+            }
+            return writeConnection;
+        }
+
+        /// <summary>
+        /// 判断状态并且获取读取的连接对象
+        /// </summary>
+        private MySqlConnection GetReadConnection()
+        {
+            if (!IsConnected(readConnection))
+            {
+                if (readConnection != null)
+                {
+                    Close(readConnection);
+                }
+                readConnection = CreateConnection();
+            }
+            return readConnection;
+        }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        private void Close(MySqlConnection connection)
+        {
+            if (connection == null)
+            {
+                return;
+            }
+            try
+            {
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
+            }
+            //Connections.Remove(connection);
+        }
+
+        /// <summary>
+        /// 设置配置文件，初始化时执行
+        /// </summary>
+        public override void SetSettings(IDatabaseSetting setting)
+        {
+            base.SetSettings(setting);
+            CommitionPool = new CachePool<DbCommition>(PushingCommitions);
+            //Connections = new ThreadSafeHashSet<MySqlConnection>();
+            writeConnection = CreateConnection();
+            readConnection = CreateConnection();
+        }
+        int totalCount = 0;
+        /// <summary>
         /// 业务处理线程
         /// </summary>
-        /// <param name="state"></param>
-        private void PushingCommitions(object state)
+        private void PushingCommitions(IReadOnlyQueue<DbCommition> set)
         {
-            while (true)
+            StringBuilder sql = new StringBuilder();
+            Interlocked.Exchange(ref isExecuting, set.Count);
+            if (isExecuting > 0)
             {
-                bool lockToken = false;
+                sql.Append("BEGIN;");
+            }
+            int count = 0;
+            while (set.Count > 0)
+            {
+                if (isClosed > 0)
+                {
+                    const int cacheCount = 4;
+                    float progress = (1.0f - ((float)set.Count / isExecuting)) * 100.0f / cacheCount;
+                    progress += (isClosed - 1) * 100.0f / cacheCount;
+                    Console.Write($"\r{FConsole.FormatCustomMessage(Kind.ToString(), $"MySQL[{Setting.ConnectKey}] is saving data... {progress.ToString("F2")}%")}");
+                }
+                DbCommition commition = set.Dequeue();
                 try
                 {
-                    Monitor.TryEnter(SyncRoot, 100, ref lockToken);
-                    if (lockToken)
-                    {
-                        int nextIndex = CommitionPoolIndex + 1;
-                        if (nextIndex >= CommitionPool.Length)
-                        {
-                            nextIndex = 0;
-                        }
-                        int pushIndex = CommitionPoolIndex - 1;
-                        if (pushIndex < 0)
-                        {
-                            pushIndex = CommitionPool.Length - 1;
-                        }
-                        Interlocked.Exchange(ref CommitionPoolIndex, nextIndex);
-                        ThreadSafeQueue<DbCommition> commitions = CommitionPool[pushIndex];
-                        while (commitions.Count > 0)
-                        {
-                            DbCommition commition = commitions.Dequeue();
-                            try
-                            {
-                                GenerateModifySql(commition);
-                            }
-                            catch (Exception e)
-                            {
-                                FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
-                            }
-                        }
-                    }
-                    Thread.Sleep(10);
+                    GenerateModifySql(commition, sql);
                 }
-                finally
+                catch (Exception e)
                 {
-                    if (lockToken)
+                    FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
+                }
+                totalCount++;
+                //最大多少条数据一起提交
+                if (count++ >= 100)
+                {
+                    count = 0;
+                    sql.Append("COMMIT;");
+                    string commitSql = sql.ToString();
+                    sql.Clear();
+                    sql.Append("BEGIN;");
+                    try
                     {
-                        Monitor.Exit(SyncRoot);
+                        if (Query(commitSql) != 0)
+                        {
+                            FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), "[Query Error] There are some errors happened on command the sql -> \r\n{0}", commitSql);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                     }
                 }
+            }
+            try
+            {
+                if (isExecuting > 0)
+                {
+                    sql.Append("COMMIT;");
+                }
+                if (Query(sql.ToString()) != 0)
+                {
+                    FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), "[Query Error] There are some errors happened on command the sql -> \r\n{0}", sql);
+                }
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
+            }
+            Interlocked.Exchange(ref isExecuting, 0);
+            if (isClosed > 0)
+            {
+                Interlocked.Increment(ref isClosed);
+            }
+            if (totalCount > 1000000)
+            {
+                FConsole.WriteWarn(DateTime.Now + ": " + totalCount);
             }
         }
 
@@ -115,12 +236,30 @@ namespace FoolishServer.Data
         /// </summary>
         public override void Close()
         {
-            if (PushThread != null)
+            Interlocked.Increment(ref isClosed);
+            while (isExecuting > 0)
             {
-                PushThread.Abort();
+                Thread.Sleep(Settings.LockerTimeout);
             }
-            PushThread = null;
-            base.Close();
+            if (CommitionPool != null)
+            {
+                CommitionPool.Release();
+            }
+            Console.Write($"\r{FConsole.FormatCustomMessage(Kind.ToString(), $"MySQL[{Setting.ConnectKey}] is saving data... 100.00%")}");
+            Console.WriteLine();
+            Console.WriteLine();
+            CommitionPool = null;
+            List<MySqlConnection> connections = null;
+            //lock (Connections.SyncRoot)
+            //{
+            //    connections = new List<MySqlConnection>(Connections);
+            //}
+            connections.Add(readConnection);
+            connections.Add(writeConnection);
+            foreach (MySqlConnection connection in connections)
+            {
+                Close(connection);
+            }
         }
 
         #region CheckTableSchema
@@ -221,9 +360,9 @@ namespace FoolishServer.Data
             if (!tableNames.Contains(tableName))
             {
                 //创建表
-                string fieldSqls = string.Join(", ", table.Fields.Values.Select(f => CreateGenerateSQL(f)));
-                string keyFieldSqls = string.Join(", ", table.Fields.Values.Where(f => f.IsKey).Select(f => $"`{f.Name}`"));
-                ITableFieldScheme[] indexs = table.Fields.Values.Where(f => f.IsIndex && !f.IsKey).ToArray();
+                string fieldSqls = string.Join(", ", table.FieldsByProperty.Values.Select(f => CreateGenerateSQL(f)));
+                string keyFieldSqls = string.Join(", ", table.FieldsByProperty.Values.Where(f => f.IsKey).Select(f => $"`{f.Name}`"));
+                ITableFieldScheme[] indexs = table.FieldsByProperty.Values.Where(f => f.IsIndex && !f.IsKey).ToArray();
                 string indexSqls = indexs.Length > 0 ? $", {string.Join(", ", indexs.Select(f => $"INDEX `INDEX_{f.Name}` (`{f.Name}`)"))}" : "";
                 sql = $"CREATE TABLE IF NOT EXISTS `{tableName}`({fieldSqls}, PRIMARY KEY ({keyFieldSqls}){indexSqls} )ENGINE=InnoDB DEFAULT CHARSET=utf8;";
                 if (Query(sql) != 0)
@@ -253,7 +392,7 @@ namespace FoolishServer.Data
                 //进行判断
                 Dictionary<string, FieldInfo> dbFields = tableFields.ToDictionary(f => f.Name.ToLower(), f => f);
                 List<TableFieldComparor> comparors = new List<TableFieldComparor>();
-                foreach (ITableFieldScheme field in table.Fields.Values)
+                foreach (ITableFieldScheme field in table.FieldsByProperty.Values)
                 {
                     FieldInfo fieldInfo = null;
                     if (dbFields.ContainsKey(field.Name.ToLower()))
@@ -311,7 +450,7 @@ namespace FoolishServer.Data
                 if (keyChanged)
                 {
                     sqls.AppendLine($"ALTER TABLE `{tableName}` DROP PRIMARY KEY;");
-                    sqls.AppendLine($"ALTER TABLE `{tableName}` ADD PRIMARY KEY ({string.Join(", ", table.Fields.Values.Where(f => f.IsKey).Select(f => $"`{f.Name}`"))});");
+                    sqls.AppendLine($"ALTER TABLE `{tableName}` ADD PRIMARY KEY ({string.Join(", ", table.FieldsByProperty.Values.Where(f => f.IsKey).Select(f => $"`{f.Name}`"))});");
                 }
 
                 if (sqls.Length > 0)
@@ -331,8 +470,9 @@ namespace FoolishServer.Data
         private TSet Query<TSet, T>(string sql, Func<MySqlDataReader, T> deserialize, IEnumerable<KeyValuePair<string, object>> parameters = null) where TSet : ICollection<T>, new()
         {
             FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), sql);
+            MySqlConnection connection = GetReadConnection();
             TSet items = new TSet();
-            using (MySqlCommand command = Connection.CreateCommand())
+            using (MySqlCommand command = connection.CreateCommand())
             {
                 command.CommandText = sql;
                 if (parameters != null)
@@ -351,6 +491,7 @@ namespace FoolishServer.Data
                 }
                 reader.Close();
             }
+            Close(connection);
             return items;
         }
 
@@ -359,8 +500,10 @@ namespace FoolishServer.Data
         /// </summary>
         private int Query(string sql, IEnumerable<KeyValuePair<string, object>> parameters = null)
         {
-            FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), @sql);
-            using (MySqlCommand command = Connection.CreateCommand())
+            FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), sql);
+            MySqlConnection connection = GetWriteConnection();
+            int result = -1;
+            using (MySqlCommand command = connection.CreateCommand())
             {
                 command.CommandText = sql;
                 if (parameters != null)
@@ -372,8 +515,10 @@ namespace FoolishServer.Data
                         parameter.Value = param.Value;
                     }
                 }
-                return command.ExecuteNonQuery();
+                result = command.ExecuteNonQuery();
             }
+            Close(connection);
+            return result;
         }
 
         private static string CreateGenerateSQL(ITableFieldScheme tableField)
@@ -533,7 +678,7 @@ namespace FoolishServer.Data
         {
             foreach (DbCommition commition in commitions)
             {
-                CommitionPool[CommitionPoolIndex].Enqueue(commition);
+                CommitionPool.Push(commition);
             }
             return true;
         }
@@ -543,20 +688,34 @@ namespace FoolishServer.Data
         /// </summary>
         public override IEnumerable<T> LoadAll<T>()
         {
-            throw new NotImplementedException();
+            ITableScheme tableScheme = DataContext.GetTableScheme<T>();
+            string sql = $"SELECT * FROM {tableScheme.TableName};";
+            return Query<List<T>, T>(sql, (reader) => { return Deserialize<T>(tableScheme, reader); });
         }
-
         /// <summary>
         /// 通过EntityKey，查询某一条数据，没有就返回空
         /// </summary>
         public override T Find<T>(EntityKey key)
         {
-            throw new NotImplementedException();
+            TableScheme tableScheme = (TableScheme)DataContext.GetTableScheme<T>();
+            Dictionary<string, string> keys = new Dictionary<string, string>(tableScheme.KeyFields.Count);
+            IReadOnlyList<ITableFieldScheme> keyFields = tableScheme.KeyFields;
+            for (int i = 0; i < keyFields.Count; i++)
+            {
+                keys.Add(keyFields[i].Name, key.Keys[i].GetString());
+            }
+            string sql = $"SELECT * FROM {tableScheme.TableName} WHERR {string.Join(" AND ", keys.Select(kv => $"`{kv.Key}` = {kv.Value}"))};";
+            List<T> result = Query<List<T>, T>(sql, (reader) => { return Deserialize<T>(tableScheme, reader); });
+            if (result.Count == 0)
+            {
+                return null;
+            }
+            return result[0];
         }
         /// <summary>
         /// 执行修改操作
         /// </summary>
-        public bool GenerateModifySql(DbCommition commition)
+        public bool GenerateModifySql(DbCommition commition, StringBuilder builder)
         {
             TableScheme tableScheme = (TableScheme)DataContext.TableSchemes[commition.Key.Type];
             Dictionary<string, string> keys = new Dictionary<string, string>(tableScheme.KeyFields.Count);
@@ -570,13 +729,12 @@ namespace FoolishServer.Data
             //删除逻辑
             if (commition.ModifyType == EModifyType.Remove || commition.Entity == null)
             {
-                Query($"DELETE FROM `{tableScheme.TableName}` WHERE {keySql};");
+                builder.Append($" DELETE FROM `{tableScheme.TableName}` WHERE {keySql};");
                 return true;
             }
             //生成修改逻辑有二进制会动到@
-            Dictionary<string, object> parameters = new Dictionary<string, object>(tableScheme.Fields.Count);
-            Dictionary<string, string> values = new Dictionary<string, string>(tableScheme.Fields.Count);
-            foreach (ITableFieldScheme field in tableScheme.Fields.Values)
+            Dictionary<string, string> values = new Dictionary<string, string>(tableScheme.FieldsByProperty.Count);
+            foreach (ITableFieldScheme field in tableScheme.FieldsByProperty.Values)
             {
                 //获取当前的值
                 object value = field.Type.GetValue(commition.Entity);
@@ -586,8 +744,20 @@ namespace FoolishServer.Data
                 }
                 else if (field.FieldType == ETableFieldType.Blob || field.FieldType == ETableFieldType.LongBlob)
                 {
-                    values.Add(field.Name, $"@{field.PropertyName}");
-                    parameters.Add(field.Name, field.PropertyName);
+                    if (value == null)
+                    {
+                        values.Add(field.Name, null);
+                    }
+                    else
+                    {
+                        byte[] buff = (byte[])value;
+                        StringBuilder buffStr = new StringBuilder();
+                        for (int i = 0; i < buff.Length; i++)
+                        {
+                            buffStr.Append(Convert.ToString(buff[i], 2));
+                        }
+                        values.Add(field.Name, buffStr.ToString());
+                    }
                 }
                 else if (field.FieldType == ETableFieldType.String || field.FieldType == ETableFieldType.Text || field.FieldType == ETableFieldType.LongText
                     || field.FieldType == ETableFieldType.DateTime)
@@ -603,9 +773,65 @@ namespace FoolishServer.Data
             string valuesSql = string.Join(", ", values.Values);
             string equalsSql = string.Join(", ", values.Where(kv => !keys.ContainsKey(kv.Key)).Select(kv => $"`{kv.Key}` = {kv.Value}"));
 
-            Query($"INSERT INTO `{tableScheme.TableName}` ({keysSql}) VALUES ({valuesSql}) ON DUPLICATE KEY UPDATE {equalsSql};", parameters);
+            builder.Append($" INSERT INTO `{tableScheme.TableName}` ({keysSql}) VALUES ({valuesSql}) ON DUPLICATE KEY UPDATE {equalsSql};");
 
             return true;
+        }
+        /// <summary>
+        /// 解析存储的数据
+        /// </summary>
+        private T Deserialize<T>(ITableScheme tableScheme, MySqlDataReader reader) where T : MajorEntity, new()
+        {
+            if (reader.FieldCount == 0)
+            {
+                return null;
+            }
+            T entity = new T();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                string name = reader.GetName(i);
+                object value = null;
+                if (!tableScheme.FieldsByName.ContainsKey(name)) { continue; }
+                ITableFieldScheme tableField = tableScheme.FieldsByName[name];
+                switch (tableField.FieldType)
+                {
+                    case ETableFieldType.Bit: { value = reader.GetBoolean(i); } break;
+                    case ETableFieldType.Blob:
+                    case ETableFieldType.LongBlob:
+                        {
+                            using (MemoryStream stream = new MemoryStream())
+                            {
+                                byte[] buff = new byte[1024];
+                                int length = 0;
+                                int index = 0;
+                                while ((length = (int)reader.GetBytes(index, 0, buff, 0, buff.Length)) > 0)
+                                {
+                                    index += length;
+                                    stream.Write(buff, 0, length);
+                                }
+                                value = stream.ToArray();
+                            }
+                        }
+                        break;
+                    case ETableFieldType.Byte: { value = reader.GetByte(i); } break;
+                    case ETableFieldType.DateTime: { value = reader.GetDateTime(i); } break;
+                    case ETableFieldType.Double: { value = reader.GetDouble(i); } break;
+                    case ETableFieldType.Float: { value = reader.GetFloat(i); } break;
+                    case ETableFieldType.Int: { value = reader.GetInt32(i); } break;
+                    case ETableFieldType.Long: { value = reader.GetInt64(i); } break;
+                    case ETableFieldType.LongText:
+                    case ETableFieldType.Text:
+                    case ETableFieldType.String: { value = reader.GetString(i); } break;
+                    case ETableFieldType.SByte: { value = reader.GetSByte(i); } break;
+                    case ETableFieldType.Short: { value = reader.GetInt16(i); } break;
+                    case ETableFieldType.UInt: { value = reader.GetUInt32(i); } break;
+                    case ETableFieldType.ULong: { value = reader.GetUInt64(i); } break;
+                    case ETableFieldType.UShort: { value = reader.GetUInt16(i); } break;
+                }
+                tableField.Type.SetValue(entity, value);
+            }
+            entity.OnPulledFromDb();
+            return entity;
         }
     }
 }

@@ -121,6 +121,12 @@
             消息预处理
             </summary>
         </member>
+        <member name="T:FoolishGames.Collections.IReadOnlyQueue`1">
+            <summary>
+            只读队列
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
         <member name="T:FoolishGames.Collections.IThreadSafeDictionary`2">
             <summary>
             线程安全字典接口
@@ -131,169 +137,10 @@
             线程安全列表接口
             </summary>
         </member>
-        <member name="T:FoolishGames.Common.ICachePool`1">
+        <member name="T:FoolishGames.Collections.TQueue`1">
             <summary>
-            缓存队列池
+            特殊队列，继承只读队列的接口
             </summary>
-        </member>
-        <member name="P:FoolishGames.Common.ICachePool`1.Thread">
-            <summary>
-            中间线程
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Common.ICachePool`1.SyncRoot">
-            <summary>
-            外部用来加锁的工具
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Common.ICachePool`1.PoolCount">
-            <summary>
-            缓存池数量
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.ICachePool`1.Push(`0)">
-            <summary>
-            把数据加入缓存池
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.AssemblyService">
-            <summary>
-            程序集管理类
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Common.AssemblyService.Assemblies">
-            <summary>
-            已加载的程序集
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.AssemblyService.Load(System.String)">
-            <summary>
-            读取程序集
-            </summary>
-            <param name="dllPath"></param>
-            <returns></returns>
-        </member>
-        <member name="T:FoolishGames.Common.ByteUtil">
-            <summary>
-            字节流处理
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.ByteUtil.ONE">
-            <summary>
-            1字节
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.ByteUtil.ZERO">
-            <summary>
-            0字节
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.FType`1">
-            <summary>
-            Type缓存类，防止多次调用GetType或者typeof
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="P:FoolishGames.Common.FType`1.Type">
-            <summary>
-            获取泛型的Type
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.FType">
-            <summary>
-            Type的一些操作
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.FType.GetDefaultValueFromType(System.Type)">
-            <summary>
-            根据Type，获取默认值
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.FType.IsSubInterfaceOf(System.Type,System.Type)">
-            <summary>
-            判断是否实现某个泛型接口，少用
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.EMessageType">
-            <summary>
-            消息类型
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.EMessageType.NoProcess">
-            <summary>
-            什么都不处理
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.EMessageType.OnlyCompress">
-            <summary>
-            压缩过
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.EMessageType.OnlyCrypto">
-            <summary>
-            加密过
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Common.EMessageType.CompressAndCrypto">
-            <summary>
-            解压+加密
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.PackageFactory">
-            <summary>
-            消息处理类
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.PackageFactory.Pack(FoolishGames.IO.IMessageWriter,System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
-            <summary>
-            打包
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.PackageFactory.Unpack(System.Byte[],System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
-            <summary>
-            解包
-            </summary>
-            <returns>返回剩余字节位置</returns>
-        </member>
-        <member name="M:FoolishGames.Common.PackageFactory.GetTotalLength(System.Byte[],System.Int32)">
-            <summary>
-            预解析整体包体大小
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.Singleton`1">
-            <summary>
-            单例类
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="P:FoolishGames.Common.Singleton`1.Instance">
-            <summary>
-            单例
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.Singleton`1.Reset">
-            <summary>
-            重置
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Common.StringFactory">
-            <summary>
-            string转换
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Common.StringFactory.Make(System.Exception)">
-            <summary>
-            从Exception转成字符串
-            </summary>
-            <param name="exception"></param>
-            <returns></returns>
-        </member>
-        <member name="M:FoolishGames.Common.StringFactory.Make(System.String,System.Exception)">
-            <summary>
-            从Exception转成字符串
-            </summary>
-            <param name="exception"></param>
-            <returns></returns>
         </member>
         <member name="T:FoolishGames.IO.ICompression">
             <summary>
@@ -1095,15 +942,11 @@
             <param name="message">日志内容</param>
             <param name="args"></param>
         </member>
-        <member name="M:FoolishGames.Log.FConsole.WriteLine(System.String,System.String,System.String)">
+        <member name="M:FoolishGames.Log.FConsole.FormatCustomMessage(System.String,System.String)">
             <summary>
-            服务器内部输出
+            用输出格式格式化自定义数据
             </summary>
-        </member>
-        <member name="M:FoolishGames.Log.FConsole.WriteLine(System.String,System.String)">
-            <summary>
-            服务器内部输出
-            </summary>
+            <returns></returns>
         </member>
         <member name="T:FoolishGames.Proxy.ISupervisor">
             <summary>
@@ -1254,6 +1097,214 @@
             <summary>
             获取当前时间
             </summary>
+        </member>
+        <member name="T:FoolishGames.Common.AssemblyService">
+            <summary>
+            程序集管理类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.AssemblyService.Assemblies">
+            <summary>
+            已加载的程序集
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.AssemblyService.Load(System.String)">
+            <summary>
+            读取程序集
+            </summary>
+            <param name="dllPath"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishGames.Common.ByteUtil">
+            <summary>
+            字节流处理
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.ByteUtil.ONE">
+            <summary>
+            1字节
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.ByteUtil.ZERO">
+            <summary>
+            0字节
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.CachePool`1">
+            <summary>
+            缓存队列池
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:FoolishGames.Common.CachePool`1.Execution">
+            <summary>
+            队列操作
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.CachePool`1.Pools">
+            <summary>
+            缓存池
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.CachePool`1.CurrentPoolIndex">
+            <summary>
+            当前压入的缓存池索引
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.CachePool`1.Thread">
+            <summary>
+            线程对象
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.CachePool`1.SyncRoot">
+            <summary>
+            线程锁
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.CachePool`1.DeltaMilliseconds">
+            <summary>
+            线程循环的间隔
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Common.CachePool`1.LockerTimeout">
+            <summary>
+            循环中锁的最长等待时间
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.CachePool`1.isReleased">
+            <summary>
+            工作状态标识
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.CachePool`1.#ctor(System.Action{FoolishGames.Collections.IReadOnlyQueue{`0}},System.Int32,System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="execution">回调函数</param>
+            <param name="lockerTimeout">循环中锁的最长等待时间</param>
+            <param name="deltaMilliseconds">线程循环的间隔</param>
+        </member>
+        <member name="M:FoolishGames.Common.CachePool`1.Push(`0)">
+            <summary>
+            数据推入
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.CachePool`1.Processing">
+            <summary>
+            线程执行的操作
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.CachePool`1.Release">
+            <summary>
+            线程释放，所有数据释放
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.FType`1">
+            <summary>
+            Type缓存类，防止多次调用GetType或者typeof
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:FoolishGames.Common.FType`1.Type">
+            <summary>
+            获取泛型的Type
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.FType">
+            <summary>
+            Type的一些操作
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.FType.GetDefaultValueFromType(System.Type)">
+            <summary>
+            根据Type，获取默认值
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.FType.IsSubInterfaceOf(System.Type,System.Type)">
+            <summary>
+            判断是否实现某个泛型接口，少用
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.EMessageType">
+            <summary>
+            消息类型
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.NoProcess">
+            <summary>
+            什么都不处理
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.OnlyCompress">
+            <summary>
+            压缩过
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.OnlyCrypto">
+            <summary>
+            加密过
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.EMessageType.CompressAndCrypto">
+            <summary>
+            解压+加密
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.PackageFactory">
+            <summary>
+            消息处理类
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.Pack(FoolishGames.IO.IMessageWriter,System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            打包
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.Unpack(System.Byte[],System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            解包
+            </summary>
+            <returns>返回剩余字节位置</returns>
+        </member>
+        <member name="M:FoolishGames.Common.PackageFactory.GetTotalLength(System.Byte[],System.Int32)">
+            <summary>
+            预解析整体包体大小
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.Singleton`1">
+            <summary>
+            单例类
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:FoolishGames.Common.Singleton`1.Instance">
+            <summary>
+            单例
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.Singleton`1.Reset">
+            <summary>
+            重置
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Common.StringFactory">
+            <summary>
+            string转换
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Common.StringFactory.Make(System.Exception)">
+            <summary>
+            从Exception转成字符串
+            </summary>
+            <param name="exception"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Common.StringFactory.Make(System.String,System.Exception)">
+            <summary>
+            从Exception转成字符串
+            </summary>
+            <param name="exception"></param>
+            <returns></returns>
         </member>
         <member name="T:FoolishGames.Sources.Common.RandomUtil">
             <summary>

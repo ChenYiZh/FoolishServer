@@ -12,29 +12,13 @@ namespace FoolishServer.Data
     public interface ISQLDatabase : IDatabase
     {
         /// <summary>
-        /// 连接器
+        /// 设置配置文件，初始化时执行
         /// </summary>
-        DbConnection GetConnection();
-
-        /// <summary>
-        /// 先建立连接
-        /// </summary>
-        void CreateConnection(IDatabaseSetting setting);
+        void SetSettings(IDatabaseSetting setting);
 
         /// <summary>
         /// 对表结构进行调整或创建
         /// </summary>
         void GenerateOrUpdateTableScheme(ITableScheme table);
     }
-    /// <summary>
-    /// SQL标准数据库
-    /// </summary>
-    public interface ISQLDatabase<out T> : ISQLDatabase where T : DbConnection
-    {
-        /// <summary>
-        /// 连接器
-        /// </summary>
-        T Connection { get; }
-
-}
 }

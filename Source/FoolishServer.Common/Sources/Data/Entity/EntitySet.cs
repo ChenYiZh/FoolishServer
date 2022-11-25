@@ -94,8 +94,12 @@ namespace FoolishServer.Data.Entity
             }
             T result;
             if (Dictionary.TryGetValue(key, out result)) { return result; }
-            // TODO: 从数据库中加载
-            return null;
+            // 从数据库中加载
+            if (FullData != null && FullData.TryGetValue(key, out result)) { return result; }
+            if (DbSet.ColdEntities.TryGetValue(key, out result)) { return result; }
+            ITableScheme tableScheme = DataContext.GetTableScheme<T>();
+            if (!DataContext.Databases.ContainsKey(tableScheme.ConnectKey)) { return null; }
+            return DataContext.Databases[tableScheme.ConnectKey].Find<T>(key);
         }
 
         /// <summary>

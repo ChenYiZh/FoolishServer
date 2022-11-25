@@ -1148,29 +1148,14 @@
             SQL标准数据库
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.ISQLDatabase.GetConnection">
+        <member name="M:FoolishServer.Data.ISQLDatabase.SetSettings(FoolishServer.Config.IDatabaseSetting)">
             <summary>
-            连接器
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.ISQLDatabase.CreateConnection(FoolishServer.Config.IDatabaseSetting)">
-            <summary>
-            先建立连接
+            设置配置文件，初始化时执行
             </summary>
         </member>
         <member name="M:FoolishServer.Data.ISQLDatabase.GenerateOrUpdateTableScheme(FoolishServer.Data.ITableScheme)">
             <summary>
             对表结构进行调整或创建
-            </summary>
-        </member>
-        <member name="T:FoolishServer.Data.ISQLDatabase`1">
-            <summary>
-            SQL标准数据库
-            </summary>
-        </member>
-        <member name="P:FoolishServer.Data.ISQLDatabase`1.Connection">
-            <summary>
-            连接器
             </summary>
         </member>
         <member name="T:FoolishServer.Data.ITableFieldScheme">
@@ -1268,14 +1253,9 @@
             判断连接状态
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.Database.GetConnection">
+        <member name="M:FoolishServer.Data.Database.SetSettings(FoolishServer.Config.IDatabaseSetting)">
             <summary>
-            连接器
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.Database.CreateConnection(FoolishServer.Config.IDatabaseSetting)">
-            <summary>
-            先建立连接
+            设置配置文件，初始化时执行
             </summary>
         </member>
         <member name="M:FoolishServer.Data.Database.GenerateOrUpdateTableScheme(FoolishServer.Data.ITableScheme)">
@@ -1314,36 +1294,6 @@
             </summary>
             <param name="setting"></param>
             <returns></returns>
-        </member>
-        <member name="T:FoolishServer.Data.Database`1">
-            <summary>
-            数据库操作
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.Database`1.GetConnection">
-            <summary>
-            连接器
-            </summary>
-        </member>
-        <member name="P:FoolishServer.Data.Database`1.Connection">
-            <summary>
-            连接器
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.Database`1.CreateConnection(FoolishServer.Config.IDatabaseSetting)">
-            <summary>
-            先建立连接
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.Database`1.CreateDbConnection(FoolishServer.Config.IDatabaseSetting)">
-            <summary>
-            创建连接对象
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Data.Database`1.Close">
-            <summary>
-            断开连接
-            </summary>
         </member>
         <member name="T:FoolishServer.Data.DataContext">
             <summary>
@@ -1673,6 +1623,7 @@
         <member name="T:FoolishServer.Data.MySQLDatabase">
             <summary>
             mysql连接管理
+            set global max_allowed_packet = 1073741824;
             </summary>
         </member>
         <member name="F:FoolishServer.Data.MySQLDatabase.CommitionPool">
@@ -1680,31 +1631,61 @@
             事务队列
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.SyncRoot">
+        <member name="F:FoolishServer.Data.MySQLDatabase.writeConnection">
             <summary>
-            读写时用的互斥锁
+            读写连接
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.CommitionPoolIndex">
+        <member name="F:FoolishServer.Data.MySQLDatabase.readConnection">
             <summary>
-            事务锁
+            读写连接
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.PushThread">
+        <member name="F:FoolishServer.Data.MySQLDatabase.isExecuting">
             <summary>
-            推送线程
+            是否正在事务处理
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.MySQLDatabase.CreateDbConnection(FoolishServer.Config.IDatabaseSetting)">
+        <member name="F:FoolishServer.Data.MySQLDatabase.isClosed">
             <summary>
-            创建连接对象
+            准备关闭
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.MySQLDatabase.PushingCommitions(System.Object)">
+        <member name="P:FoolishServer.Data.MySQLDatabase.Connected">
+            <summary>
+            判断连接状态
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.CreateConnection">
+            <summary>
+            创建连接，多并发事务处理使用
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.GetWriteConnection">
+            <summary>
+            判断状态并且获取写入的连接对象
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.GetReadConnection">
+            <summary>
+            判断状态并且获取读取的连接对象
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.Close(MySql.Data.MySqlClient.MySqlConnection)">
+            <summary>
+            关闭连接
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.SetSettings(FoolishServer.Config.IDatabaseSetting)">
+            <summary>
+            设置配置文件，初始化时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.PushingCommitions(FoolishGames.Collections.IReadOnlyQueue{FoolishServer.Data.DbCommition})">
             <summary>
             业务处理线程
             </summary>
-            <param name="state"></param>
         </member>
         <member name="M:FoolishServer.Data.MySQLDatabase.Close">
             <summary>
@@ -1801,7 +1782,7 @@
             通过EntityKey，查询某一条数据，没有就返回空
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.MySQLDatabase.GenerateModifySql(FoolishServer.Data.DbCommition)">
+        <member name="M:FoolishServer.Data.MySQLDatabase.GenerateModifySql(FoolishServer.Data.DbCommition,System.Text.StringBuilder)">
             <summary>
             执行修改操作
             </summary>
@@ -1846,9 +1827,19 @@
             连接中的数据库
             </summary>
         </member>
+        <member name="F:FoolishServer.Data.RedisDatabase.isExecuting">
+            <summary>
+            判断是否正在事务处理
+            </summary>
+        </member>
         <member name="P:FoolishServer.Data.RedisDatabase.Kind">
             <summary>
             什么类型的数据库
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.RedisDatabase.#ctor(FoolishServer.Config.IRedisSetting)">
+            <summary>
+            初始化
             </summary>
         </member>
         <member name="M:FoolishServer.Data.RedisDatabase.Close">
@@ -1861,6 +1852,16 @@
             连接函数
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Data.RedisDatabase.CheckRedis">
+            <summary>
+            检查连接状态
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.RedisDatabase.Reconnect">
+            <summary>
+            重新连接
+            </summary>
         </member>
         <member name="M:FoolishServer.Data.RedisDatabase.Ping(System.Object)">
             <summary>

@@ -23,7 +23,12 @@ namespace FoolishServer.Data
         /// <summary>
         /// 列信息，Key: PropertyName
         /// </summary>
-        IReadOnlyDictionary<string, ITableFieldScheme> Fields { get; }
+        IReadOnlyDictionary<string, ITableFieldScheme> FieldsByProperty { get; }
+
+        /// <summary>
+        /// 列信息，Key: Name
+        /// </summary>
+        IReadOnlyDictionary<string, ITableFieldScheme> FieldsByName { get; }
 
         /// <summary>
         /// 用于存数据库的表名
