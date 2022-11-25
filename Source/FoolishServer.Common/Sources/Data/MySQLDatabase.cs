@@ -96,11 +96,15 @@ namespace FoolishServer.Data
         {
             if (!IsConnected(writeConnection))
             {
-                if (writeConnection != null)
+                if (writeConnection != null && writeConnection.State == ConnectionState.Closed)
+                {
+                    writeConnection.Open();
+                }
+                else
                 {
                     Close(writeConnection);
+                    writeConnection = CreateConnection();
                 }
-                writeConnection = CreateConnection();
             }
             return writeConnection;
         }
@@ -112,11 +116,15 @@ namespace FoolishServer.Data
         {
             if (!IsConnected(readConnection))
             {
-                if (readConnection != null)
+                if (readConnection != null && readConnection.State == ConnectionState.Closed)
+                {
+                    readConnection.Open();
+                }
+                else
                 {
                     Close(readConnection);
+                    readConnection = CreateConnection();
                 }
-                readConnection = CreateConnection();
             }
             return readConnection;
         }
@@ -491,7 +499,7 @@ namespace FoolishServer.Data
                 }
                 reader.Close();
             }
-            Close(connection);
+            //Close(connection);
             return items;
         }
 
@@ -517,7 +525,7 @@ namespace FoolishServer.Data
                 }
                 result = command.ExecuteNonQuery();
             }
-            Close(connection);
+            //Close(connection);
             return result;
         }
 
@@ -704,7 +712,7 @@ namespace FoolishServer.Data
             {
                 keys.Add(keyFields[i].Name, key.Keys[i].GetString());
             }
-            string sql = $"SELECT * FROM {tableScheme.TableName} WHERR {string.Join(" AND ", keys.Select(kv => $"`{kv.Key}` = {kv.Value}"))};";
+            string sql = $"SELECT * FROM {tableScheme.TableName} WHERE {string.Join(" AND ", keys.Select(kv => $"`{kv.Key}` = '{kv.Value}'"))};";
             List<T> result = Query<List<T>, T>(sql, (reader) => { return Deserialize<T>(tableScheme, reader); });
             if (result.Count == 0)
             {
@@ -741,6 +749,10 @@ namespace FoolishServer.Data
                 if (field.Type.PropertyType.IsSubclassOf(FType<PropertyEntity>.Type))
                 {
                     values.Add(field.Name, $"'{JsonUtility.ToJson(value)}'");
+                }
+                else if (field.Type.PropertyType == FType<TimeSpan>.Type)
+                {
+                    values.Add(field.Name, $"{((TimeSpan)value).Ticks}");
                 }
                 else if (field.FieldType == ETableFieldType.Blob || field.FieldType == ETableFieldType.LongBlob)
                 {
@@ -791,7 +803,7 @@ namespace FoolishServer.Data
             {
                 string name = reader.GetName(i);
                 object value = null;
-                if (!tableScheme.FieldsByName.ContainsKey(name)) { continue; }
+                if (!tableScheme.FieldsByName.ContainsKey(name) || reader.IsDBNull(i)) { continue; }
                 ITableFieldScheme tableField = tableScheme.FieldsByName[name];
                 switch (tableField.FieldType)
                 {
@@ -828,7 +840,18 @@ namespace FoolishServer.Data
                     case ETableFieldType.ULong: { value = reader.GetUInt64(i); } break;
                     case ETableFieldType.UShort: { value = reader.GetUInt16(i); } break;
                 }
-                tableField.Type.SetValue(entity, value);
+                if (tableField.Type.PropertyType.IsSubclassOf(FType<PropertyEntity>.Type))
+                {
+                    tableField.Type.SetValue(entity, JsonUtility.ToObject(value.GetString(), tableField.Type.PropertyType));
+                }
+                else if (tableField.Type.PropertyType == FType<TimeSpan>.Type)
+                {
+                    tableField.Type.SetValue(entity, new TimeSpan((long)value));
+                }
+                else
+                {
+                    tableField.Type.SetValue(entity, value);
+                }
             }
             entity.OnPulledFromDb();
             return entity;

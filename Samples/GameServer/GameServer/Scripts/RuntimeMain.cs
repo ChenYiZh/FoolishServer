@@ -56,13 +56,16 @@ namespace FoolishServer
             stopwatch.Stop();
             FConsole.Write(stopwatch.Elapsed);
 
-            var result = set.Find(99999999, "Good");
-            FConsole.Write("result: " + result.TestID);
+            //var result = set.Find(2, "Hello World!");
+            //FConsole.Write("result: " + result.TestID);
+            FConsole.Write("set count: " + set.Count());
+            set.LoadAll();
+            FConsole.Write("set count: " + set.Count());
 
             return;
             stopwatch.Restart();
             FConsole.WriteWarn(DateTime.Now);
-            int number = 1000000;
+            int number = 1000;
             Parallel.For(0, number / 500, (i) =>
              {
                  //var set = DataContext.GetEntity<Test>();

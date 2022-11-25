@@ -37,5 +37,13 @@ namespace FoolishServer.Common
         {
             return JsonConvert.DeserializeObject<T>(json);
         }
+
+        /// <summary>
+        /// 转对象
+        /// </summary>
+        public static object ToObject(string json, Type type)
+        {
+            return JsonConvert.DeserializeObject(json, type);
+        }
     }
 }
