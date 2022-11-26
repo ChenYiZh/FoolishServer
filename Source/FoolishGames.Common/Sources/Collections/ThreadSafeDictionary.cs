@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoolishGames.Collections
 {
@@ -25,9 +26,13 @@ namespace FoolishGames.Collections
             dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
         }
 
-        public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary)
+        public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary.Count)
         {
-            this.dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, dictionary.Count);
+            //this.dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, dictionary.Count);
+            Parallel.ForEach(dictionary, (KeyValuePair<TKey, TValue> kv) =>
+            {
+                this.dictionary[kv.Key] = kv.Value;
+            });
         }
 
         public TValue this[TKey key]
@@ -77,7 +82,7 @@ namespace FoolishGames.Collections
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            //ConcurrentDictionary<TKey,TValue>
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()

@@ -4,9 +4,12 @@ using FoolishGames.Log;
 using FoolishServer.Log;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoolishServer.Data.Entity
 {
@@ -105,18 +108,18 @@ namespace FoolishServer.Data.Entity
         public IList<T> Find(Func<T, bool> condition)
         {
             ThreadSafeDictionary<EntityKey, T> dic = Dictionary;
-            List<T> entities = new List<T>(dic.Count);
+            ConcurrentDictionary<EntityKey, T> entities = new ConcurrentDictionary<EntityKey, T>(Environment.ProcessorCount, dic.Count);
             lock (dic.SyncRoot)
             {
-                foreach (T t in dic.Values)
+                Parallel.ForEach(dic, (KeyValuePair<EntityKey, T> kv) =>
                 {
-                    if (condition(t))
+                    if (condition(kv.Value))
                     {
-                        entities.Add(t);
+                        entities[kv.Key] = kv.Value;
                     }
-                }
+                });
             }
-            return entities;
+            return entities.Values.ToList();
         }
 
         /// <summary>
