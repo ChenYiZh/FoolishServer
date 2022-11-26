@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Log;
+using FoolishGames.Timer;
 using FoolishServer.Config;
 using FoolishServer.Log;
 using FoolishServer.Struct;
@@ -109,6 +110,11 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         [JsonIgnore]
         private EntityKey entityKey;
+        /// <summary>
+        /// 判断数据是否长时间没有修改
+        /// </summary>
+        [JsonIgnore]
+        internal bool IsExpired { get { return (TimeLord.Now - ModifiedTime) > Settings.ColdEntitiesCheckoutInterval; } }
 
         /// <summary>
         /// 构造函数

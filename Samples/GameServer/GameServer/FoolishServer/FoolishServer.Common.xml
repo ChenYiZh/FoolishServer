@@ -296,9 +296,14 @@
             线程锁的Timeout
             </summary>
         </member>
-        <member name="P:FoolishServer.Config.Settings.ModifiedCacheCount">
+        <member name="P:FoolishServer.Config.Settings.UseColdEntities">
             <summary>
-            修改缓存池的数量，需要 >= 0
+            是否检查热数据并推到冷数据
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Config.Settings.ColdEntitiesCheckoutInterval">
+            <summary>
+            热数据检查周期
             </summary>
         </member>
         <member name="M:FoolishServer.Config.Settings.LoadFromFile">
@@ -413,6 +418,11 @@
             <summary>
             表名的格式
             {0}为数据库名称，{1:MMdd}为之间名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.Entity.IEntityTable.InCache">
+            <summary>
+            是否进入缓存，默认true，但是日志这些结构，需要设置为false
             </summary>
         </member>
         <member name="P:FoolishServer.Data.Entity.IEntityTable.NeverExpired">
@@ -780,14 +790,14 @@
             存储类型
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EStorageType.WriteToRedis">
+        <member name="F:FoolishServer.Data.Entity.EStorageType.WriteToRawDb">
             <summary>
-            往Redis写
+            往RawDb写
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EStorageType.ReadFromRedis">
+        <member name="F:FoolishServer.Data.Entity.EStorageType.ReadFromRawDb">
             <summary>
-            从Redis读
+            从RawDb读
             </summary>
         </member>
         <member name="F:FoolishServer.Data.Entity.EStorageType.WriteToDb">
@@ -818,6 +828,11 @@
         <member name="P:FoolishServer.Data.Entity.EntityTableAttribute.TableNameFormat">
             <summary>
             {0}为数据库名称，{1:MMdd}为之间名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.Entity.EntityTableAttribute.InCache">
+            <summary>
+            是否进入缓存，默认true，但是日志这些结构，需要设置为false
             </summary>
         </member>
         <member name="P:FoolishServer.Data.Entity.EntityTableAttribute.NeverExpired">
@@ -885,6 +900,11 @@
         <member name="F:FoolishServer.Data.Entity.MajorEntity.entityKey">
             <summary>
             Redis主键名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Data.Entity.MajorEntity.IsExpired">
+            <summary>
+            判断数据是否长时间没有修改
             </summary>
         </member>
         <member name="M:FoolishServer.Data.Entity.MajorEntity.#ctor">
@@ -1031,6 +1051,11 @@
             缓存中的数据结构
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.IDbSet.TableScheme">
+            <summary>
+            表结构配置
+            </summary>
+        </member>
         <member name="P:FoolishServer.Data.IDbSet.SyncRoot">
             <summary>
             用于锁的对象
@@ -1074,6 +1099,11 @@
         <member name="M:FoolishServer.Data.IDbSet.PushAllRawData">
             <summary>
             将所有的缓存的热数据全部推送出去
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.IDbSet.CheckOutColdEntities">
+            <summary>
+            移出冷数据
             </summary>
         </member>
         <member name="M:FoolishServer.Data.IDbSet.Release">
@@ -1122,6 +1152,11 @@
             推入所有数据
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Data.IDbSet`1.Find(FoolishServer.Data.Entity.EntityKey)">
+            <summary>
+            冷热数据库查询
+            </summary>
         </member>
         <member name="T:FoolishServer.Data.IEntityConverter">
             <summary>
@@ -1441,6 +1476,11 @@
             数据变化监听
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.DbSet`1.TableScheme">
+            <summary>
+            表结构配置
+            </summary>
+        </member>
         <member name="F:FoolishServer.Data.DbSet`1.rawEntities">
             <summary>
             缓存中的数据，热数据
@@ -1454,6 +1494,11 @@
         <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPoolIndex">
             <summary>
             现在真在使用的修改缓存池id
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPoolLocker">
+            <summary>
+            修改池的锁
             </summary>
         </member>
         <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPool">
@@ -1503,11 +1548,6 @@
             用于锁的对象
             </summary>
         </member>
-        <member name="P:FoolishServer.Data.DbSet`1.CommitThread">
-            <summary>
-            提交的线程管理
-            </summary>
-        </member>
         <member name="F:FoolishServer.Data.DbSet`1.commitFlag">
             <summary>
             提交判断标示
@@ -1521,6 +1561,11 @@
         <member name="M:FoolishServer.Data.DbSet`1.OnModified(FoolishServer.Data.Entity.EntityKey,`0)">
             <summary>
             当数据修改时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.DbSet`1.Find(FoolishServer.Data.Entity.EntityKey)">
+            <summary>
+            冷热数据库查询
             </summary>
         </member>
         <member name="M:FoolishServer.Data.DbSet`1.Remove(FoolishServer.Data.Entity.EntityKey)">
@@ -1555,7 +1600,7 @@
             提交所有修改
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.DbSet`1.ForceCommitModifiedData(FoolishGames.Collections.ThreadSafeDictionary{FoolishServer.Data.Entity.EntityKey,`0})">
+        <member name="M:FoolishServer.Data.DbSet`1.ForceCommitModifiedData(System.Collections.Generic.IDictionary{FoolishServer.Data.Entity.EntityKey,`0})">
             <summary>
             强制提交修改
             </summary>
@@ -1570,7 +1615,7 @@
             将所有的缓存的热数据全部推送出去
             </summary>
         </member>
-        <member name="M:FoolishServer.Data.DbSet`1.CommitModifiedEntitys(FoolishGames.Collections.ThreadSafeDictionary{FoolishServer.Data.Entity.EntityKey,`0},System.Action)">
+        <member name="M:FoolishServer.Data.DbSet`1.CommitModifiedEntitys(System.Collections.Generic.IDictionary{FoolishServer.Data.Entity.EntityKey,`0},System.Action)">
             <summary>
             推送集合中的数据
             </summary>
@@ -1588,6 +1633,11 @@
         <member name="M:FoolishServer.Data.DbSet`1.Release">
             <summary>
             执行释放
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.DbSet`1.CheckOutColdEntities">
+            <summary>
+            移出冷数据
             </summary>
         </member>
         <member name="T:FoolishServer.Data.EConvertType">
@@ -1765,6 +1815,11 @@
         <member name="M:FoolishServer.Data.MySQLDatabase.GenerateOrUpdateTableScheme(FoolishServer.Data.ITableScheme)">
             <summary>
             对表结构进行调整或创建
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.MySQLDatabase.CheckTableNameChanged(FoolishServer.Data.ITableScheme)">
+            <summary>
+            判断表名是否发生变化，有变化就生成新的表
             </summary>
         </member>
         <member name="M:FoolishServer.Data.MySQLDatabase.Query``2(System.String,System.Func{MySql.Data.MySqlClient.MySqlDataReader,``1},System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}})">
@@ -2096,6 +2151,11 @@
             {0}为数据库名称，{1:MMdd}为之间名称
             </summary>
         </member>
+        <member name="P:FoolishServer.Data.TableScheme.InCache">
+            <summary>
+            是否进入缓存，默认true，但是日志这些结构，需要设置为false
+            </summary>
+        </member>
         <member name="P:FoolishServer.Data.TableScheme.NeverExpired">
             <summary>
              是否从不过期,判断是否产生冷数据，默认false
@@ -2115,6 +2175,21 @@
         <member name="F:FoolishServer.Data.TableScheme.PrivateGlobalTableName">
             <summary>
             缓存全局表名
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableScheme.TableNameChanged">
+            <summary>
+            判断表名是否发生变化
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Data.TableScheme.SyncRoot">
+            <summary>
+            事务处理锁
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.TableScheme.TableNameChangedAndReset">
+            <summary>
+            判断表名是否发生变化，并且重置缓存名称
             </summary>
         </member>
         <member name="M:FoolishServer.Data.TableScheme.GetTableName">

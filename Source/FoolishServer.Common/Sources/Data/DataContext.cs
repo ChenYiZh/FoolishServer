@@ -180,7 +180,7 @@ namespace FoolishServer.Data
             FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Start loading hot data...");
             Parallel.ForEach(entityPool.Values, (IDbSet dbSet) =>
             {
-               dbSet.PullAllRawData();
+                dbSet.PullAllRawData();
             });
 
             //开启计时器
@@ -244,6 +244,8 @@ namespace FoolishServer.Data
                     {
                         ThreadPool.UnsafeQueueUserWorkItem((obj) => { dbSet.ReleaseColdEntities(); }, null);
                     }
+                    //检查需要移出的冷数据
+                    ThreadPool.UnsafeQueueUserWorkItem((obj) => { dbSet.CheckOutColdEntities(); }, null);
                 }
                 catch (Exception e)
                 {

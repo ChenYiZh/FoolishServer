@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace FoolishServer.Data
 {
@@ -98,6 +99,10 @@ namespace FoolishServer.Data
         /// </summary>
         public string TableNameFormat { get { return EntityTable.TableNameFormat; } }
         /// <summary>
+        /// 是否进入缓存，默认true，但是日志这些结构，需要设置为false
+        /// </summary>
+        public bool InCache { get { return EntityTable.InCache; } }
+        /// <summary>
         ///  是否从不过期,判断是否产生冷数据，默认false
         /// </summary>
         public bool NeverExpired { get { return EntityTable.NeverExpired; } }
@@ -114,6 +119,21 @@ namespace FoolishServer.Data
         /// 缓存全局表名
         /// </summary>
         private string PrivateGlobalTableName;
+        /// <summary>
+        /// 判断表名是否发生变化
+        /// </summary>
+        private int TableNameChanged = 0;
+        /// <summary>
+        /// 事务处理锁
+        /// </summary>
+        private readonly object SyncRoot = new object();
+        /// <summary>
+        /// 判断表名是否发生变化，并且重置缓存名称
+        /// </summary>
+        public bool TableNameChangedAndReset()
+        {
+            return Interlocked.CompareExchange(ref TableNameChanged, 0, 1) == 1;
+        }
         /// <summary>
         /// 用于存数据库的表名
         /// </summary>
@@ -133,8 +153,16 @@ namespace FoolishServer.Data
             //return tableName;
             if (PrivateTempTableName != tableName)
             {
-                PrivateTempTableName = tableName;
-                PrivateGlobalTableName = StringConverter.ToLowerWithDownLine(tableName);
+                lock (SyncRoot)
+                {
+                    //锁阻塞后再一次判断是否改变，保证操作只做一次
+                    if (PrivateTempTableName != tableName)
+                    {
+                        Interlocked.Exchange(ref TableNameChanged, 1);
+                        PrivateTempTableName = tableName;
+                        PrivateGlobalTableName = StringConverter.ToLowerWithDownLine(tableName);
+                    }
+                }
             }
             return PrivateGlobalTableName;
         }

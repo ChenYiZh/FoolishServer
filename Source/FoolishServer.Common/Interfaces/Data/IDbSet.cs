@@ -11,6 +11,10 @@ namespace FoolishServer.Data
     internal interface IDbSet
     {
         /// <summary>
+        /// 表结构配置
+        /// </summary>
+        ITableScheme TableScheme { get; }
+        /// <summary>
         /// 用于锁的对象
         /// </summary>
         object SyncRoot { get; }
@@ -46,6 +50,10 @@ namespace FoolishServer.Data
         /// 将所有的缓存的热数据全部推送出去
         /// </summary>
         void PushAllRawData();
+        /// <summary>
+        /// 移出冷数据
+        /// </summary>
+        void CheckOutColdEntities();
         /// <summary>
         /// 关闭
         /// </summary>
@@ -87,7 +95,9 @@ namespace FoolishServer.Data
         /// </summary>
         /// <returns></returns>
         IReadOnlyDictionary<EntityKey, T> LoadAll();
-
-
+        /// <summary>
+        /// 冷热数据库查询
+        /// </summary>
+        T Find(EntityKey key);
     }
 }

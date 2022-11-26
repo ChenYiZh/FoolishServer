@@ -183,6 +183,7 @@ namespace FoolishServer.Data
                     Console.Write($"\r{FConsole.FormatCustomMessage(Kind.ToString(), $"MySQL[{Setting.ConnectKey}] is saving data... {progress.ToString("F2")}%")}");
                 }
                 DbCommition commition = set.Dequeue();
+                CheckTableNameChanged(DataContext.GetTableScheme(commition.Key.Type));
                 try
                 {
                     GenerateModifySql(commition, sql);
@@ -471,11 +472,23 @@ namespace FoolishServer.Data
                 }
             }
         }
+        /// <summary>
+        /// 判断表名是否发生变化，有变化就生成新的表
+        /// </summary>
+        private void CheckTableNameChanged(ITableScheme table)
+        {
+            TableScheme tableScheme = (TableScheme)table;
+            if (tableScheme.TableNameChangedAndReset())
+            {
+                GenerateOrUpdateTableScheme(table);
+            }
+        }
         #endregion
         /// <summary>
         /// 通过MySqlDataReader解析数据
         /// </summary>
-        private TSet Query<TSet, T>(string sql, Func<MySqlDataReader, T> deserialize, IEnumerable<KeyValuePair<string, object>> parameters = null) where TSet : ICollection<T>, new()
+        private TSet Query<TSet, T>(string sql, Func<MySqlDataReader, T> deserialize, IEnumerable<KeyValuePair<string, object>> parameters = null)
+            where TSet : ICollection<T>, new()
         {
             FConsole.WriteTo(LOG_LEVEL, Kind.ToString(), sql);
             MySqlConnection connection = GetReadConnection();
@@ -502,7 +515,6 @@ namespace FoolishServer.Data
             //Close(connection);
             return items;
         }
-
         /// <summary>
         /// 只执行SQL
         /// </summary>
@@ -697,6 +709,7 @@ namespace FoolishServer.Data
         public override IEnumerable<T> LoadAll<T>()
         {
             ITableScheme tableScheme = DataContext.GetTableScheme<T>();
+            CheckTableNameChanged(DataContext.GetTableScheme<T>());
             string sql = $"SELECT * FROM {tableScheme.TableName};";
             return Query<List<T>, T>(sql, (reader) => { return Deserialize<T>(tableScheme, reader); });
         }
@@ -713,6 +726,7 @@ namespace FoolishServer.Data
                 keys.Add(keyFields[i].Name, key.Keys[i].GetString());
             }
             string sql = $"SELECT * FROM {tableScheme.TableName} WHERE {string.Join(" AND ", keys.Select(kv => $"`{kv.Key}` = '{kv.Value}'"))};";
+            CheckTableNameChanged(DataContext.GetTableScheme<T>());
             List<T> result = Query<List<T>, T>(sql, (reader) => { return Deserialize<T>(tableScheme, reader); });
             if (result.Count == 0)
             {

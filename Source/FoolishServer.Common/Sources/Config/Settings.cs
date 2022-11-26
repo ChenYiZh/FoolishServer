@@ -51,10 +51,6 @@ namespace FoolishServer.Config
         /// 服务器启动运行时,需要实现FoolishServer.Runtime.CustomRuntime
         /// </summary>
         public static string MainClass { get; private set; }
-        ///// <summary>
-        ///// Model类的命名空间
-        ///// </summary>
-        //public static string ModelNamespace { get; private set; }
         /// <summary>
         /// 是否是Debug模式
         /// </summary>
@@ -92,9 +88,13 @@ namespace FoolishServer.Config
         /// </summary>
         public static int LockerTimeout { get; private set; } = 100;
         /// <summary>
-        /// 修改缓存池的数量，需要 >= 0
+        /// 是否检查热数据并推到冷数据
         /// </summary>
-        public static int ModifiedCacheCount { get; private set; }
+        public static bool UseColdEntities { get; private set; }
+        /// <summary>
+        /// 热数据检查周期
+        /// </summary>
+        public static TimeSpan ColdEntitiesCheckoutInterval { get; private set; }
         /// <summary>
         /// 读取配置
         /// </summary>
@@ -118,8 +118,34 @@ namespace FoolishServer.Config
             DataReleasePeriod = xml.SelectSingleNode("/configuration/settings/data-release-period").GetValue(15000);
             DataCommitInterval = xml.SelectSingleNode("/configuration/settings/data-commit-interval").GetValue(1000);
             LockerTimeout = xml.SelectSingleNode("/configuration/settings/locker-timeout").GetValue(100);
-            ModifiedCacheCount = xml.SelectSingleNode("/configuration/settings/modified-cache-count").GetValue(3);
-            if (ModifiedCacheCount < 1) { ModifiedCacheCount = 3; }
+            string checkoutInterval = xml.SelectSingleNode("/configuration/settings/data-checkout-interval").GetValue("30d");
+            UseColdEntities = checkoutInterval != "0";
+            if (UseColdEntities)
+            {
+                int interval;
+                if (checkoutInterval.EndsWith("s") && int.TryParse(checkoutInterval.Substring(0, checkoutInterval.Length - 1), out interval))
+                {
+                    ColdEntitiesCheckoutInterval = TimeSpan.FromSeconds(interval);
+                }
+                else if (checkoutInterval.EndsWith("m") && int.TryParse(checkoutInterval.Substring(0, checkoutInterval.Length - 1), out interval))
+                {
+                    ColdEntitiesCheckoutInterval = TimeSpan.FromMinutes(interval);
+                }
+                else if (checkoutInterval.EndsWith("h") && int.TryParse(checkoutInterval.Substring(0, checkoutInterval.Length - 1), out interval))
+                {
+                    ColdEntitiesCheckoutInterval = TimeSpan.FromHours(interval);
+                }
+                else if (checkoutInterval.EndsWith("d") && int.TryParse(checkoutInterval.Substring(0, checkoutInterval.Length - 1), out interval))
+                {
+                    ColdEntitiesCheckoutInterval = TimeSpan.FromDays(interval);
+                }
+                else
+                {
+                    ColdEntitiesCheckoutInterval = TimeSpan.FromDays(30);
+                }
+            }
+
+            //if (ModifiedCacheCount < 1) { ModifiedCacheCount = 3; }
             LoadHostSettings(xml);
             RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
 

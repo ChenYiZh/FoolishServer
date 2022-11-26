@@ -15,13 +15,13 @@ namespace FoolishServer.Data.Entity
         ///// </summary>
         //Default = 0,
         /// <summary>
-        /// 往Redis写
+        /// 往RawDb写
         /// </summary>
-        WriteToRedis = 10,
+        WriteToRawDb = 10,
         /// <summary>
-        /// 从Redis读
+        /// 从RawDb读
         /// </summary>
-        ReadFromRedis = 11,
+        ReadFromRawDb = 11,
         /// <summary>
         /// 往Db写
         /// </summary>
@@ -53,6 +53,11 @@ namespace FoolishServer.Data.Entity
         public string TableNameFormat { get; set; }
 
         /// <summary>
+        /// 是否进入缓存，默认true，但是日志这些结构，需要设置为false
+        /// </summary>
+        public bool InCache { get; set; } = true;
+
+        /// <summary>
         /// 是否从不过期,判断是否产生冷数据，默认false
         /// </summary>
         public bool NeverExpired { get; set; } = false;
@@ -61,7 +66,7 @@ namespace FoolishServer.Data.Entity
         /// 存储方案(位运算)
         /// <para>默认 StorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb</para>
         /// </summary>
-        public EStorageType StorageType { get; set; } = EStorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb;
+        public EStorageType StorageType { get; set; } = EStorageType.WriteToRawDb | EStorageType.ReadFromRawDb | EStorageType.WriteToDb | EStorageType.ReadFromDb;
 
         public EntityTableAttribute()
         {

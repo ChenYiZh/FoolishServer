@@ -23,6 +23,10 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         string TableNameFormat { get; }
         /// <summary>
+        /// 是否进入缓存，默认true，但是日志这些结构，需要设置为false
+        /// </summary>
+        bool InCache { get; }
+        /// <summary>
         /// 是否从不过期,判断是否产生冷数据，默认false
         /// </summary>
         bool NeverExpired { get; }

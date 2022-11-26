@@ -58,19 +58,20 @@ namespace FoolishServer
 
             //var result = set.Find(2, "Hello World!");
             //FConsole.Write("result: " + result.TestID);
-            FConsole.Write("set count: " + set.Count());
-            set.LoadAll();
-            FConsole.Write("set count: " + set.Count());
+            //result.Password = "Good Morning";
+            //FConsole.Write("set count: " + set.Count());
+            //set.LoadAll();
+            //FConsole.Write("set count: " + set.Count());
 
-            return;
+            //return;
             stopwatch.Restart();
             FConsole.WriteWarn(DateTime.Now);
-            int number = 1000;
-            Parallel.For(0, number / 500, (i) =>
+            int number = 1000000;
+            Parallel.For(0, number / 5000, (i) =>
              {
                  //var set = DataContext.GetEntity<Test>();
-                 int startIndex = i * 500;
-                 for (int index = startIndex; index < startIndex + 500; index++)
+                 int startIndex = i * 5000;
+                 for (int index = startIndex; index < startIndex + 5000; index++)
                  {
                      //var set = DataContext.GetEntity<Test>();
                      NewTest(set, index);

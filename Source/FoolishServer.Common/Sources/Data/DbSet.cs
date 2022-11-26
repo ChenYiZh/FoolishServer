@@ -18,12 +18,17 @@ namespace FoolishServer.Data
     /// <summary>
     /// 缓存中的数据结构
     /// </summary>
-    internal class DbSet<T> : IDbSet<T> where T : MajorEntity, new()
+    internal sealed class DbSet<T> : IDbSet<T> where T : MajorEntity, new()
     {
         /// <summary>
         /// 数据变化监听
         /// </summary>
         public event OnDbSetDataModified<T> OnDataModified;
+
+        /// <summary>
+        /// 表结构配置
+        /// </summary>
+        public ITableScheme TableScheme { get; private set; }
 
         /// <summary>
         /// 缓存中的数据，热数据
@@ -39,6 +44,11 @@ namespace FoolishServer.Data
         /// 现在真在使用的修改缓存池id
         /// </summary>
         private int modifiedEntitiesPoolIndex = 0;
+
+        /// <summary>
+        /// 修改池的锁
+        /// </summary>
+        private readonly object modifiedEntitiesPoolLocker = new object();
 
         /// <summary>
         /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
@@ -87,10 +97,10 @@ namespace FoolishServer.Data
         /// </summary>
         public object SyncRoot { get; private set; } = new object();
 
-        /// <summary>
-        /// 提交的线程管理
-        /// </summary>
-        internal Thread CommitThread { get; private set; }
+        ///// <summary>
+        ///// 提交的线程管理
+        ///// </summary>
+        //internal Thread CommitThread { get; private set; }
 
         /// <summary>
         /// 提交判断标示
@@ -99,11 +109,12 @@ namespace FoolishServer.Data
 
         public DbSet()
         {
-            modifiedEntitiesPool = new IReadOnlyDictionary<EntityKey, T>[Settings.ModifiedCacheCount];
+            modifiedEntitiesPool = new IReadOnlyDictionary<EntityKey, T>[3];
             for (int i = 0; i < modifiedEntitiesPool.Length; i++)
             {
-                modifiedEntitiesPool[i] = new ThreadSafeDictionary<EntityKey, T>();
+                modifiedEntitiesPool[i] = new Dictionary<EntityKey, T>();
             }
+            TableScheme = DataContext.GetTableScheme<T>();
             //CommitThread = new Thread(OnCommitModifiedData);
             //CommitThread.Priority = ThreadPriority.Highest;
             //CommitThread.Start();
@@ -164,11 +175,34 @@ namespace FoolishServer.Data
             }
 
             //更新
-           ((ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = entity;
+            lock (modifiedEntitiesPoolLocker)
+            {
+                ((Dictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = entity;
+            }
 
             Modify(entity);
             //通知事件
             OnDataModified?.Invoke(key, entity);
+        }
+
+        /// <summary>
+        /// 冷热数据库查询
+        /// </summary>
+        public T Find(EntityKey key)
+        {
+            // 从数据库中加载
+            T result;
+            if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromRawDb))
+            {
+                if (!rawEntities.TryGetValue(key, out result)) { return result; }
+            }
+            if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromDb))
+            {
+                if (ReleaseCountdown > 0 && coldEntities.TryGetValue(key, out result)) { return result; }
+                if (!DataContext.Databases.ContainsKey(TableScheme.ConnectKey)) { return null; }
+                return DataContext.Databases[TableScheme.ConnectKey].Find<T>(key);
+            }
+            return null;
         }
 
         /// <summary>
@@ -190,7 +224,10 @@ namespace FoolishServer.Data
             coldEntities.Remove(key);
 
             //提交更改
-            ((ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = null;
+            lock (modifiedEntitiesPoolLocker)
+            {
+                ((Dictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = null;
+            }
             //通知
             OnDataModified?.Invoke(key, null);
         }
@@ -200,7 +237,11 @@ namespace FoolishServer.Data
         /// </summary>
         private void Modify(T entity)
         {
-            rawEntities[entity.GetEntityKey()] = entity;
+            //只有配置进入缓存才会缓存
+            if (TableScheme.InCache)
+            {
+                rawEntities[entity.GetEntityKey()] = entity;
+            }
             coldEntities.Remove(entity.GetEntityKey());
         }
 
@@ -236,26 +277,32 @@ namespace FoolishServer.Data
             //    if (commitFlag > 0)
             //    {
             //        Interlocked.Exchange(ref commitFlag, 0);
+            if (commitFlag > 0)
+            {
+                return;
+            }
+            Interlocked.Exchange(ref commitFlag, 1);
             try
             {
                 int pushIndex = modifiedEntitiesPoolIndex - 1;
                 if (pushIndex < 0)
                 {
-                    pushIndex = Settings.ModifiedCacheCount - 1;
+                    pushIndex = modifiedEntitiesPool.Length - 1;
                 }
                 int nextIndex = modifiedEntitiesPoolIndex + 1;
-                if (nextIndex >= Settings.ModifiedCacheCount)
+                if (nextIndex >= modifiedEntitiesPool.Length)
                 {
                     nextIndex = 0;
                 }
                 Interlocked.Exchange(ref modifiedEntitiesPoolIndex, nextIndex);
-                ThreadSafeDictionary<EntityKey, T> entities = (ThreadSafeDictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
+                Dictionary<EntityKey, T> entities = (Dictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
                 ForceCommitModifiedData(entities);
             }
             catch (Exception e)
             {
                 FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
             }
+            Interlocked.Exchange(ref commitFlag, 0);
             //    }
             //    Thread.Sleep(10);
             //}
@@ -266,9 +313,9 @@ namespace FoolishServer.Data
         /// </summary>
         public void ForceCommitAllModifiedData()
         {
-            lock (this)
+            lock (modifiedEntitiesPoolLocker)
             {
-                foreach (ThreadSafeDictionary<EntityKey, T> entities in modifiedEntitiesPool)
+                foreach (Dictionary<EntityKey, T> entities in modifiedEntitiesPool)
                 {
                     ForceCommitModifiedData(entities);
                 }
@@ -278,7 +325,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 强制提交修改
         /// </summary>
-        private void ForceCommitModifiedData(ThreadSafeDictionary<EntityKey, T> entities)
+        private void ForceCommitModifiedData(IDictionary<EntityKey, T> entities)
         {
             try
             {
@@ -295,12 +342,22 @@ namespace FoolishServer.Data
         /// </summary>
         public void PullAllRawData()
         {
-            IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
-            rawEntities.Clear();
-            foreach (T entity in iterator)
+            if (TableScheme.InCache)
             {
-                entity.OnPulledFromDb();
-                rawEntities[entity.GetEntityKey()] = entity;
+                if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromRawDb))
+                {
+                    IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
+                    rawEntities.Clear();
+                    foreach (T entity in iterator)
+                    {
+                        entity.OnPulledFromDb();
+                        rawEntities[entity.GetEntityKey()] = entity;
+                    }
+                }
+            }
+            else
+            {
+                rawEntities.Clear();
             }
         }
 
@@ -309,48 +366,60 @@ namespace FoolishServer.Data
         /// </summary>
         public void PushAllRawData()
         {
-            CommitModifiedEntitys(rawEntities);
+            lock (rawEntities.SyncRoot)
+            {
+                CommitModifiedEntitys(rawEntities);
+            }
         }
 
         /// <summary>
         /// 推送集合中的数据
         /// </summary>
-        private void CommitModifiedEntitys(ThreadSafeDictionary<EntityKey, T> entities, System.Action onCopied = null)
+        private void CommitModifiedEntitys(IDictionary<EntityKey, T> entities, System.Action onCopied = null)
         {
-            if (entities.Count > 0)
+            if (TableScheme.StorageType.HasFlag(EStorageType.WriteToDb) || TableScheme.StorageType.HasFlag(EStorageType.WriteToRawDb))
             {
-                List<DbCommition> commitions = new List<DbCommition>();
-                Dictionary<EntityKey, T> dic = null;
-                bool lockToken = false;
-                try
+                if (entities.Count > 0)
                 {
-                    Monitor.TryEnter(entities.SyncRoot, Settings.LockerTimeout, ref lockToken);
+                    List<DbCommition> commitions = new List<DbCommition>();
+                    Dictionary<EntityKey, T> dic = null;
+                    bool lockToken = true;//false 原本是为了线程安全，现在使用的缓存池，在读取时可以不用加锁
+                    try
+                    {
+                        //Monitor.TryEnter(entities.SyncRoot, Settings.LockerTimeout, ref lockToken);
+                        if (lockToken)
+                        {
+                            //中间缓存池，防死锁
+                            dic = new Dictionary<EntityKey, T>(entities);
+                            onCopied?.Invoke();
+                        }
+                    }
+                    finally
+                    {
+                        if (lockToken)
+                        {
+                            //Monitor.Exit(entities.SyncRoot);
+                        }
+                    }
                     if (lockToken)
                     {
-                        //中间缓存池，防死锁
-                        dic = new Dictionary<EntityKey, T>(entities);
-                        onCopied?.Invoke();
-                    }
-                }
-                finally
-                {
-                    if (lockToken)
-                    {
-                        Monitor.Exit(entities.SyncRoot);
-                    }
-                }
-                if (lockToken)
-                {
-                    string database = DataContext.GetTableScheme<T>().ConnectKey;
-                    foreach (KeyValuePair<EntityKey, T> kv in dic)
-                    {
-                        commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
-                        kv.Value?.ResetModifiedType();
-                    }
-                    DataContext.RawDatabase.CommitModifiedEntitys(commitions);
-                    if (!string.IsNullOrEmpty(database) && DataContext.Databases.ContainsKey(database))
-                    {
-                        DataContext.Databases[database].CommitModifiedEntitys(commitions);
+                        string database = TableScheme.ConnectKey;
+                        foreach (KeyValuePair<EntityKey, T> kv in dic)
+                        {
+                            commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
+                            kv.Value?.ResetModifiedType();
+                        }
+                        if (TableScheme.StorageType.HasFlag(EStorageType.WriteToRawDb))
+                        {
+                            DataContext.RawDatabase.CommitModifiedEntitys(commitions);
+                        }
+                        if (TableScheme.StorageType.HasFlag(EStorageType.WriteToDb))
+                        {
+                            if (!string.IsNullOrEmpty(database) && DataContext.Databases.ContainsKey(database))
+                            {
+                                DataContext.Databases[database].CommitModifiedEntitys(commitions);
+                            }
+                        }
                     }
                 }
             }
@@ -365,34 +434,41 @@ namespace FoolishServer.Data
         public IReadOnlyDictionary<EntityKey, T> LoadAll()
         {
             Dictionary<EntityKey, T> result;
-            // LoadAll;
-            lock (loadingAllFlag)
+            //如果有标识从数据库中读
+            if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromDb))
             {
-                //还未卸载直接加载
-                if (releaseCountdown <= 0 || ColdEntities.Count == 0)
+                // LoadAll;
+                lock (loadingAllFlag)
                 {
-                    //数据库加载
-                    coldEntities.Clear();
-                    ITableScheme tableScheme = DataContext.GetTableScheme<T>();
-                    if (!DataContext.Databases.ContainsKey(tableScheme.ConnectKey)) { return coldEntities; }
-                    IEnumerable<T> data = DataContext.Databases[tableScheme.ConnectKey].LoadAll<T>();
-                    foreach (T entity in data)
+                    //还未卸载直接加载
+                    if (releaseCountdown <= 0 || ColdEntities.Count == 0)
                     {
-                        EntityKey key = entity.GetEntityKey();
-                        T value;
-                        if (RawEntities.TryGetValue(key, out value))
+                        //数据库加载
+                        coldEntities.Clear();
+                        if (!DataContext.Databases.ContainsKey(TableScheme.ConnectKey)) { return coldEntities; }
+                        IEnumerable<T> data = DataContext.Databases[TableScheme.ConnectKey].LoadAll<T>();
+                        foreach (T entity in data)
                         {
-                            continue;
-                        }
-                        else
-                        {
-                            coldEntities[key] = entity;
+                            EntityKey key = entity.GetEntityKey();
+                            T value;
+                            if (RawEntities.TryGetValue(key, out value))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                coldEntities[key] = entity;
+                            }
                         }
                     }
-                }
 
-                result = new Dictionary<EntityKey, T>(coldEntities);
-                ReleaseCountdown = Settings.DataReleasePeriod;
+                    result = new Dictionary<EntityKey, T>(coldEntities);
+                    ReleaseCountdown = Settings.DataReleasePeriod;
+                }
+            }
+            else
+            {
+                result = new Dictionary<EntityKey, T>();
             }
             lock (rawEntities.SyncRoot)
             {
@@ -410,6 +486,45 @@ namespace FoolishServer.Data
         public void Release()
         {
             //CommitThread.Abort();
+        }
+
+        /// <summary>
+        /// 移出冷数据
+        /// </summary>
+        public void CheckOutColdEntities()
+        {
+            if (TableScheme.NeverExpired) { return; }
+            bool lockToken = false;
+            List<T> entities = null;
+            try
+            {
+                Monitor.TryEnter(rawEntities.SyncRoot, Settings.LockerTimeout, ref lockToken);
+                if (lockToken)
+                {
+                    entities = new List<T>(rawEntities.Values);
+                }
+            }
+            finally
+            {
+                if (lockToken)
+                {
+                    Monitor.Exit(rawEntities.SyncRoot);
+                }
+            }
+            if (lockToken && entities != null)
+            {
+                foreach (T entity in entities)
+                {
+                    if (entity.IsExpired)
+                    {
+                        rawEntities.Remove(entity.GetEntityKey());
+                    }
+                    if (ReleaseCountdown > 0)
+                    {
+                        coldEntities.Add(entity.GetEntityKey(), entity);
+                    }
+                }
+            }
         }
     }
 }
