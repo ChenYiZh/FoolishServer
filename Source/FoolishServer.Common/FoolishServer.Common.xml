@@ -379,6 +379,11 @@
             主键类查询
             </summary>
         </member>
+        <member name="M:FoolishServer.Data.Entity.IEntitySet`1.Find(System.Func{`0,System.Boolean})">
+            <summary>
+            根据Lamda返回新的列表，不会影响内部数据列表
+            </summary>
+        </member>
         <member name="M:FoolishServer.Data.Entity.IEntitySet`1.AddOrUpdate(`0)">
             <summary>
             添加数据
@@ -748,6 +753,12 @@
         <member name="M:FoolishServer.Data.Entity.EntitySet`1.Find(FoolishServer.Data.Entity.EntityKey)">
             <summary>
             主键类查询
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Data.Entity.EntitySet`1.Find(System.Func{`0,System.Boolean})">
+            <summary>
+            根据Lamda返回新的列表，不会影响内部数据列表
+            <para>如果要遍历所有，需要预先使用LoadAll</para>
             </summary>
         </member>
         <member name="M:FoolishServer.Data.Entity.EntitySet`1.AddOrUpdate(`0)">

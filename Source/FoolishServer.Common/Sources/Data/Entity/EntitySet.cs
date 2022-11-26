@@ -99,6 +99,27 @@ namespace FoolishServer.Data.Entity
         }
 
         /// <summary>
+        /// 根据Lamda返回新的列表，不会影响内部数据列表
+        /// <para>如果要遍历所有，需要预先使用LoadAll</para>
+        /// </summary>
+        public IList<T> Find(Func<T, bool> condition)
+        {
+            ThreadSafeDictionary<EntityKey, T> dic = Dictionary;
+            List<T> entities = new List<T>(dic.Count);
+            lock (dic.SyncRoot)
+            {
+                foreach (T t in dic.Values)
+                {
+                    if (condition(t))
+                    {
+                        entities.Add(t);
+                    }
+                }
+            }
+            return entities;
+        }
+
+        /// <summary>
         /// 添加或保存
         /// </summary>
         public bool AddOrUpdate(T entity)

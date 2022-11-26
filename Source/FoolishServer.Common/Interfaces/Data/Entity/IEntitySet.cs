@@ -28,6 +28,11 @@ namespace FoolishServer.Data.Entity
         T Find(EntityKey key);
 
         /// <summary>
+        /// 根据Lamda返回新的列表，不会影响内部数据列表
+        /// </summary>
+        IList<T> Find(Func<T, bool> condition);
+
+        /// <summary>
         /// 添加数据
         /// </summary>
         bool AddOrUpdate(T entity);

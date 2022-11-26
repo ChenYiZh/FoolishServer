@@ -331,6 +331,7 @@ namespace FoolishServer.Data
         /// </summary>
         public override void GenerateOrUpdateTableScheme(ITableScheme table)
         {
+            ((TableScheme)table).TableNameChangedAndReset();
             string tableName = table.TableName;
             string sql = "SHOW TABLES;";
             HashSet<string> tableNames = Query<HashSet<string>, string>(sql, (reader) => { return reader.GetString(0); });//加载所有表

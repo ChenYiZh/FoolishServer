@@ -27,7 +27,7 @@ namespace FoolishGames.Collections
 
         public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            dictionary = new ConcurrentDictionary<TKey, TValue>(dictionary);
+            this.dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, dictionary.Count);
         }
 
         public TValue this[TKey key]
