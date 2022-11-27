@@ -48,8 +48,6 @@ namespace FoolishServer.RPC.Sockets
         /// <summary>
         /// 发送消息
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns>是否发送成功</returns>
         void Send(byte[] data, Action<ISocketAsyncResult> callback);
 
         /// <summary>

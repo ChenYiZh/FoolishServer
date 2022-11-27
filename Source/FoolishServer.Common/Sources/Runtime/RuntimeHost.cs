@@ -1,5 +1,6 @@
 ﻿using FoolishGames.Log;
 using FoolishGames.Reflection;
+using FoolishGames.Timer;
 using FoolishServer.Config;
 using FoolishServer.Data;
 using FoolishServer.Log;
@@ -124,6 +125,9 @@ namespace FoolishServer.Runtime
                 {
                     ServerManager.Start(setting);
                 }
+                //启动时间计划周期
+                TimeLord.Worker.Start();
+
                 FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "Foolish Server exit command \"Ctrl+C\" or \"Ctrl+Break\".");
 
                 if (CustomRuntime != null)
@@ -148,6 +152,8 @@ namespace FoolishServer.Runtime
             }
             IsRunning = false;
             FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "RuntimeHost begin to shutdown...");
+            //先终止时间计划
+            TimeLord.Worker.Stop();
             //先关闭所有玩家连接
             ServerManager.Shutdown();
             //后关闭数据连接，因为需要保存

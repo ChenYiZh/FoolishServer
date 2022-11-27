@@ -1,4 +1,5 @@
 ﻿using FoolishGames.IO;
+using FoolishGames.Net;
 using FoolishGames.Security;
 using FoolishServer.Config;
 using FoolishServer.Delegate;
@@ -8,9 +9,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace FoolishServer.RPC.Sockets
+namespace FoolishServer.Net
 {
-    public interface IServerSocket : ISocketMini
+    /// <summary>
+    /// 服务器套接字接口定义
+    /// </summary>
+    public interface IServerSocket : ISocket, IMsgSocket
     {
         /// <summary>
         /// 对应Host的名称
@@ -26,16 +30,6 @@ namespace FoolishServer.RPC.Sockets
         /// 获取配置信息
         /// </summary>
         IHostSetting Setting { get; }
-
-        /// <summary>
-        /// 压缩工具
-        /// </summary>
-        ICompression Compression { get; set; }
-
-        /// <summary>
-        /// 加密工具
-        /// </summary>
-        ICryptoProvider CryptoProvider { get; set; }
 
         /// <summary>
         /// 连接事件
@@ -71,5 +65,11 @@ namespace FoolishServer.RPC.Sockets
         /// 启动函数
         /// </summary>
         void Start(IHostSetting setting);
+
+        /// <summary>
+        /// 消息发送，
+        /// 会影响到客户端解析
+        /// </summary>
+        void PostAsync(ISocket socket, byte[] buffer);
     }
 }

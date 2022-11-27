@@ -5,8 +5,15 @@ using System.Text;
 
 namespace FoolishClient.Net
 {
-    public class TcpSocket : FSocket, ISocket
+    /// <summary>
+    /// Tcp连接池
+    /// </summary>
+    public class TcpSocket : ClientSocket
     {
+        /// <summary>
+        /// 建立原生套接字
+        /// </summary>
+        /// <returns></returns>
         protected override Socket MakeSocket()
         {
             return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

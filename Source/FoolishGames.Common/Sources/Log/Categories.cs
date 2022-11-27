@@ -11,5 +11,7 @@ namespace FoolishGames.Log
         public const string TIME_LORD = "Time Lord";
 
         public const string REFLECTION = "Reflection";
+
+        public const string SOCKET = "Socket";
     }
 }

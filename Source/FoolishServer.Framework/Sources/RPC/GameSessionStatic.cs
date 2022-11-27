@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Collections;
+using FoolishGames.IO;
 using FoolishServer.RPC.Sockets;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,19 @@ namespace FoolishServer.RPC
         {
             ISession session;
             return KeyCode != null && sessions.TryGetValue(KeyCode.Value, out session) ? session : null;
+        }
+
+        /// <summary>
+        /// 异步给一堆客户端发消息
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="sessions"></param>
+        public static void SendAsync(IMessageWriter message, IEnumerable<GameSession> sessions)
+        {
+            foreach (GameSession session in sessions)
+            {
+                session.SendAsync(message);
+            }
         }
     }
 }

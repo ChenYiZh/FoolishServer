@@ -7,7 +7,7 @@ namespace FoolishGames.Proxy
     /// <summary>
     /// 工头
     /// </summary>
-    public interface ISupervisor
+    public interface IBoss
     {
         /// <summary>
         /// 工人加入

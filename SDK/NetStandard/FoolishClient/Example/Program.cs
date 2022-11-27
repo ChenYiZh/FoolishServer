@@ -19,7 +19,7 @@ namespace Example
             FConsole.LogStackTracker = true;
             FConsole.RegistLogger(new Logger());
             TcpSocket socket = new TcpSocket();
-            socket.MessageOffset = 2;
+            //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
             socket.Ready("default", "127.0.0.1", 9001);
@@ -30,10 +30,10 @@ namespace Example
             message.OpCode = -1;
             message.ActionId = 1;
             message.WriteString("Hello World!");
-            socket.SendAsync(message);
-            socket.SendAsync(message);
-            socket.SendAsync(message);
-            socket.SendAsync(message);
+            socket.Send(message);
+            socket.Send(message);
+            socket.Send(message);
+            socket.Send(message);
             while (true)
             {
                 Console.ReadLine();
@@ -43,10 +43,10 @@ namespace Example
                 }
                 else
                 {
-                    socket.SendAsync(message);
-                    socket.SendAsync(message);
-                    socket.SendAsync(message);
-                    socket.SendAsync(message);
+                    socket.Send(message);
+                    socket.Send(message);
+                    socket.Send(message);
+                    socket.Send(message);
                 }
             }
         }

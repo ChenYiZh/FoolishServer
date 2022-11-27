@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+using FoolishGames.Common;
+using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Timer;
 using FoolishServer.Log;
@@ -147,6 +150,21 @@ namespace FoolishServer.RPC
             {
                 //设置Socket为Closed的状态, 并未将物理连接马上中断
                 ((FSocket)session.Socket).IsRunning = false;
+            }
+        }
+        /// <summary>
+        /// 异步发送一条数据
+        /// </summary>
+        public void SendAsync(IMessageWriter message)
+        {
+            try
+            {
+                byte[] buffer = PackageFactory.Pack(message, Server.MessageOffset, Server.Compression, Server.CryptoProvider);
+                Server.PostAsync(Socket, buffer);
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.SOCKET, "GameSession failed to send message.", e);
             }
         }
     }

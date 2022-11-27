@@ -1,4 +1,5 @@
-﻿using FoolishServer.RPC;
+﻿using FoolishServer.Net;
+using FoolishServer.RPC;
 using FoolishServer.RPC.Sockets;
 using System;
 using System.Collections.Generic;

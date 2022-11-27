@@ -16,6 +16,7 @@ using FoolishGames.IO;
 using FoolishGames.Common;
 using FoolishGames.Security;
 using FoolishGames.Timer;
+using FoolishServer.Net;
 
 namespace FoolishServer.RPC.Sockets
 {
@@ -86,6 +87,11 @@ namespace FoolishServer.RPC.Sockets
         /// 配置信息
         /// </summary>
         public IHostSetting Setting { get; private set; }
+
+        /// <summary>
+        /// 消息偏移值
+        /// </summary>
+        public int MessageOffset { get; set; } = 2;
 
         /// <summary>
         /// 压缩工具
@@ -539,6 +545,15 @@ namespace FoolishServer.RPC.Sockets
         }
 
         /// <summary>
+        /// 消息发送，
+        /// 会影响到客户端解析
+        /// </summary>
+        public void PostAsync(ISocket socket, byte[] buffer)
+        {
+            socket.Send(buffer, null);
+        }
+
+        /// <summary>
         /// 发送接口
         /// </summary>
         /// <param name="ioEventArgs"></param>
@@ -546,8 +561,11 @@ namespace FoolishServer.RPC.Sockets
         {
             FConsole.Write("Process Send...");
             // TODO: Process Send
+            ioEventArgs.AcceptSocket.SendAsync(ioEventArgs);
         }
-
+        /// <summary>
+        /// 关闭操作
+        /// </summary>
         internal protected void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode = EOpCode.Close, string reason = "")
         {
             Interlocked.Decrement(ref summary.CurrentConnectCount);

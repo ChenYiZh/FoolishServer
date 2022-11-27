@@ -411,6 +411,11 @@
             退出
             </summary>
         </member>
+        <member name="T:FoolishServer.RPC.Sockets.IServerSocket">
+            <summary>
+            服务器套接字接口定义
+            </summary>
+        </member>
         <member name="P:FoolishServer.RPC.Sockets.IServerSocket.ServerName">
             <summary>
             对应Host的名称
@@ -424,6 +429,11 @@
         <member name="P:FoolishServer.RPC.Sockets.IServerSocket.Setting">
             <summary>
             获取配置信息
+            </summary>
+        </member>
+        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.MessageOffset">
+            <summary>
+            消息偏移值
             </summary>
         </member>
         <member name="P:FoolishServer.RPC.Sockets.IServerSocket.Compression">
@@ -471,6 +481,12 @@
             启动函数
             </summary>
         </member>
+        <member name="M:FoolishServer.RPC.Sockets.IServerSocket.PostAsync(FoolishServer.RPC.Sockets.ISocket,System.Byte[])">
+            <summary>
+            消息发送，
+            会影响到客户端解析
+            </summary>
+        </member>
         <member name="T:FoolishServer.RPC.Sockets.ISocket">
             <summary>
             自定义套接字
@@ -511,8 +527,6 @@
             <summary>
             发送消息
             </summary>
-            <param name="data"></param>
-            <returns>是否发送成功</returns>
         </member>
         <member name="M:FoolishServer.RPC.Sockets.ISocket.TryDequeueOrReset(FoolishServer.RPC.Sockets.ISocketAsyncResult@)">
             <summary>
@@ -819,6 +833,11 @@
             配置信息
             </summary>
         </member>
+        <member name="P:FoolishServer.RPC.Sockets.SocketListener.MessageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
         <member name="P:FoolishServer.RPC.Sockets.SocketListener.Compression">
             <summary>
             压缩工具
@@ -918,11 +937,22 @@
             </summary>
             <param name="ioEventArgs"></param>
         </member>
+        <member name="M:FoolishServer.RPC.Sockets.SocketListener.PostAsync(FoolishServer.RPC.Sockets.ISocket,System.Byte[])">
+            <summary>
+            消息发送，
+            会影响到客户端解析
+            </summary>
+        </member>
         <member name="M:FoolishServer.RPC.Sockets.SocketListener.ProcessSend(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             发送接口
             </summary>
             <param name="ioEventArgs"></param>
+        </member>
+        <member name="M:FoolishServer.RPC.Sockets.SocketListener.Close(System.Net.Sockets.SocketAsyncEventArgs,FoolishServer.RPC.Sockets.EOpCode,System.String)">
+            <summary>
+            关闭操作
+            </summary>
         </member>
         <member name="M:FoolishServer.RPC.Sockets.SocketListener.CreateAcceptEventArgs">
             <summary>
@@ -1084,6 +1114,11 @@
             关闭Session
             </summary>
         </member>
+        <member name="M:FoolishServer.RPC.GameSession.SendAsync(FoolishGames.IO.IMessageWriter)">
+            <summary>
+            异步发送一条数据
+            </summary>
+        </member>
         <member name="F:FoolishServer.RPC.GameSession.sessions">
             <summary>
             会话窗口池
@@ -1103,6 +1138,13 @@
             <summary>
             通过Guid获取Session
             </summary>
+        </member>
+        <member name="M:FoolishServer.RPC.GameSession.SendAsync(FoolishGames.IO.IMessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
+            <summary>
+            异步给一堆客户端发消息
+            </summary>
+            <param name="message"></param>
+            <param name="sessions"></param>
         </member>
         <member name="T:FoolishServer.RPC.MessageEventArgs">
             <summary>

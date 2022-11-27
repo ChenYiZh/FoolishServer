@@ -948,12 +948,384 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:FoolishGames.Proxy.ISupervisor">
+        <member name="T:FoolishGames.Net.IMsgSocket">
+            <summary>
+            消息配置的修改接口定义
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.IMsgSocket.SetMessageOffset(System.Int32)">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.IMsgSocket.SetCompression(FoolishGames.IO.ICompression)">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.IMsgSocket.SetCryptoProvide(FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.IReceivableSocket">
+            <summary>
+            消息接收的处理套接字接口定义
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.IReceivableSocket.Receiver">
+            <summary>
+            接收管理类
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.IReceiver">
+            <summary>
+            消息接收处理类
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.ISendableSocket">
+            <summary>
+            带有发送函数的套接字接口定义
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISendableSocket.Sender">
+            <summary>
+            发送的管理类
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.ISender">
+            <summary>
+            套接字消息发送的接口定义
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISender.MessageNumber">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISender.Send(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+            <summary>
+            数据发送<c>异步</c>
+            </summary>
+            <param name="message">大宋的消息</param>
+            <param name="callback">发送回调</param>
+            <returns>判断有没有发送出去</returns>
+        </member>
+        <member name="M:FoolishGames.Net.ISender.SendImmediately(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+            <summary>
+            立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
+            </summary>
+            <param name="message">发送的消息</param>
+            <param name="callback">消息回调</param>
+        </member>
+        <member name="M:FoolishGames.Net.ISender.SendBytes(System.Byte[],FoolishGames.Net.SendCallback)">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISender.SendBytesImmediately(System.Byte[],FoolishGames.Net.SendCallback)">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析，以及解析顺序
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.ISocket">
+            <summary>
+            套接字扩充接口
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.IsRunning">
+            <summary>
+            是否在运行
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.Connected">
+            <summary>
+            Socket是否还连接着？
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.Address">
+            <summary>
+            封装的地址
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.Socket">
+            <summary>
+            内部原生Socket
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.Type">
+            <summary>
+            获取类型
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.MessageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.Compression">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.CryptoProvider">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ISocket.MessageEventProcessor">
+            <summary>
+            消息处理方案
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.Close">
+            <summary>
+            关闭函数
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.SendCallback">
+            <summary>
+            数据发送的回调
+            </summary>
+            <param name="success">操作是否成功，不包含结果</param>
+            <param name="result">同步的结果</param>
+        </member>
+        <member name="T:FoolishGames.Net.FSocket">
+            <summary>
+            套接字管理基类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.IsRunning">
+            <summary>
+            是否在运行
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.Connected">
+            <summary>
+            是否已经开始运行
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.Address">
+            <summary>
+            地址
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.Socket">
+            <summary>
+            内部关键原生Socket
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.MessageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.Compression">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.CryptoProvider">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.MessageEventProcessor">
+            <summary>
+            消息处理方案
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.Close">
+            <summary>
+            关闭函数
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.SocketReceiver">
+            <summary>
+            消息接收处理类
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.SocketSender">
+            <summary>
+            消息发送处理类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketSender.Socket">
+            <summary>
+            套接字管理类
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.SendableSyncRoot">
+            <summary>
+            发送队列的锁
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessages">
+            <summary>
+            待发送的消息列表
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.messageNumber">
+            <summary>
+            消息Id，需要加原子锁
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketSender.MessageNumber">
+            <summary>
+            消息Id
+            <para>get 返回时会自动 +1</para>
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.#ctor(FoolishGames.Net.ISocket)">
+            <summary>
+            消息发送处理类
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.Send(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+            <summary>
+            消息发送
+            </summary>
+            <param name="message">发送的消息</param>
+            <param name="callback">消息回调</param>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.SendImmediately(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+            <summary>
+            立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
+            </summary>
+            <param name="message">发送的消息</param>
+            <param name="callback">消息回调</param>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.SendBytes(System.Byte[],FoolishGames.Net.SendCallback)">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.SendBytesImmediately(System.Byte[],FoolishGames.Net.SendCallback)">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析，以及解析顺序
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.CheckIn(System.Byte[],FoolishGames.Net.SendCallback,System.Boolean)">
+            <summary>
+            挤入消息队列
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.CheckIn(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback,System.Boolean)">
+            <summary>
+            挤入消息队列
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.CheckIn(FoolishGames.Net.SocketSender.WaitToSendMessage,System.Boolean)">
+            <summary>
+            挤入消息队列
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.Send(System.Byte[],System.IAsyncResult@)">
+            <summary>
+            以同步方式发送
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.SendCompleted">
+            <summary>
+            消息执行完后，判断还有没有需要继续发送的消息
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.SocketSender.WaitToSendMessage">
+            <summary>
+            待发送的消息
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessage.Message">
+            <summary>
+            消息
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessage.Callback">
+            <summary>
+            回调
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessage.Sender">
+            <summary>
+            发送接口的套接字
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.#ctor(FoolishGames.Net.SocketSender,System.Byte[],FoolishGames.Net.SendCallback)">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.Work">
+            <summary>
+            执行函数
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker">
+            <summary>
+            消息处理对象
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker.Callback">
+            <summary>
+            回调
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker.Success">
+            <summary>
+            处理是否成功
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker.Result">
+            <summary>
+            处理结果
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker.#ctor(FoolishGames.Net.SendCallback,System.Boolean,System.IAsyncResult)">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.MessageWorker.Work">
+            <summary>
+            事务处理
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.ESocketType">
+            <summary>
+            套接字类型
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.ESocketType.Tcp">
+            <summary>
+            Tcp
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.ESocketType.Http">
+            <summary>
+            Http
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.ESocketType.Udp">
+            <summary>
+            Udp
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.ESocketType.Web">
+            <summary>
+            WebSocket
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Proxy.IBoss">
             <summary>
             工头
             </summary>
         </member>
-        <member name="M:FoolishGames.Proxy.ISupervisor.CheckIn(FoolishGames.Proxy.IWorker)">
+        <member name="M:FoolishGames.Proxy.IBoss.CheckIn(FoolishGames.Proxy.IWorker)">
             <summary>
             工人加入
             </summary>
@@ -976,6 +1348,16 @@
         <member name="M:FoolishGames.Proxy.ActionBoss.Exploit(FoolishGames.Action.GameAction,System.Int32,FoolishGames.IO.IMessageReader)">
             <summary>
             剥削劳动力
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Proxy.DirectMessageProcessor">
+            <summary>
+            消息处理方案，直接处理
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Proxy.DirectMessageProcessor.CheckIn(FoolishGames.Proxy.IWorker)">
+            <summary>
+            直接进行事务处理
             </summary>
         </member>
         <member name="T:FoolishGames.Security.ICryptoProvider">
@@ -1096,6 +1478,247 @@
         <member name="P:FoolishGames.Timer.TimeLord.UTC">
             <summary>
             获取当前时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeLord.Worker">
+            <summary>
+            内部的时间计划管理者
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeLord.Append(FoolishGames.Timer.TimeSchedule)">
+            <summary>
+            添加新的时间计划
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeLord.Remove(FoolishGames.Timer.TimeSchedule)">
+            <summary>
+            移除时间计划
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeLord.#cctor">
+            <summary>
+            初始化操作
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Timer.PlanCycle">
+            <summary>
+            计划周期
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.PlanCycle.Once">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.PlanCycle.Day">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.PlanCycle.Week">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Timer.TimeScheduleCallback">
+            <summary>
+            时间计划回调
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Timer.TimeSchedule">
+            <summary>
+            时间计划
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.ExcutingNum">
+            <summary>
+            执行次数
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.IsCycle">
+            <summary>
+            是否循环
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.Callback">
+            <summary>
+            回调
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.BeginTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.DeltaSeconds">
+            <summary>
+            执行时长
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.SecondInterval">
+            <summary>
+            执行间隔
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.ExecTime">
+            <summary>
+            最新执行时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.NextTime">
+            <summary>
+            下次执行时间
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.PlanCycle">
+            <summary>
+            循环周期
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.DayOfWeek">
+            <summary>
+            执行星期
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.IsExpired">
+            <summary>
+            是否到期
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.IsExecuting">
+            <summary>
+            是否一直在执行阶段
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeSchedule.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.#ctor(System.Boolean,FoolishGames.Timer.PlanCycle,System.String,FoolishGames.Timer.TimeScheduleCallback,System.String,System.String,System.Int32,System.DayOfWeek)">
+            <summary>
+            时间计划
+            </summary>
+            <param name="isCycle">是否循环</param>
+            <param name="planCycle">循环类型</param>
+            <param name="name">唯一名称</param>
+            <param name="callback">回调</param>
+            <param name="beginTime">开始时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+            <param name="endTime">结束时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+            <param name="secondInterval">间隔</param>
+            <param name="week">周几执行</param>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.Execute">
+            <summary>
+            执行任务
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.EveryDayPlan(FoolishGames.Timer.TimeScheduleCallback,System.String,System.String)">
+            <summary>
+            创建每日任务
+            </summary>
+            <param name="callback">任务回调</param>
+            <param name="name">唯一名称</param>
+            <param name="beginTime">开始时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.EveryMinutePlan(FoolishGames.Timer.TimeScheduleCallback,System.String,System.String,System.String,System.Int32)">
+            <summary>
+            每分钟任务
+            </summary>
+            <param name="callback">任务回调</param>
+            <param name="name">唯一名称</param>
+            <param name="beginTime">开始时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+            <param name="endTime">结束时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+            <param name="secondInterval">循环间隔</param>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.EveryWeekPlan(FoolishGames.Timer.TimeScheduleCallback,System.String,System.DayOfWeek,System.String)">
+            <summary>
+            每周任务
+            </summary>
+            <param name="callback">任务回调</param>
+            <param name="name">唯一名称</param>
+            <param name="week">周几执行</param>
+            <param name="beginTime">开始时间"09:00:00"</param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.EveryWeekPlan(FoolishGames.Timer.TimeScheduleCallback,System.String,System.DayOfWeek,System.String,System.String,System.Int32)">
+            <summary>
+            每周任务
+            </summary>
+            <param name="callback">任务回调</param>
+            <param name="name">唯一名称</param>
+            <param name="week">周几执行</param>
+            <param name="beginTime">开始时间"09:00:00"</param>
+            <param name="endTime">结束时间"09:00:00"</param>
+            <param name="secondInterval">循环间隔</param>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeSchedule.OncePlan(FoolishGames.Timer.TimeScheduleCallback,System.String,System.String)">
+            <summary>
+            只执行一次
+            </summary>
+            <param name="callback">任务回调</param>
+            <param name="name">唯一名称</param>
+            <param name="beginTime">开始时间"2015/01/01 09:00:00", 或者 "09:00:00"</param>
+        </member>
+        <member name="T:FoolishGames.Timer.TimeWorker">
+            <summary>
+            时间任务管理
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Timer.TimeWorker.Timer">
+            <summary>
+            计时器
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.TimeWorker.schedules">
+            <summary>
+            时间计划
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Timer.TimeWorker.INTERVAL">
+            <summary>
+            计时器间隔
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Restart">
+            <summary>
+            重启
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Start">
+            <summary>
+            启动
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Update(System.Object)">
+            <summary>
+            计时器执行的操作
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Append(FoolishGames.Timer.TimeSchedule)">
+            <summary>
+            添加新的时间计划
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Remove(FoolishGames.Timer.TimeSchedule)">
+            <summary>
+            移除时间计划
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Timer.TimeWorker.Stop">
+            <summary>
+            移除并结束所有任务
             </summary>
         </member>
         <member name="T:FoolishGames.Common.AssemblyService">

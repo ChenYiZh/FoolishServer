@@ -89,5 +89,28 @@ namespace FoolishGames.Timer
                 }
             }
         }
+
+        /// <summary>
+        /// 内部的时间计划管理者
+        /// </summary>
+        public static TimeWorker Worker { get; private set; }
+
+        /// <summary>
+        /// 添加新的时间计划
+        /// </summary>
+        public static void Append(TimeSchedule schedule) { Worker.Append(schedule); }
+
+        /// <summary>
+        /// 移除时间计划
+        /// </summary>
+        public static void Remove(TimeSchedule schedule) { Worker.Remove(schedule); }
+
+        /// <summary>
+        /// 初始化操作
+        /// </summary>
+        static TimeLord()
+        {
+            Worker = new TimeWorker();
+        }
     }
 }

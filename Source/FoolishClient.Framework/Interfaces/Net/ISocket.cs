@@ -8,7 +8,7 @@ using System.Text;
 
 namespace FoolishClient.Net
 {
-    public interface ISocket
+    public interface ISocketsss
     {
         /// <summary>
         /// 标识名称
@@ -63,7 +63,7 @@ namespace FoolishClient.Net
         /// <summary>
         /// 加密工具
         /// </summary>
-        ICryptoProvider CryptoProvide { get; set; }
+        ICryptoProvider CryptoProvider { get; set; }
 
         /// <summary>
         /// 初始化信息
