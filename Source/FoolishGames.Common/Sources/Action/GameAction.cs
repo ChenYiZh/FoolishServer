@@ -75,6 +75,7 @@ namespace FoolishGames.Action
         /// <summary>
         /// 工作函数
         /// </summary>
+        /// <param name="actionId"></param>
         /// <param name="reader"></param>
         internal void Work(int actionId, IMessageReader reader)
         {

@@ -67,7 +67,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 生成Action
         /// </summary>
-        protected IServerActionDispatcher ActionProvider { get; set; } = new ServerActionDispatcher("FoolishServer.Action{0}");
+        protected IServerActionDispatcher ActionProvider { get; set; }
 
         /// <summary>
         /// 消息处理的中转站
@@ -86,6 +86,7 @@ namespace FoolishServer.Net
         {
             if (IsRunning) { return false; }
             Setting = setting;
+            ActionProvider = new ServerActionDispatcher(setting.ActionClassFullName);
             FConsole.WriteInfoFormatWithCategory(setting.GetCategory(), "Server is starting...", setting.Name);
             try
             {
@@ -128,7 +129,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 消息处理
         /// </summary>
-        private void ProcessMessage(IServerSocket socket, IMessageEventArgs args)
+        private void ProcessMessage(IServerSocket socket, IMessageEventArgs<IRemoteSocket> args)
         {
             try
             {
@@ -247,7 +248,7 @@ namespace FoolishServer.Net
             FConsole.WriteFormat("Bye {0}!", session.SessionId);
         }
 
-        private void OnSocketReceiveHeartbeat(IServerSocket socket, IMessageEventArgs args)
+        private void OnSocketReceiveHeartbeat(IServerSocket socket, IMessageEventArgs<IRemoteSocket> args)
         {
             try
             {

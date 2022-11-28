@@ -22,7 +22,7 @@ namespace Example
             //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
-            socket.Ready("default", "127.0.0.1", 9001);
+            socket.Ready("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
             MessageWriter message = new MessageWriter();
             //message.Secret = false;
             //message.Compress = false;
@@ -30,7 +30,9 @@ namespace Example
             message.OpCode = -1;
             message.ActionId = 1;
             message.WriteString("Hello World!");
+            //Console.Read();
             socket.Send(message);
+            Console.Read();
             socket.Send(message);
             socket.Send(message);
             socket.Send(message);

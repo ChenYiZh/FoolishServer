@@ -41,6 +41,6 @@ namespace FoolishGames.Net
         /// <summary>
         /// 消息发送处理
         /// </summary>
-        void ProcessSend();
+        bool ProcessSend();
     }
 }

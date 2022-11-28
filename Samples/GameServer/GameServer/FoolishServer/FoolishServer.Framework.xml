@@ -55,6 +55,11 @@
             类型
             </summary>
         </member>
+        <member name="P:FoolishServer.Config.IHostSetting.ActionClassFullName">
+            <summary>
+            消息处理的完整类名，用{0}嵌入id
+            </summary>
+        </member>
         <member name="P:FoolishServer.Config.IHostSetting.MainClass">
             <summary>
             执行类
@@ -98,6 +103,690 @@
         <member name="M:FoolishServer.Config.IHostSetting.GetCategory">
             <summary>
             获取类别显示
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.IRemoteSocket">
+            <summary>
+            自定义套接字
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IRemoteSocket.Server">
+            <summary>
+            所属服务器
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IRemoteSocket.HashCode">
+            <summary>
+            唯一id
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IRemoteSocket.AccessTime">
+            <summary>
+            获取时间
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IRemoteSocket.ResetHashset(System.Guid)">
+            <summary>
+            重置唯一id
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="T:FoolishServer.Net.IServer">
+            <summary>
+            服务器对象接口定义
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.IsRunning">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.Name">
+            <summary>
+            标识名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.Port">
+            <summary>
+            开放的端口
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.Setting">
+            <summary>
+            配置文件
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServer.ServerSocket">
+            <summary>
+            监听套接字
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServer.Start(FoolishServer.Config.IHostSetting)">
+            <summary>
+            启动结构
+            </summary>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Net.IServer.Shutdown">
+            <summary>
+            关闭
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishServer.Net.IServerMessageProcessor">
+            <summary>
+            消息处理类
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServerMessageProcessor.MessageReceived(FoolishGames.Net.IMessageEventArgs{FoolishServer.Net.IRemoteSocket})">
+            <summary>
+            接收到数据包事件
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServerMessageProcessor.Ping(FoolishGames.Net.IMessageEventArgs{FoolishServer.Net.IRemoteSocket})">
+            <summary>
+            心跳探索事件
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServerMessageProcessor.Pong(FoolishGames.Net.IMessageEventArgs{FoolishServer.Net.IRemoteSocket})">
+            <summary>
+            心跳回应事件
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.IServerSocket">
+            <summary>
+            服务器套接字接口定义
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServerSocket.ServerName">
+            <summary>
+            对应Host的名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServerSocket.Port">
+            <summary>
+            绑定的端口
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.IServerSocket.Setting">
+            <summary>
+            获取配置信息
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnConnected">
+            <summary>
+            连接事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnHandshaked">
+            <summary>
+            握手事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnDisconnected">
+            <summary>
+            断开连接事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnMessageReceived">
+            <summary>
+            接收到数据包事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnPing">
+            <summary>
+            心跳探索事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.IServerSocket.OnPong">
+            <summary>
+            心跳回应事件
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServerSocket.Start(FoolishServer.Config.IHostSetting)">
+            <summary>
+            启动函数
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.IServerSocket.OnRemoteSocketClosed(FoolishServer.Net.IRemoteSocket,FoolishGames.Net.EOpCode)">
+            <summary>
+            当远端连接关闭时，执行一些回收代码
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.RemoteSocket">
+            <summary>
+            套接字嵌套层
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.SetIsRunning(System.Boolean)">
+            <summary>
+            是否在运行
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Server">
+            <summary>
+            所属服务器
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.HashCode">
+            <summary>
+            唯一id
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.AccessTime">
+            <summary>
+            获取时间
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.RemoteSocket.address">
+            <summary>
+            地址
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Address">
+            <summary>
+            地址
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.MessageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Compression">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.CryptoProvider">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Sender">
+            <summary>
+            发送的管理类
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.Receiver">
+            <summary>
+            接收管理类
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.MessageNumber">
+            <summary>
+            消息Id
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.#ctor(FoolishServer.Net.IServerSocket,System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.Close(FoolishGames.Net.EOpCode)">
+            <summary>
+            关闭
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.ResetHashset(System.Guid)">
+            <summary>
+            重置唯一id
+            </summary>
+            <param name="key">新的id</param>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#BeginSend">
+            <summary>
+            开始执行发送
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.Send(FoolishGames.IO.IMessageWriter)">
+            <summary>
+            数据发送<c>异步</c>
+            </summary>
+            <param name="message">大宋的消息</param>
+            <returns>判断有没有发送出去</returns>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.SendImmediately(FoolishGames.IO.IMessageWriter)">
+            <summary>
+            立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
+            </summary>
+            <param name="message">发送的消息</param>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#SendBytes(System.Byte[])">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#SendBytesImmediately(System.Byte[])">
+            <summary>
+            内部函数，直接传bytes，会影响数据解析，以及解析顺序
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#ProcessSend">
+            <summary>
+            消息发送处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.BeginReceive">
+            <summary>
+            等待消息接收
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#IReceiver#ProcessReceive">
+            <summary>
+            处理数据接收回调
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.MessageSolved(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            当消息处理完执行
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.ConnectionEventHandler">
+            <summary>
+            连接消息代理
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.MessageEventHandler">
+            <summary>
+            收发消息处理
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.ServerSocket">
+            <summary>
+            服务器套接字管理
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnConnected">
+            <summary>
+            连接事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnHandshaked">
+            <summary>
+            握手事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnDisconnected">
+            <summary>
+            断开连接事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnMessageReceived">
+            <summary>
+            接收到数据包事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnPing">
+            <summary>
+            心跳探索事件
+            </summary>
+        </member>
+        <member name="E:FoolishServer.Net.ServerSocket.OnPong">
+            <summary>
+            心跳回应事件
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.socket">
+            <summary>
+            内部关键原生Socket
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Socket">
+            <summary>
+            内部关键原生Socket
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.address">
+            <summary>
+            封装的地址
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Address">
+            <summary>
+            封装的地址
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Port">
+            <summary>
+            绑定的端口
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.ServerName">
+            <summary>
+            对应Host的名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Setting">
+            <summary>
+            配置信息
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.messageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.MessageOffset">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.SetMessageOffset(System.Int32)">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.compression">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Compression">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.SetCompression(FoolishGames.IO.ICompression)">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.cryptoProvider">
+            <summary>
+            消息偏移值
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.CryptoProvider">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.SetCryptoProvide(FoolishGames.Security.ICryptoProvider)">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.summary">
+            <summary>
+            状态类
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.summaryTask">
+            <summary>
+            输出统计的线程
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.maxConnectionsEnforcer">
+            <summary>
+            并发管理锁
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.acceptEventArgsPool">
+            <summary>
+            接受连接并发对象池
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.ioEventArgsPool">
+            <summary>
+            回复并发对象池
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.AllEventArgsPool">
+            <summary>
+            生成的所有套接字管理对象都缓存在这里
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.ServerSocket.BytePool">
+            <summary>
+            字节流池
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.Start(FoolishServer.Config.IHostSetting)">
+            <summary>
+            入口函数
+            </summary>
+            <param name="setting"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.PostAccept">
+            <summary>
+            开始接受连接
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.ProcessAccept(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            处理接收到的连接
+            </summary>
+            <param name="acceptEventArgs"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.AcceptCompleted(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            收到连接时需要做的事情
+            </summary>
+            <param name="sender"></param>
+            <param name="acceptEventArgs"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.ReleaseAccept(System.Net.Sockets.SocketAsyncEventArgs,System.Boolean)">
+            <summary>
+            释放并发锁
+            </summary>
+            <param name="acceptEventArgs"></param>
+            <param name="isRelease"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.IOCompleted(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            消息接收处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.ReleaseIOEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            释放消息事件
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.HandleBadAccept(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            异常连接处理
+            </summary>
+            <param name="acceptEventArgs"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.ResetSocketAsyncEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            重置Socket连接对象
+            </summary>
+            <param name="eventArgs"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.OnRemoteSocketClosed(FoolishServer.Net.IRemoteSocket,FoolishGames.Net.EOpCode)">
+            <summary>
+            当远端连接关闭时，执行一些回收代码
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.WriteSummary(System.Object)">
+            <summary>
+            输出状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.MakeIOEventArgs">
+            <summary>
+            设置缓冲区大小
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.CreateAcceptEventArgs">
+            <summary>
+            创建待建立连接的套接字缓存类
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.Close">
+            <summary>
+            关闭操作
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.SocketServer">
+            <summary>
+            套接字服务器
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.IsRunning">
+            <summary>
+            是否启动
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.Name">
+            <summary>
+            标识名称
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.Port">
+            <summary>
+            端口号
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.ServerSocket">
+            <summary>
+            监听套接字
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.Compression">
+            <summary>
+            压缩工具
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.CryptoProvider">
+            <summary>
+            加密工具
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.ActionProvider">
+            <summary>
+            生成Action
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.MessageContractor">
+            <summary>
+            消息处理的中转站
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Net.SocketServer.Setting">
+            <summary>
+            配置文件
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.Start(FoolishServer.Config.IHostSetting)">
+            <summary>
+            启动结构
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnStart">
+            <summary>
+            在服务器启动时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.ProcessMessage(FoolishServer.Net.IServerSocket,FoolishGames.Net.IMessageEventArgs{FoolishServer.Net.IRemoteSocket})">
+            <summary>
+            消息处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnReceiveMessage(FoolishServer.RPC.ISession,FoolishGames.IO.IMessageReader)">
+            <summary>
+            开始接收数据，第一部处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.ProcessMessage(FoolishServer.RPC.ISession,FoolishGames.IO.IMessageReader)">
+            <summary>
+            消息处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnSocketConnected(FoolishServer.Net.IServerSocket,FoolishServer.Net.IRemoteSocket)">
+            <summary>
+            Socket连接时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnSessionConnected(FoolishServer.RPC.ISession)">
+            <summary>
+            在客户端连接时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnSessionDisonnected(FoolishServer.RPC.ISession)">
+            <summary>
+            在客户端断开时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnSessionHeartbeat(FoolishServer.RPC.ISession)">
+            <summary>
+            收到客户端的心跳包时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnSessionHeartbeatExpired(FoolishServer.RPC.ISession)">
+            <summary>
+            在客户端心跳包过期时执行
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.OnClose">
+            <summary>
+            在关闭前处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.SocketServer.Shutdown">
+            <summary>
+            退出
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.SummaryStatus.TotalConnectCount">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.SummaryStatus.CurrentConnectCount">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.SummaryStatus.RejectedConnectCount">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.SummaryStatus.CloseConnectCount">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.TcpServer">
+            <summary>
+            Tcp服务器
+            </summary>
+        </member>
+        <member name="T:FoolishServer.Net.UdpServer">
+            <summary>
+            Udp服务器
             </summary>
         </member>
         <member name="T:FoolishServer.Proxy.IServerActionDispatcher">
@@ -153,19 +842,9 @@
             </summary>
             <param name="actionNameFormat">Action名称的格式</param>
         </member>
-        <member name="T:FoolishServer.RPC.IMessageEventArgs">
+        <member name="M:FoolishServer.Proxy.ServerActionDispatcher.Provide(System.Int32)">
             <summary>
-            连接消息处理
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.IMessageEventArgs.Socket">
-            <summary>
-            获取封装的套接字
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.IMessageEventArgs.Message">
-            <summary>
-            获取消息
+            生成Action协议
             </summary>
         </member>
         <member name="T:FoolishServer.RPC.OnSessionHeartbeatExpired">
@@ -243,734 +922,9 @@
             关闭会话窗口
             </summary>
         </member>
-        <member name="T:FoolishServer.RPC.Tokens.IUserToken">
+        <member name="M:FoolishServer.RPC.ISession.Send(FoolishGames.IO.IMessageWriter)">
             <summary>
-            寄宿在原生Socket的管理类
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Tokens.IUserToken.Socket">
-            <summary>
-            嵌套的Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Tokens.IUserToken.AsyncResult">
-            <summary>
-            套接字处理结果
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Tokens.IUserToken.Reset">
-            <summary>
-            重置数据
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.IsRunning">
-            <summary>
-            状态
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.Name">
-            <summary>
-            标识名称
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.Port">
-            <summary>
-            开放的端口
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.Setting">
-            <summary>
-            配置文件
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.Type">
-            <summary>
-            类型
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.IServer.SocketListener">
-            <summary>
-            监听套接字
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.IServer.Start(FoolishServer.Config.IHostSetting)">
-            <summary>
-            启动结构
-            </summary>
-            <param name="setting"></param>
-            <returns></returns>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.IServer.Shutdown">
-            <summary>
-            关闭
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.IsRunning">
-            <summary>
-            是否启动
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.Name">
-            <summary>
-            标识名称
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.Port">
-            <summary>
-            端口号
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.Type">
-            <summary>
-            类型
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.SocketListener">
-            <summary>
-            监听套接字
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.Compression">
-            <summary>
-            压缩工具
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.CryptoProvider">
-            <summary>
-            加密工具
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.ActionProvider">
-            <summary>
-            生成Action
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.MessageContractor">
-            <summary>
-            消息处理的中转站
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Server.SocketServer.Setting">
-            <summary>
-            配置文件
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.Start(FoolishServer.Config.IHostSetting)">
-            <summary>
-            启动结构
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.ProcessMessage(FoolishServer.RPC.Sockets.IServerSocket,FoolishServer.RPC.IMessageEventArgs)">
-            <summary>
-            消息处理
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnReceiveMessage(FoolishServer.RPC.ISession,FoolishGames.IO.IMessageReader)">
-            <summary>
-            开始接收数据，第一部处理
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.ProcessMessage(FoolishServer.RPC.ISession,FoolishGames.IO.IMessageReader)">
-            <summary>
-            消息处理
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnSocketConnected(FoolishServer.RPC.Sockets.IServerSocket,FoolishServer.RPC.Sockets.ISocket)">
-            <summary>
-            Socket连接时执行
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnSessionConnected(FoolishServer.RPC.ISession)">
-            <summary>
-            在客户端连接时执行
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnSessionDisonnected(FoolishServer.RPC.ISession)">
-            <summary>
-            在客户端断开时执行
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnSessionHeartbeat(FoolishServer.RPC.ISession)">
-            <summary>
-            收到客户端的心跳包时执行
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnSessionHeartbeatExpired(FoolishServer.RPC.ISession)">
-            <summary>
-            在客户端心跳包过期时执行
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.OnClose">
-            <summary>
-            在关闭前处理
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Server.SocketServer.Shutdown">
-            <summary>
-            退出
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.ServerName">
-            <summary>
-            对应Host的名称
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.Port">
-            <summary>
-            绑定的端口
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.Setting">
-            <summary>
-            获取配置信息
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.Compression">
-            <summary>
-            压缩工具
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.IServerSocket.CryptoProvider">
-            <summary>
-            加密工具
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnConnected">
-            <summary>
-            连接事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnHandshaked">
-            <summary>
-            握手事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnDisconnected">
-            <summary>
-            断开连接事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnMessageReceived">
-            <summary>
-            接收到数据包事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnPing">
-            <summary>
-            心跳探索事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.IServerSocket.OnPong">
-            <summary>
-            心跳回应事件
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.IServerSocket.Start(FoolishServer.Config.IHostSetting)">
-            <summary>
-            启动函数
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.ISocket">
-            <summary>
-            自定义套接字
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocket.HashCode">
-            <summary>
-            唯一id
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocket.AccessTime">
-            <summary>
-            获取时间
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocket.Connected">
-            <summary>
-            Socket是否还连接着？
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocket.MessageQueueCount">
-            <summary>
-            待发送的消息队列长度
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocket.ResetHashset(System.Guid)">
-            <summary>
-            重置唯一id
-            </summary>
-            <param name="key"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocket.ResetSendFlag">
-            <summary>
-            重置发送标识
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocket.Send(System.Byte[],System.Action{FoolishServer.RPC.Sockets.ISocketAsyncResult})">
-            <summary>
-            发送消息
-            </summary>
-            <param name="data"></param>
-            <returns>是否发送成功</returns>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocket.TryDequeueOrReset(FoolishServer.RPC.Sockets.ISocketAsyncResult@)">
-            <summary>
-            获取最早等待发送的消息
-            </summary>
-            <returns>是否有消息</returns>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.EResultCode">
-            <summary>
-            操作结果
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EResultCode.Wait">
-            <summary>
-            等待阶段
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EResultCode.Success">
-            <summary>
-            操作成功
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EResultCode.Close">
-            <summary>
-            Socket已经关闭
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EResultCode.Error">
-            <summary>
-            Socket 已报错
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.ISocketAsyncResult">
-            <summary>
-            套接字处理结果
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketAsyncResult.Socket">
-            <summary>
-            内部关联的Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketAsyncResult.Buffer">
-            <summary>
-            需要发送的消息大小
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketAsyncResult.Result">
-            <summary>
-            处理结果
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketAsyncResult.Error">
-            <summary>
-            报错信息
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketAsyncResult.OnCallback">
-            <summary>
-            数据处理完成后的回调
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocketAsyncResult.Execute">
-            <summary>
-            消息处理完成时执行
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketMini.IsRunning">
-            <summary>
-            是否在运行
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketMini.Address">
-            <summary>
-            封装的地址
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketMini.Socket">
-            <summary>
-            内部关键原生Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.ISocketMini.Type">
-            <summary>
-            获取类型
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.ISocketMini.Close">
-            <summary>
-            关闭函数
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.FSocket">
-            <summary>
-            套接字嵌套层
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.HashCode">
-            <summary>
-            唯一id
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.AccessTime">
-            <summary>
-            获取时间
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.Connected">
-            <summary>
-            Socket是否还连接着？
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.sendQueue">
-            <summary>
-            待发送队列
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.MessageQueueCount">
-            <summary>
-            待发送的消息队列长度
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.IsRunning">
-            <summary>
-            是否在运行
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.Address">
-            <summary>
-            地址
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.Socket">
-            <summary>
-            内部关键原生Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.FSocket.Type">
-            <summary>
-            类型
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.#ctor(System.Net.Sockets.Socket)">
-            <summary>
-            构造函数
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.Close">
-            <summary>
-            关闭
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.Send(System.Byte[],System.Action{FoolishServer.RPC.Sockets.ISocketAsyncResult})">
-            <summary>
-            发送消息
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.TryDequeueOrReset(FoolishServer.RPC.Sockets.ISocketAsyncResult@)">
-            <summary>
-            获取最早等待发送的消息
-            </summary>
-            <returns>是否有消息</returns>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.ResetHashset(System.Guid)">
-            <summary>
-            重置唯一id
-            </summary>
-            <param name="key">新的id</param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.FSocket.ResetSendFlag">
-            <summary>
-            重置发送标识
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.EOpCode">
-            <summary>
-            操作码
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Empty">
-            <summary>
-            空数据
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Text">
-            <summary>
-            文本数据
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Binary">
-            <summary>
-            二进制数据
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Close">
-            <summary>
-            关闭操作数据
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Ping">
-            <summary>
-            服务器检测客户端是否存活的协议，暂时没有用到
-            <para>原WebSocket中服务器向客户端发送的检测数据</para>
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.EOpCode.Pong">
-            <summary>
-            客户端发送给服务器的心跳包
-            <para>原WebSocket中客户端接收到服务器的Ping协议的回复</para>
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.Sockets.SocketAsyncResult">
-            <summary>
-            套接字处理结果
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketAsyncResult.Socket">
-            <summary>
-            内部关联的Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketAsyncResult.Buffer">
-            <summary>
-            需要发送的消息大小
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketAsyncResult.Result">
-            <summary>
-            处理结果
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketAsyncResult.Error">
-            <summary>
-            报错信息
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketAsyncResult.OnCallback">
-            <summary>
-            数据处理完成后的回调
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketAsyncResult.Execute">
-            <summary>
-            消息处理完成时执行
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnConnected">
-            <summary>
-            连接事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnHandshaked">
-            <summary>
-            握手事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnDisconnected">
-            <summary>
-            断开连接事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnMessageReceived">
-            <summary>
-            接收到数据包事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnPing">
-            <summary>
-            心跳探索事件
-            </summary>
-        </member>
-        <member name="E:FoolishServer.RPC.Sockets.SocketListener.OnPong">
-            <summary>
-            心跳回应事件
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.IsRunning">
-            <summary>
-            是否在运行
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Socket">
-            <summary>
-            内部关键原生Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Address">
-            <summary>
-            封装的地址
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Port">
-            <summary>
-            绑定的端口
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.ServerName">
-            <summary>
-            对应Host的名称
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Setting">
-            <summary>
-            配置信息
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Compression">
-            <summary>
-            压缩工具
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.CryptoProvider">
-            <summary>
-            加密工具
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.Sockets.SocketListener.Type">
-            <summary>
-            类型
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SocketListener.summary">
-            <summary>
-            状态类
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SocketListener.summaryTask">
-            <summary>
-            输出统计的线程
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SocketListener.maxConnectionsEnforcer">
-            <summary>
-            并发管理锁
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SocketListener.acceptEventArgsPool">
-            <summary>
-            接受连接并发对象池
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SocketListener.ioEventArgsPool">
-            <summary>
-            回复并发对象池
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.Start(FoolishServer.Config.IHostSetting)">
-            <summary>
-            入口函数
-            </summary>
-            <param name="setting"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ArrangeSocketBuffer(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            设置缓冲区大小
-            </summary>
-            <param name="ioEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.PostAccept">
-            <summary>
-            开始接受连接
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.AcceptCompleted(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            收到连接时需要做的事情
-            </summary>
-            <param name="sender"></param>
-            <param name="acceptEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ProcessAccept(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            处理接收到的连接
-            </summary>
-            <param name="acceptEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ReleaseAccept(System.Net.Sockets.SocketAsyncEventArgs,System.Boolean)">
-            <summary>
-            释放并发锁
-            </summary>
-            <param name="acceptEventArgs"></param>
-            <param name="isRelease"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.IOCompleted(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            消息接收处理
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ReleaseIOEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            释放消息事件
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.PostReceive(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            投递接收数据请求
-            </summary>
-            <param name="ioEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ProcessReceive(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            处理数据接收回调
-            </summary>
-            <param name="ioEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ProcessSend(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            发送接口
-            </summary>
-            <param name="ioEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.CreateAcceptEventArgs">
-            <summary>
-            创建连接代理
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.HandleBadAccept(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            异常连接处理
-            </summary>
-            <param name="acceptEventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.ResetSocketAsyncEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            重置Socket连接对象
-            </summary>
-            <param name="eventArgs"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.WriteSummary(System.Object)">
-            <summary>
-            输出状态
-            </summary>
-            <param name="state"></param>
-        </member>
-        <member name="M:FoolishServer.RPC.Sockets.SocketListener.Close">
-            <summary>
-            关闭操作
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SummaryStatus.TotalConnectCount">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SummaryStatus.CurrentConnectCount">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SummaryStatus.RejectedConnectCount">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:FoolishServer.RPC.Sockets.SummaryStatus.CloseConnectCount">
-            <summary>
-            
+            异步发送一条数据
             </summary>
         </member>
         <member name="T:FoolishServer.RPC.GameSession">
@@ -1056,12 +1010,10 @@
             心跳到期
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.#ctor(System.Guid,FoolishServer.RPC.Sockets.ISocket,FoolishServer.RPC.Sockets.IServerSocket)">
+        <member name="M:FoolishServer.RPC.GameSession.#ctor(System.Guid,FoolishServer.Net.IRemoteSocket,FoolishServer.Net.IServerSocket)">
             <summary>
             内部构造函数
             </summary>
-            <param name="keyCode"></param>
-            <param name=""></param>
         </member>
         <member name="M:FoolishServer.RPC.GameSession.GenerateSessionId">
             <summary>
@@ -1084,6 +1036,11 @@
             关闭Session
             </summary>
         </member>
+        <member name="M:FoolishServer.RPC.GameSession.Send(FoolishGames.IO.IMessageWriter)">
+            <summary>
+            异步发送一条数据
+            </summary>
+        </member>
         <member name="F:FoolishServer.RPC.GameSession.sessions">
             <summary>
             会话窗口池
@@ -1094,7 +1051,7 @@
             静态初始化
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.CreateNew(System.Guid,FoolishServer.RPC.Sockets.ISocket,FoolishServer.RPC.Sockets.IServerSocket)">
+        <member name="M:FoolishServer.RPC.GameSession.CreateNew(System.Guid,FoolishServer.Net.IRemoteSocket,FoolishServer.Net.IServerSocket)">
             <summary>
             创建会话窗口
             </summary>
@@ -1104,19 +1061,16 @@
             通过Guid获取Session
             </summary>
         </member>
-        <member name="T:FoolishServer.RPC.MessageEventArgs">
+        <member name="M:FoolishServer.RPC.GameSession.SendAsync(FoolishGames.IO.IMessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
             <summary>
-            消息发送
+            异步给一堆客户端发消息
             </summary>
+            <param name="message"></param>
+            <param name="sessions"></param>
         </member>
-        <member name="P:FoolishServer.RPC.MessageEventArgs.Socket">
+        <member name="T:FoolishServer.RPC.ServerManager">
             <summary>
-            发送的套接字
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.MessageEventArgs.Message">
-            <summary>
-            消息
+            服务器管理类
             </summary>
         </member>
         <member name="M:FoolishServer.RPC.ServerManager.Start(FoolishServer.Config.IHostSetting)">
@@ -1133,7 +1087,7 @@
             <param name="hostName"></param>
             <returns></returns>
         </member>
-        <member name="M:FoolishServer.RPC.ServerManager.Shutdown(FoolishServer.RPC.Server.IServer)">
+        <member name="M:FoolishServer.RPC.ServerManager.Shutdown(FoolishServer.Net.IServer)">
             <summary>
             关闭一个服务器
             </summary>
@@ -1162,46 +1116,6 @@
         <member name="M:FoolishServer.RPC.SessionExtensions.IsValid(FoolishServer.RPC.ISession)">
             <summary>
             判断有效性
-            </summary>
-        </member>
-        <member name="T:FoolishServer.RPC.UserToken">
-            <summary>
-            寄宿在原生Socket的管理类
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.UserToken.Socket">
-            <summary>
-            嵌套的Socket
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.UserToken.AsyncResult">
-            <summary>
-            套接字处理结果
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.UserToken.TempStartIndex">
-            <summary>
-            已经接收的数据长度
-            </summary>
-        </member>
-        <member name="P:FoolishServer.RPC.UserToken.TempBuffer">
-            <summary>
-            解析包时解析不完的数据
-            </summary>
-        </member>
-        <member name="M:FoolishServer.RPC.UserToken.Reset">
-            <summary>
-            重置数据
-            </summary>
-        </member>
-        <member name="T:FoolishServer.Delegate.ConnectionEventHandler">
-            <summary>
-            连接消息代理
-            </summary>
-        </member>
-        <member name="T:FoolishServer.Delegate.MessageEventHandler">
-            <summary>
-            收发消息处理
             </summary>
         </member>
         <member name="T:FoolishServer.Log.Categories">

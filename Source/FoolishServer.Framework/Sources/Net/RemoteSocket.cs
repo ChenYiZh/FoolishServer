@@ -76,7 +76,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 接收管理类
         /// </summary>
-        internal SocketReceiver Receiver { get; private set; }
+        internal SocketReceiver<IRemoteSocket> Receiver { get; private set; }
 
         /// <summary>
         /// 消息Id
@@ -93,7 +93,10 @@ namespace FoolishServer.Net
                 throw new NullReferenceException("Fail to create remove socket, because the server is null.");
             }
             Sender = new SocketSender(this);
-            Receiver = new SocketReceiver(this);
+            Receiver = new SocketReceiver<IRemoteSocket>(this);
+            Receiver.OnMessageReceived = OnMessageReceived;
+            Receiver.OnPing = OnPing;
+            Receiver.OnPong = OnPong;
             Server = server;
             IsRunning = true;
             HashCode = Guid.NewGuid();
@@ -174,9 +177,9 @@ namespace FoolishServer.Net
         /// <summary>
         /// 消息发送处理
         /// </summary>
-        void ISender.ProcessSend()
+        bool ISender.ProcessSend()
         {
-            Sender.ProcessSend();
+            return Sender.ProcessSend();
         }
 
         /// <summary>
@@ -190,9 +193,9 @@ namespace FoolishServer.Net
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        void IReceiver.ProcessReceive()
+        bool IReceiver.ProcessReceive()
         {
-            Receiver.ProcessReceive();
+            return Receiver.ProcessReceive();
         }
 
         /// <summary>
@@ -213,6 +216,21 @@ namespace FoolishServer.Net
                 default:
                     throw new ArgumentException("The last operation completed on the socket was not a receive or send");
             }
+        }
+
+        private void OnMessageReceived(IMessageEventArgs<IRemoteSocket> e)
+        {
+            ((IServerMessageProcessor)Server).MessageReceived(e);
+        }
+
+        private void OnPong(IMessageEventArgs<IRemoteSocket> e)
+        {
+            ((IServerMessageProcessor)Server).Pong(e);
+        }
+
+        private void OnPing(IMessageEventArgs<IRemoteSocket> e)
+        {
+            ((IServerMessageProcessor)Server).Ping(e);
         }
     }
 }

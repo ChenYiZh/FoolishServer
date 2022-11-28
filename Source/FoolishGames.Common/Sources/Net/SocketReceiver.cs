@@ -9,19 +9,19 @@ using System.Text;
 namespace FoolishGames.Net
 {
     /// <summary>
-    /// 收发消息处理
-    /// </summary>
-    public delegate void MessageReceiveEventHandler(IMessageEventArgs<ISocket> e);
-    /// <summary>
     /// 消息接收处理类
     /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
     /// </summary>
-    public sealed class SocketReceiver : IReceiver
+    public sealed class SocketReceiver<TSocket> : IReceiver where TSocket : ISocket
     {
+        /// <summary>
+        /// 收发消息处理
+        /// </summary>
+        public delegate void MessageReceiveEventHandler(IMessageEventArgs<TSocket> e);
         /// <summary>
         /// 封装的套接字
         /// </summary>
-        public ISocket Socket { get; private set; }
+        public TSocket Socket { get; private set; }
         /// <summary>
         /// 增强类
         /// </summary>
@@ -33,24 +33,24 @@ namespace FoolishGames.Net
         /// <summary>
         /// 接收到数据包事件
         /// </summary>
-        public event MessageReceiveEventHandler OnMessageReceived;
-        private void MessageReceived(MessageReceiverEventArgs args) { OnMessageReceived?.Invoke(args); }
+        public MessageReceiveEventHandler OnMessageReceived;
+        private void MessageReceived(MessageReceiverEventArgs<TSocket> args) { OnMessageReceived?.Invoke(args); }
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
-        public event MessageReceiveEventHandler OnPing;
-        private void Ping(MessageReceiverEventArgs args) { OnPing?.Invoke(args); }
+        public MessageReceiveEventHandler OnPing;
+        private void Ping(MessageReceiverEventArgs<TSocket> args) { OnPing?.Invoke(args); }
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
-        public event MessageReceiveEventHandler OnPong;
-        private void Pong(MessageReceiverEventArgs args) { OnPong?.Invoke(args); }
+        public MessageReceiveEventHandler OnPong;
+        private void Pong(MessageReceiverEventArgs<TSocket> args) { OnPong?.Invoke(args); }
         /// <summary>
         /// 初始化
         /// </summary>
-        public SocketReceiver(ISocket socket)
+        public SocketReceiver(TSocket socket)
         {
             Socket = socket;
             if (socket.EventArgs == null) { throw new NullReferenceException("Fail to create socket receiver, because the SocketAsyncEventArgs is null."); }
@@ -74,12 +74,12 @@ namespace FoolishGames.Net
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        public void ProcessReceive()
+        public bool ProcessReceive()
         {
             if (EventArgs.BytesTransferred == 0)
             {
                 Socket.Close(EOpCode.Empty);
-                return;
+                return false;
             }
             if (EventArgs.SocketError != SocketError.Success)
             {
@@ -89,7 +89,7 @@ namespace FoolishGames.Net
                     EventArgs.SocketError.ToString(),
                     EventArgs.BytesTransferred);
                 Socket.Close();
-                return;
+                return false;
             }
 
             //Process Receive
@@ -214,17 +214,17 @@ namespace FoolishGames.Net
                                 break;
                             case (sbyte)EOpCode.Ping:
                                 {
-                                    Ping(new MessageReceiverEventArgs { Socket = Socket, Message = message });
+                                    Ping(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
                                 }
                                 break;
                             case (sbyte)EOpCode.Pong:
                                 {
-                                    Pong(new MessageReceiverEventArgs { Socket = Socket, Message = message });
+                                    Pong(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
                                 }
                                 break;
                             default:
                                 {
-                                    MessageReceived(new MessageReceiverEventArgs { Socket = Socket, Message = message });
+                                    MessageReceived(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
                                 }
                                 break;
                         }
@@ -239,6 +239,7 @@ namespace FoolishGames.Net
             {
                 //数据错乱
                 UserToken.ReceivedBuffer = null;
+                return false;
             }
 
             BeginReceive();
@@ -249,6 +250,7 @@ namespace FoolishGames.Net
                 //ResetSocketAsyncEventArgs(ioEventArgs);
                 Socket?.Close();
             }
+            return true;
         }
     }
 }

@@ -32,6 +32,11 @@ namespace FoolishServer.Config
         public string MainClass { get; private set; }
 
         /// <summary>
+        /// 消息处理的完整类名，用{0}嵌入id
+        /// </summary>
+        public string ActionClassFullName { get; private set; }
+
+        /// <summary>
         /// TCP全连接队列长度
         /// </summary>
         public int Backlog { get; private set; }
@@ -94,6 +99,7 @@ namespace FoolishServer.Config
             BufferSize = node.SelectSingleNode("buffer-size").GetValue(8192);
             Offset = node.SelectSingleNode("offset").GetValue(8192);
             UseGZip = node.SelectSingleNode("use-gzip").GetValue(true);
+            ActionClassFullName = node.SelectSingleNode("action-class-fullname").GetValue(null);
         }
         /// <summary>
         /// 判断是否有效

@@ -17,6 +17,6 @@ namespace FoolishGames.Net
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        void ProcessReceive();
+        bool ProcessReceive();
     }
 }

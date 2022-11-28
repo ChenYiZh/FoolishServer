@@ -24,6 +24,11 @@ namespace FoolishServer.Config
         ESocketType Type { get; }
 
         /// <summary>
+        /// 消息处理的完整类名，用{0}嵌入id
+        /// </summary>
+        string ActionClassFullName { get; }
+
+        /// <summary>
         /// 执行类
         /// </summary>
         string MainClass { get; }

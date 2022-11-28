@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using FoolishClient.Action;
 using FoolishGames.Reflection;
-using FoolishServer.Action;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace FoolishServer.Proxy
+namespace FoolishClient.Proxy
 {
     /// <summary>
-    /// 默认反射创建Action
+    /// 客户端Action协议生成类
     /// </summary>
-    public class ServerActionDispatcher : IServerActionDispatcher
+    public class ClientActionDispatcher : IClientActionDispatcher
     {
         /// <summary>
         /// Action名称的格式
@@ -21,7 +20,7 @@ namespace FoolishServer.Proxy
         /// 构造函数
         /// </summary>
         /// <param name="actionNameFormat">Action名称的格式</param>
-        public ServerActionDispatcher(string actionNameFormat)
+        public ClientActionDispatcher(string actionNameFormat)
         {
             ActionNameFormat = actionNameFormat;
         }
@@ -29,10 +28,10 @@ namespace FoolishServer.Proxy
         /// <summary>
         /// 生成Action协议
         /// </summary>
-        public virtual ServerAction Provide(int actionId)
+        public virtual ClientAction Provide(int actionId)
         {
             string typeName = string.Format(ActionNameFormat, actionId);
-            return ObjectFactory.Create<ServerAction>(typeName);
+            return ObjectFactory.Create<ClientAction>(typeName);
         }
     }
 }

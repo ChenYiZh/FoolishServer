@@ -1,10 +1,13 @@
-﻿using FoolishClient.Delegate;
+﻿using FoolishClient.Action;
+using FoolishClient.Delegate;
 using FoolishClient.Log;
+using FoolishClient.Proxy;
 using FoolishGames.Collections;
 using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Net;
+using FoolishGames.Proxy;
 using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
@@ -18,7 +21,7 @@ namespace FoolishClient.Net
     /// <summary>
     /// 套接字父类
     /// </summary>
-    public abstract class ClientSocket : FSocket, ISendableSocket, IReceivableSocket, IMsgSocket
+    public abstract class ClientSocket : FSocket, IClientSocket
     {
         /// <summary>
         /// 地址
@@ -118,17 +121,27 @@ namespace FoolishClient.Net
         /// <summary>
         /// 发送的管理类
         /// </summary>
-        internal protected ISender Sender { get; private set; }
+        internal protected SocketSender Sender { get; private set; }
 
         /// <summary>
         /// 接收管理类
         /// </summary>
-        internal protected IReceiver Receiver { get; private set; }
+        internal protected SocketReceiver<IClientSocket> Receiver { get; private set; }
 
         /// <summary>
         /// 消息Id
         /// </summary>
         public long MessageNumber { get { return Sender.MessageNumber; } set { Sender.MessageNumber = value; } }
+
+        /// <summary>
+        /// Action生成类
+        /// </summary>
+        public IClientActionDispatcher ActionProvider { get; set; }
+
+        /// <summary>
+        /// 消息处理的中转站
+        /// </summary>
+        public IBoss MessageContractor { get; set; }
 
         /// <summary>
         /// 初始化
@@ -143,8 +156,10 @@ namespace FoolishClient.Net
         /// <param name="name"></param>
         /// <param name="host"></param>
         /// <param name="port"></param>
+        /// <param name="actionClassFullName">Action协议类的完整名称</param>
         /// <param name="heartbeatInterval">心跳间隔</param>
         public virtual void Ready(string name, string host, int port,
+            string actionClassFullName,
             int heartbeatInterval = 10000)
         {
             Name = name;
@@ -152,6 +167,7 @@ namespace FoolishClient.Net
             Port = port;
             address = new IPEndPoint(IPAddress.Parse(host), port);
             Category = string.Format("{0}:{1},{2}", GetType().Name, Host, Port);
+            ActionProvider = new ClientActionDispatcher(actionClassFullName);
             HeartbeatInterval = heartbeatInterval;
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is ready...");
             Interlocked.Exchange(ref readyFlag, 1);
@@ -174,6 +190,7 @@ namespace FoolishClient.Net
         public virtual void ConnectAsync(Action<bool> callback = null)
         {
             IsRunning = true;
+            Awake();
             ThreadPool.UnsafeQueueUserWorkItem((state) =>
             {
                 bool success = Connect();
@@ -193,17 +210,14 @@ namespace FoolishClient.Net
                 return false;
             }
             IsRunning = true;
+            Awake();
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is starting...");
             try
             {
-                Socket socket = MakeSocket();
-                EventArgs = MakeEventArgs(socket);
                 EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
-                Sender = new SocketSender(this);
-                Receiver = new SocketReceiver(this);
-                IAsyncResult opt = socket.BeginConnect(Address, null, EventArgs);
+                IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
                 bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
-                if (!success || !opt.IsCompleted || !socket.Connected)
+                if (!success || !opt.IsCompleted || !Socket.Connected)
                 {
                     IsRunning = false;
                     throw new Exception(string.Format("Socket connect failed!"));
@@ -227,11 +241,29 @@ namespace FoolishClient.Net
             //ThreadProcessReceive.Start();
 
             BeginReceive();
-            Sender.BeginSend();
+            //Sender.BeginSend();
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
             return true;
+        }
+
+        protected virtual void Awake()
+        {
+            if (Socket == null)
+            {
+                Socket socket = MakeSocket();
+                EventArgs = MakeEventArgs(socket);
+            }
+            if (Sender == null)
+            {
+                Sender = new SocketSender(this);
+            }
+            if (Receiver == null)
+            {
+                Receiver = new SocketReceiver<IClientSocket>(this);
+                Receiver.OnMessageReceived = OnMessageReceived;
+            }
         }
 
         /// <summary>
@@ -253,14 +285,21 @@ namespace FoolishClient.Net
         /// </summary>
         private void MessageSolved(object sender, SocketAsyncEventArgs e)
         {
+            FConsole.Write(e.LastOperation);
             // determine which type of operation just completed and call the associated handler
             switch (e.LastOperation)
             {
                 case SocketAsyncOperation.Receive:
-                    Receiver.ProcessReceive();
+                    if (!Receiver.ProcessReceive())
+                    {
+                        Sender.ProcessSend();
+                    }
                     break;
                 case SocketAsyncOperation.Send:
-                    Sender.ProcessSend();
+                    if (!Sender.ProcessSend())
+                    {
+                        Receiver.ProcessReceive();
+                    }
                     break;
                 default:
                     throw new ArgumentException("The last operation completed on the socket was not a receive or send");
@@ -378,8 +417,8 @@ namespace FoolishClient.Net
         /// <returns>判断有没有发送出去</returns>
         public void Send(IMessageWriter message)
         {
-            Sender.Send(message);
             AutoConnect();
+            Sender.Send(message);
         }
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
@@ -388,31 +427,31 @@ namespace FoolishClient.Net
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
         public void SendImmediately(IMessageWriter message)
         {
-            Sender.SendImmediately(message);
             AutoConnect();
+            Sender.SendImmediately(message);
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
         void ISender.SendBytes(byte[] data)
         {
-            Sender.SendBytes(data);
             AutoConnect();
+            Sender.SendBytes(data);
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
         void ISender.SendBytesImmediately(byte[] data)
         {
-            Sender.SendBytesImmediately(data);
             AutoConnect();
+            Sender.SendBytesImmediately(data);
         }
         /// <summary>
         /// 消息发送处理
         /// </summary>
-        void ISender.ProcessSend()
+        bool ISender.ProcessSend()
         {
-            Sender.ProcessSend();
+            return Sender.ProcessSend();
         }
         /// <summary>
         /// 等待消息接收
@@ -424,9 +463,60 @@ namespace FoolishClient.Net
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        void IReceiver.ProcessReceive()
+        bool IReceiver.ProcessReceive()
         {
-            Receiver.ProcessReceive();
+            return Receiver.ProcessReceive();
+        }
+
+        /// <summary>
+        /// 消息处理
+        /// </summary>
+        /// <param name="e"></param>
+        private void OnMessageReceived(IMessageEventArgs<IClientSocket> args)
+        {
+            try
+            {
+                if (MessageContractor != null)
+                {
+                    MessageContractor.CheckIn(new MessageWorker { Message = args.Message, Socket = this });
+                }
+                else
+                {
+                    ThreadPool.QueueUserWorkItem((obj) => { ProcessMessage(args.Message); });
+                }
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Category, "Process message error.", e);
+            }
+        }
+
+        /// <summary>
+        /// 消息处理
+        /// </summary>
+        internal virtual void ProcessMessage(IMessageReader message)
+        {
+            if (message == null)
+            {
+                FConsole.WriteErrorFormatWithCategory(Category, "{0} receive empty message.", Category);
+                return;
+            }
+            try
+            {
+                ClientAction action = ActionProvider.Provide(message.ActionId);
+                try
+                {
+                    ActionBoss.Exploit(action, message.ActionId, message);
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Category, "Action error.", e);
+                }
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Category, "ActionProvider error.", e);
+            }
         }
     }
 }

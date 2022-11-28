@@ -186,12 +186,11 @@ namespace FoolishGames.Net
         /// <summary>
         /// 消息发送处理
         /// </summary>
-        public void ProcessSend()
+        public bool ProcessSend()
         {
             if (UserToken.SendingBuffer == null)
             {
-                SendCompleted();
-                return;
+                return SendCompleted();
             }
             byte[] argsBuffer = EventArgs.Buffer;
             int argsCount = EventArgs.Count;
@@ -209,8 +208,9 @@ namespace FoolishGames.Net
             }
             if (!Socket.Socket.SendAsync(EventArgs))
             {
-                ProcessSend();
+                return ProcessSend();
             }
+            return true;
         }
 
         /// <summary>
@@ -224,19 +224,20 @@ namespace FoolishGames.Net
         /// <summary>
         /// 消息执行完后，判断还有没有需要继续发送的消息
         /// </summary>
-        private void SendCompleted()
+        private bool SendCompleted()
         {
             lock (SendableSyncRoot)
             {
                 //没有消息就退出
                 if (WaitToSendMessages.Count == 0)
                 {
-                    return;
+                    return false;
                 }
                 //有消息就继续执行
                 IWorker execution = WaitToSendMessages.First.Value;
                 WaitToSendMessages.RemoveFirst();
                 execution.Work();
+                return true;
             }
         }
 

@@ -4,6 +4,21 @@
         <name>FoolishClient.Framework</name>
     </assembly>
     <members>
+        <member name="T:FoolishClient.Action.IClientAction">
+            <summary>
+            客户端协议类
+            </summary>
+        </member>
+        <member name="T:FoolishClient.Action.ClientAction">
+            <summary>
+            客户端协议类
+            </summary>
+        </member>
+        <member name="T:FoolishClient.Net.IClientSocket">
+            <summary>
+            客户端套接字连接管理类
+            </summary>
+        </member>
         <member name="P:FoolishClient.Net.ISocketsss.Name">
             <summary>
             标识名称
@@ -196,18 +211,29 @@
             消息Id
             </summary>
         </member>
+        <member name="P:FoolishClient.Net.ClientSocket.ActionProvider">
+            <summary>
+            Action生成类
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Net.ClientSocket.MessageContractor">
+            <summary>
+            消息处理的中转站
+            </summary>
+        </member>
         <member name="M:FoolishClient.Net.ClientSocket.#ctor">
             <summary>
             初始化
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.Ready(System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:FoolishClient.Net.ClientSocket.Ready(System.String,System.String,System.Int32,System.String,System.Int32)">
             <summary>
             初始化Socket基本信息
             </summary>
             <param name="name"></param>
             <param name="host"></param>
             <param name="port"></param>
+            <param name="actionClassFullName">Action协议类的完整名称</param>
             <param name="heartbeatInterval">心跳间隔</param>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.AutoConnect">
@@ -315,6 +341,17 @@
             处理数据接收回调
             </summary>
         </member>
+        <member name="M:FoolishClient.Net.ClientSocket.OnMessageReceived(FoolishGames.Net.IMessageEventArgs{FoolishClient.Net.IClientSocket})">
+            <summary>
+            消息处理
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:FoolishClient.Net.ClientSocket.ProcessMessage(FoolishGames.IO.IMessageReader)">
+            <summary>
+            消息处理
+            </summary>
+        </member>
         <member name="T:FoolishClient.Net.TcpSocket">
             <summary>
             Tcp连接池
@@ -335,6 +372,59 @@
             建立原生套接字
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:FoolishClient.Proxy.IClientActionDispatcher">
+            <summary>
+            Action工厂
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Proxy.IClientActionDispatcher.Provide(System.Int32)">
+            <summary>
+            获取Action
+            </summary>
+            <param name="actionId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FoolishClient.Proxy.ClientActionDispatcher">
+            <summary>
+            客户端Action协议生成类
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Proxy.ClientActionDispatcher.ActionNameFormat">
+            <summary>
+            Action名称的格式
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Proxy.ClientActionDispatcher.#ctor(System.String)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="actionNameFormat">Action名称的格式</param>
+        </member>
+        <member name="M:FoolishClient.Proxy.ClientActionDispatcher.Provide(System.Int32)">
+            <summary>
+            生成Action协议
+            </summary>
+        </member>
+        <member name="T:FoolishClient.Proxy.MessageWorker">
+            <summary>
+            消息处理的代理
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Proxy.MessageWorker.Message">
+            <summary>
+            消息处理窗口
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Proxy.MessageWorker.Socket">
+            <summary>
+            服务器
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Proxy.MessageWorker.Work">
+            <summary>
+            需要处理的工作
+            </summary>
         </member>
         <member name="T:FoolishClient.Delegate.SendCallback">
             <summary>

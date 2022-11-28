@@ -56,13 +56,13 @@ namespace FoolishServer
             stopwatch.Stop();
             FConsole.Write(stopwatch.Elapsed);
 
-            var result = set.Find(2, "Hello World!");
-            FConsole.Write("result: " + result.TestID);
-            result.Password = "Good Morning";
-            FConsole.Write("set count: " + set.Count());
-            //set.LoadAll();
-            set = DataContext.GetEntity<Test>();
-            FConsole.Write("set count: " + set.Find(t => t.Password.Equals("Good Morning")).Count);
+            //var result = set.Find(2, "Hello World!");
+            //FConsole.Write("result: " + result.TestID);
+            //result.Password = "Good Morning";
+            //FConsole.Write("set count: " + set.Count());
+            ////set.LoadAll();
+            //set = DataContext.GetEntity<Test>();
+            //FConsole.Write("set count: " + set.Find(t => t.Password.Equals("Good Morning")).Count);
 
             return;
             stopwatch.Restart();

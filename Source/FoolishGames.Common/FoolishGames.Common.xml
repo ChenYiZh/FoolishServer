@@ -109,6 +109,7 @@
             <summary>
             工作函数
             </summary>
+            <param name="actionId"></param>
             <param name="reader"></param>
         </member>
         <member name="M:FoolishGames.Action.GameAction.Check">
@@ -1282,17 +1283,17 @@
             创建Socket的超类
             </summary>
         </member>
-        <member name="T:FoolishGames.Net.MessageReceiverEventArgs">
+        <member name="T:FoolishGames.Net.MessageReceiverEventArgs`1">
             <summary>
             接收到的消息处理
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.MessageReceiverEventArgs.Socket">
+        <member name="P:FoolishGames.Net.MessageReceiverEventArgs`1.Socket">
             <summary>
             发送的套接字
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.MessageReceiverEventArgs.Message">
+        <member name="P:FoolishGames.Net.MessageReceiverEventArgs`1.Message">
             <summary>
             消息
             </summary>
@@ -1392,58 +1393,58 @@
             消息处理完成时执行
             </summary>
         </member>
-        <member name="T:FoolishGames.Net.MessageReceiveEventHandler">
-            <summary>
-            收发消息处理
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Net.SocketReceiver">
+        <member name="T:FoolishGames.Net.SocketReceiver`1">
             <summary>
             消息接收处理类
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.SocketReceiver.Socket">
+        <member name="T:FoolishGames.Net.SocketReceiver`1.MessageReceiveEventHandler">
+            <summary>
+            收发消息处理
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.SocketReceiver`1.Socket">
             <summary>
             封装的套接字
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.SocketReceiver.EventArgs">
+        <member name="P:FoolishGames.Net.SocketReceiver`1.EventArgs">
             <summary>
             增强类
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.SocketReceiver.UserToken">
+        <member name="P:FoolishGames.Net.SocketReceiver`1.UserToken">
             <summary>
             数据管理对象
             </summary>
         </member>
-        <member name="E:FoolishGames.Net.SocketReceiver.OnMessageReceived">
+        <member name="F:FoolishGames.Net.SocketReceiver`1.OnMessageReceived">
             <summary>
             接收到数据包事件
             </summary>
         </member>
-        <member name="E:FoolishGames.Net.SocketReceiver.OnPing">
+        <member name="F:FoolishGames.Net.SocketReceiver`1.OnPing">
             <summary>
             心跳探索事件
             </summary>
         </member>
-        <member name="E:FoolishGames.Net.SocketReceiver.OnPong">
+        <member name="F:FoolishGames.Net.SocketReceiver`1.OnPong">
             <summary>
             心跳回应事件
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketReceiver.#ctor(FoolishGames.Net.ISocket)">
+        <member name="M:FoolishGames.Net.SocketReceiver`1.#ctor(`0)">
             <summary>
             初始化
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketReceiver.BeginReceive">
+        <member name="M:FoolishGames.Net.SocketReceiver`1.BeginReceive">
             <summary>
             等待消息接收
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketReceiver.ProcessReceive">
+        <member name="M:FoolishGames.Net.SocketReceiver`1.ProcessReceive">
             <summary>
             处理数据接收回调
             </summary>

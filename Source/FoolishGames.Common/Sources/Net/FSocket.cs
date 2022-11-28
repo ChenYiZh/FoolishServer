@@ -143,6 +143,7 @@ namespace FoolishGames.Net
             // 设置缓冲区大小
             args.SetBuffer(buffer, offset % buffer.Length, bufferSize);
             UserToken userToken = new UserToken(args);
+            args.UserToken = userToken;
             userToken.SetOriginalOffset(offset);
             args.AcceptSocket = socket;
             return args;

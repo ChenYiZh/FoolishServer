@@ -17,6 +17,7 @@ namespace FoolishServer.Struct
     /// <summary>
     /// 当属性发生变化时执行
     /// </summary>
+    /// <param name="sender">被修改的对象</param>
     /// <param name="propertyName">属性名称</param>
     /// <param name="oldValue">原本的数据</param>
     /// <param name="value">现在的数据</param>
@@ -91,7 +92,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    return modifiedTime;
+                    return GetModifiedTime();
                 }
                 finally
                 {
@@ -317,6 +318,15 @@ namespace FoolishServer.Struct
                     Monitor.Exit(syncRoot);
                 }
             }
+        }
+
+        /// <summary>
+        /// 用于判断是否作为冷数据来卸载。默认使用内部的修改时间，如果需要用自用的修改时间，比如使用登录时间，覆盖这个函数。
+        /// </summary>
+        /// <returns></returns>
+        protected virtual DateTime GetModifiedTime()
+        {
+            return modifiedTime;
         }
     }
 }

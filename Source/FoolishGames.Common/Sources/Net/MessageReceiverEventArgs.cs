@@ -8,12 +8,12 @@ namespace FoolishGames.Net
     /// <summary>
     /// 接收到的消息处理
     /// </summary>
-    public struct MessageReceiverEventArgs : IMessageEventArgs<ISocket>
+    public struct MessageReceiverEventArgs<TSocket> : IMessageEventArgs<TSocket> where TSocket : ISocket
     {
         /// <summary>
         /// 发送的套接字
         /// </summary>
-        public ISocket Socket { get; internal set; }
+        public TSocket Socket { get; internal set; }
 
         /// <summary>
         /// 消息

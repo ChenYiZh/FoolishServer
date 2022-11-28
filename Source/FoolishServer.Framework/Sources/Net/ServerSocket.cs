@@ -21,11 +21,11 @@ namespace FoolishServer.Net
     /// <summary>
     /// 收发消息处理
     /// </summary>
-    public delegate void MessageEventHandler(IServerSocket socket, IMessageEventArgs e);
+    public delegate void MessageEventHandler(IServerSocket socket, IMessageEventArgs<IRemoteSocket> e);
     /// <summary>
     /// 服务器套接字管理
     /// </summary>
-    public class ServerSocket : FSocket, IServerSocket, IMsgSocket
+    public class ServerSocket : FSocket, IServerSocket, IMsgSocket, IServerMessageProcessor
     {
         /// <summary>
         /// 连接事件
@@ -49,19 +49,19 @@ namespace FoolishServer.Net
         /// 接收到数据包事件
         /// </summary>
         public event MessageEventHandler OnMessageReceived;
-        private void MessageReceived(IMessageEventArgs args) { OnMessageReceived?.Invoke(this, args); }
+        void IServerMessageProcessor.MessageReceived(IMessageEventArgs<IRemoteSocket> args) { OnMessageReceived?.Invoke(this, args); }
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
         public event MessageEventHandler OnPing;
-        private void Ping(IMessageEventArgs args) { OnPing?.Invoke(this, args); }
+        void IServerMessageProcessor.Ping(IMessageEventArgs<IRemoteSocket> args) { OnPing?.Invoke(this, args); }
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
         public event MessageEventHandler OnPong;
-        private void Pong(IMessageEventArgs args) { OnPong?.Invoke(this, args); }
+        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args) { OnPong?.Invoke(this, args); }
 
         /// <summary>
         /// 内部关键原生Socket
@@ -176,7 +176,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 生成的所有套接字管理对象都缓存在这里
         /// </summary>
-        private ThreadSafeList<SocketAsyncEventArgs> AllEventArgsPool;
+        private ThreadSafeList<SocketAsyncEventArgs> AllEventArgsPool = new ThreadSafeList<SocketAsyncEventArgs>();
 
         /// <summary>
         /// 字节流池
