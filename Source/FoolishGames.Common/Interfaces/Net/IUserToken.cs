@@ -1,12 +1,11 @@
-﻿using FoolishServer.RPC.Sockets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.RPC.Tokens
+namespace FoolishGames.Net
 {
     /// <summary>
-    /// 寄宿在原生Socket的管理类
+    /// 连接套接字管理类内部对象
     /// </summary>
     public interface IUserToken
     {
@@ -16,9 +15,14 @@ namespace FoolishServer.RPC.Tokens
         ISocket Socket { get; }
 
         /// <summary>
-        /// 套接字处理结果
+        /// 原本的生成时的offset
         /// </summary>
-        ISocketAsyncResult AsyncResult { get; }
+        int OriginalOffset { get; }
+
+        ///// <summary>
+        ///// 设置原本的生成时的offset
+        ///// </summary>
+        //void SetOriginalOffset(int offset);
 
         /// <summary>
         /// 重置数据

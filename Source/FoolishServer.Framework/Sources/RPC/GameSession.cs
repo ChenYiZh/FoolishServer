@@ -8,7 +8,7 @@ using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Timer;
 using FoolishServer.Log;
-using FoolishServer.RPC.Sockets;
+using FoolishServer.Net;
 
 namespace FoolishServer.RPC
 {
@@ -40,7 +40,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 自身的Socket
         /// </summary>
-        public ISocket Socket { get; private set; }
+        public IRemoteSocket Socket { get; private set; }
 
         /// <summary>
         /// 服务器名称
@@ -95,9 +95,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 内部构造函数
         /// </summary>
-        /// <param name="keyCode"></param>
-        /// <param name=""></param>
-        private GameSession(Guid keyCode, ISocket socket, IServerSocket server)
+        private GameSession(Guid keyCode, IRemoteSocket socket, IServerSocket server)
         {
             KeyCode = keyCode;
             Socket = socket;
@@ -149,18 +147,17 @@ namespace FoolishServer.RPC
             if (sessions.TryGetValue(KeyCode, out session) && session.Socket != null)
             {
                 //设置Socket为Closed的状态, 并未将物理连接马上中断
-                ((FSocket)session.Socket).IsRunning = false;
+                ((RemoteSocket)session.Socket).SetIsRunning(false);
             }
         }
         /// <summary>
         /// 异步发送一条数据
         /// </summary>
-        public void SendAsync(IMessageWriter message)
+        public void Send(IMessageWriter message)
         {
             try
             {
-                byte[] buffer = PackageFactory.Pack(message, Server.MessageOffset, Server.Compression, Server.CryptoProvider);
-                Server.PostAsync(Socket, buffer);
+                Socket.Send(message);
             }
             catch (Exception e)
             {

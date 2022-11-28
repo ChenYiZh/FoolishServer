@@ -9,9 +9,9 @@ namespace FoolishGames.Net
     /// </summary>
     public interface IReceivableSocket : ISocket, IReceiver
     {
-        /// <summary>
-        /// 接收管理类
-        /// </summary>
-        IReceiver Receiver { get; }
+        ///// <summary>
+        ///// 接收管理类
+        ///// </summary>
+        //IReceiver Receiver { get; }
     }
 }

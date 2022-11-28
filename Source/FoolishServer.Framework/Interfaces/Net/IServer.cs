@@ -1,14 +1,17 @@
-﻿using FoolishServer.RPC.Sockets;
-using FoolishServer.Config;
+﻿using FoolishServer.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using FoolishGames.IO;
 using FoolishGames.Security;
 using FoolishGames.Proxy;
+using FoolishGames.Net;
 
-namespace FoolishServer.RPC.Server
+namespace FoolishServer.Net
 {
+    /// <summary>
+    /// 服务器对象接口定义
+    /// </summary>
     public interface IServer
     {
         /// <summary>
@@ -34,12 +37,12 @@ namespace FoolishServer.RPC.Server
         /// <summary>
         /// 类型
         /// </summary>
-        EServerType Type { get; }
+        ESocketType Type { get; }
 
         /// <summary>
         /// 监听套接字
         /// </summary>
-        IServerSocket SocketListener { get; }
+        IServerSocket ServerSocket { get; }
 
         ///// <summary>
         ///// 压缩工具

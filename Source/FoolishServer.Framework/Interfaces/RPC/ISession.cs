@@ -1,4 +1,5 @@
-﻿using FoolishServer.RPC.Sockets;
+﻿using FoolishGames.IO;
+using FoolishServer.Net;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -44,7 +45,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 自身的Socket
         /// </summary>
-        ISocket Socket { get; }
+        IRemoteSocket Socket { get; }
 
         ///// <summary>
         ///// 当前的Session是否还有效
@@ -85,5 +86,10 @@ namespace FoolishServer.RPC
         /// 关闭会话窗口
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// 异步发送一条数据
+        /// </summary>
+        void Send(IMessageWriter message);
     }
 }

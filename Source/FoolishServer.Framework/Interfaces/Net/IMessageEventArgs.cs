@@ -1,10 +1,9 @@
 ﻿using FoolishGames.IO;
-using FoolishServer.RPC.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.RPC
+namespace FoolishServer.Net
 {
     /// <summary>
     /// 连接消息处理
@@ -14,7 +13,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 获取封装的套接字
         /// </summary>
-        ISocket Socket { get; }
+        IRemoteSocket Socket { get; }
 
         /// <summary>
         /// 获取消息

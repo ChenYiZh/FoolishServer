@@ -1,6 +1,4 @@
 ﻿using FoolishServer.RPC;
-using FoolishServer.RPC.Server;
-using FoolishServer.RPC.Sockets;
 using FoolishServer.Config;
 using FoolishServer.Log;
 using System;
@@ -14,9 +12,13 @@ using FoolishGames.Proxy;
 using FoolishServer.Proxy;
 using System.Threading;
 using FoolishServer.Action;
+using FoolishGames.Net;
 
-namespace FoolishServer.RPC.Server
+namespace FoolishServer.Net
 {
+    /// <summary>
+    /// 套接字服务器
+    /// </summary>
     public abstract class SocketServer : IServer
     {
         /// <summary>
@@ -37,26 +39,20 @@ namespace FoolishServer.RPC.Server
         /// <summary>
         /// 类型
         /// </summary>
-        public EServerType Type { get { return Setting.Type; } }
+        public ESocketType Type { get { return Setting.Type; } }
 
         /// <summary>
         /// 监听套接字
         /// </summary>
-        public IServerSocket SocketListener { get; private set; }
+        public IServerSocket ServerSocket { get; private set; }
 
         /// <summary>
         /// 压缩工具
         /// </summary>
         protected ICompression Compression
         {
-            get { return SocketListener?.Compression; }
-            set
-            {
-                if (SocketListener != null)
-                {
-                    SocketListener.Compression = value;
-                }
-            }
+            get { return ServerSocket?.Compression; }
+            set { ServerSocket?.SetCompression(value); }
         }
 
         /// <summary>
@@ -64,14 +60,8 @@ namespace FoolishServer.RPC.Server
         /// </summary>
         protected ICryptoProvider CryptoProvider
         {
-            get { return SocketListener?.CryptoProvider; }
-            set
-            {
-                if (SocketListener != null)
-                {
-                    SocketListener.CryptoProvider = value;
-                }
-            }
+            get { return ServerSocket?.CryptoProvider; }
+            set { ServerSocket?.SetCryptoProvide(value); }
         }
 
         /// <summary>
@@ -82,7 +72,7 @@ namespace FoolishServer.RPC.Server
         /// <summary>
         /// 消息处理的中转站
         /// </summary>
-        protected ISupervisor MessageContractor { get; set; }
+        protected IBoss MessageContractor { get; set; }
 
         /// <summary>
         /// 配置文件
@@ -107,16 +97,16 @@ namespace FoolishServer.RPC.Server
             }
             try
             {
-                if (SocketListener != null)
+                if (ServerSocket != null)
                 {
-                    SocketListener.Close();
+                    ServerSocket.Close();
                 }
-                SocketListener = new SocketListener();
-                SocketListener.OnConnected += OnSocketConnected;
-                SocketListener.OnDisconnected += OnSocketDisconnected;
-                SocketListener.OnPong += OnSocketReceiveHeartbeat;
-                SocketListener.OnMessageReceived += ProcessMessage;
-                SocketListener.Start(setting);
+                ServerSocket = new ServerSocket();
+                ServerSocket.OnConnected += OnSocketConnected;
+                ServerSocket.OnDisconnected += OnSocketDisconnected;
+                ServerSocket.OnPong += OnSocketReceiveHeartbeat;
+                ServerSocket.OnMessageReceived += ProcessMessage;
+                ServerSocket.Start(setting);
             }
             catch (Exception e)
             {
@@ -127,6 +117,9 @@ namespace FoolishServer.RPC.Server
             return true;
         }
 
+        /// <summary>
+        /// 在服务器启动时执行
+        /// </summary>
         protected virtual void OnStart()
         {
 
@@ -198,7 +191,7 @@ namespace FoolishServer.RPC.Server
         /// <summary>
         /// Socket连接时执行
         /// </summary>
-        private void OnSocketConnected(IServerSocket socket, ISocket remoteSocket)
+        private void OnSocketConnected(IServerSocket socket, IRemoteSocket remoteSocket)
         {
             try
             {
@@ -221,7 +214,7 @@ namespace FoolishServer.RPC.Server
             FConsole.WriteFormat("Hello {0}!", session.SessionId);
         }
 
-        private void OnSocketDisconnected(IServerSocket socket, ISocket remoteSocket)
+        private void OnSocketDisconnected(IServerSocket socket, IRemoteSocket remoteSocket)
         {
             try
             {
@@ -313,12 +306,12 @@ namespace FoolishServer.RPC.Server
             {
                 return;
             }
-            if (SocketListener != null)
+            if (ServerSocket != null)
             {
                 try
                 {
-                    SocketListener.Close();
-                    SocketListener = null;
+                    ServerSocket.Close();
+                    ServerSocket = null;
                 }
                 catch (Exception e)
                 {

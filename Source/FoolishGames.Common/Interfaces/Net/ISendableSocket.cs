@@ -10,9 +10,9 @@ namespace FoolishGames.Net
     /// </summary>
     public interface ISendableSocket : ISocket, ISender
     {
-        /// <summary>
-        /// 发送的管理类
-        /// </summary>
-        ISender Sender { get; }
+        ///// <summary>
+        ///// 发送的管理类
+        ///// </summary>
+        //ISender Sender { get; }
     }
 }

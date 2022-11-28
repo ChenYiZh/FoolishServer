@@ -5,10 +5,10 @@ using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Net;
-using FoolishGames.RPC;
 using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -18,8 +18,18 @@ namespace FoolishClient.Net
     /// <summary>
     /// 套接字父类
     /// </summary>
-    public abstract class ClientSocket : FSocket, ISendableSocket, IMsgSocket
+    public abstract class ClientSocket : FSocket, ISendableSocket, IReceivableSocket, IMsgSocket
     {
+        /// <summary>
+        /// 地址
+        /// </summary>
+        protected IPEndPoint address = null;
+
+        /// <summary>
+        /// 地址
+        /// </summary>
+        public override IPEndPoint Address { get { return address; } }
+
         /// <summary>
         /// 标识名称
         /// </summary>
@@ -60,15 +70,15 @@ namespace FoolishClient.Net
         /// </summary>
         private byte[] heartbeatBuffer;
 
-        /// <summary>
-        /// 线程循环等待时间
-        /// </summary>
-        private const int THREAD_SLEEP_TIMEOUT = 5;
+        ///// <summary>
+        ///// 线程循环等待时间
+        ///// </summary>
+        //private const int THREAD_SLEEP_TIMEOUT = 5;
 
-        /// <summary>
-        /// 数据接收线程
-        /// </summary>
-        internal protected virtual Thread ThreadProcessReceive { get; set; } = null;
+        ///// <summary>
+        ///// 数据接收线程
+        ///// </summary>
+        //internal protected virtual Thread ThreadProcessReceive { get; set; } = null;
 
         /// <summary>
         /// 设置类别名称
@@ -108,7 +118,12 @@ namespace FoolishClient.Net
         /// <summary>
         /// 发送的管理类
         /// </summary>
-        public ISender Sender { get; private set; }
+        internal protected ISender Sender { get; private set; }
+
+        /// <summary>
+        /// 接收管理类
+        /// </summary>
+        internal protected IReceiver Receiver { get; private set; }
 
         /// <summary>
         /// 消息Id
@@ -118,9 +133,8 @@ namespace FoolishClient.Net
         /// <summary>
         /// 初始化
         /// </summary>
-        public ClientSocket()
+        protected ClientSocket() : base(null)
         {
-            Sender = new SocketSender(this);
         }
 
         /// <summary>
@@ -136,10 +150,22 @@ namespace FoolishClient.Net
             Name = name;
             Host = host;
             Port = port;
+            address = new IPEndPoint(IPAddress.Parse(host), port);
             Category = string.Format("{0}:{1},{2}", GetType().Name, Host, Port);
             HeartbeatInterval = heartbeatInterval;
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is ready...");
             Interlocked.Exchange(ref readyFlag, 1);
+        }
+
+        /// <summary>
+        /// 自动连接
+        /// </summary>
+        public virtual void AutoConnect()
+        {
+            if (!IsRunning)
+            {
+                ConnectAsync();
+            }
         }
 
         /// <summary>
@@ -170,10 +196,14 @@ namespace FoolishClient.Net
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is starting...");
             try
             {
-                Socket = MakeSocket();
-                IAsyncResult opt = Socket.BeginConnect(Host, Port, null, Socket);
+                Socket socket = MakeSocket();
+                EventArgs = MakeEventArgs(socket);
+                EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+                Sender = new SocketSender(this);
+                Receiver = new SocketReceiver(this);
+                IAsyncResult opt = socket.BeginConnect(Address, null, EventArgs);
                 bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
-                if (!success || !opt.IsCompleted || !Socket.Connected)
+                if (!success || !opt.IsCompleted || !socket.Connected)
                 {
                     IsRunning = false;
                     throw new Exception(string.Format("Socket connect failed!"));
@@ -192,9 +222,12 @@ namespace FoolishClient.Net
                 HeartbeatTimer = new Timer(SendHeartbeatPackage, null, HeartbeatInterval, HeartbeatInterval);
                 RebuildHeartbeatPackage();
             }
-            //开始监听数据
-            ThreadProcessReceive = new Thread(new ThreadStart(ProcessReceive));
-            ThreadProcessReceive.Start();
+            ////开始监听数据
+            //ThreadProcessReceive = new Thread(new ThreadStart(ProcessReceive));
+            //ThreadProcessReceive.Start();
+
+            BeginReceive();
+            Sender.BeginSend();
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
@@ -202,9 +235,37 @@ namespace FoolishClient.Net
         }
 
         /// <summary>
+        /// 开始执行发送
+        /// </summary>
+        void ISender.BeginSend()
+        {
+            Sender.BeginSend();
+        }
+
+        /// <summary>
         /// 创建原生套接字
         /// </summary>
         protected abstract Socket MakeSocket();
+
+        /// <summary>
+        /// 当消息处理完执行
+        /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+        /// </summary>
+        private void MessageSolved(object sender, SocketAsyncEventArgs e)
+        {
+            // determine which type of operation just completed and call the associated handler
+            switch (e.LastOperation)
+            {
+                case SocketAsyncOperation.Receive:
+                    Receiver.ProcessReceive();
+                    break;
+                case SocketAsyncOperation.Send:
+                    Sender.ProcessSend();
+                    break;
+                default:
+                    throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+            }
+        }
 
         /// <summary>
         /// 发送心跳包
@@ -248,19 +309,11 @@ namespace FoolishClient.Net
         }
 
         /// <summary>
-        /// 线程处理数据接收
-        /// </summary>
-        internal protected virtual void ProcessReceive()
-        {
-
-        }
-
-        /// <summary>
         /// 关闭函数
         /// </summary>
-        public override void Close()
+        public override void Close(EOpCode opCode = EOpCode.Close)
         {
-            base.Close();
+            base.Close(opCode);
             lock (this)
             {
                 if (HeartbeatTimer != null)
@@ -275,18 +328,25 @@ namespace FoolishClient.Net
                     }
                     HeartbeatTimer = null;
                 }
-                if (ThreadProcessReceive != null)
-                {
-                    try
-                    {
-                        ThreadProcessReceive.Abort();
-                    }
-                    catch (Exception e)
-                    {
-                        FConsole.WriteExceptionWithCategory(Category, "ThreadProcessReceive abort error.", e);
-                    }
-                    ThreadProcessReceive = null;
-                }
+                //if (ThreadProcessReceive != null)
+                //{
+                //    try
+                //    {
+                //        ThreadProcessReceive.Abort();
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        FConsole.WriteExceptionWithCategory(Category, "ThreadProcessReceive abort error.", e);
+                //    }
+                //    ThreadProcessReceive = null;
+                //}          
+
+                //管理类回收
+                EventArgs.Dispose();
+                EventArgs = null;
+
+                Sender = null;
+                Receiver = null;
             }
             FConsole.WriteInfoFormatWithCategory(Category, "Socket Closed.");
         }
@@ -315,35 +375,58 @@ namespace FoolishClient.Net
         /// 数据发送<c>异步</c>
         /// </summary>
         /// <param name="message">大宋的消息</param>
-        /// <param name="callback">发送回调</param>
         /// <returns>判断有没有发送出去</returns>
-        public void Send(IMessageWriter message, FoolishGames.Net.SendCallback callback)
+        public void Send(IMessageWriter message)
         {
-            Sender.Send(message, callback);
+            Sender.Send(message);
+            AutoConnect();
         }
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
         /// </summary>
         /// <param name="message">发送的消息</param>
-        /// <param name="callback">消息回调</param>
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
-        public void SendImmediately(IMessageWriter message, FoolishGames.Net.SendCallback callback = null)
+        public void SendImmediately(IMessageWriter message)
         {
-            Sender.SendImmediately(message, callback);
+            Sender.SendImmediately(message);
+            AutoConnect();
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
-        void ISender.SendBytes(byte[] data, FoolishGames.Net.SendCallback callback = null)
+        void ISender.SendBytes(byte[] data)
         {
-            Sender.SendBytes(data, callback);
+            Sender.SendBytes(data);
+            AutoConnect();
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
-        void ISender.SendBytesImmediately(byte[] data, FoolishGames.Net.SendCallback callback = null)
+        void ISender.SendBytesImmediately(byte[] data)
         {
-            Sender.SendBytesImmediately(data, callback);
+            Sender.SendBytesImmediately(data);
+            AutoConnect();
+        }
+        /// <summary>
+        /// 消息发送处理
+        /// </summary>
+        void ISender.ProcessSend()
+        {
+            Sender.ProcessSend();
+        }
+        /// <summary>
+        /// 等待消息接收
+        /// </summary>
+        public void BeginReceive()
+        {
+            Receiver.BeginReceive();
+        }
+        /// <summary>
+        /// 处理数据接收回调
+        /// </summary>
+        void IReceiver.ProcessReceive()
+        {
+            Receiver.ProcessReceive();
         }
     }
 }

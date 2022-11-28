@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using FoolishGames.Net;
 
 namespace FoolishServer.Config
 {
@@ -23,7 +24,7 @@ namespace FoolishServer.Config
         /// <summary>
         /// 类型
         /// </summary>
-        public EServerType Type { get; private set; }
+        public ESocketType Type { get; private set; }
 
         /// <summary>
         /// 执行类
@@ -81,10 +82,10 @@ namespace FoolishServer.Config
             string type = node.GetValue("type", "tcp");
             switch (type.ToLower())
             {
-                case "tcp": Type = EServerType.Tcp; break;
-                case "http": Type = EServerType.Http; break;
-                case "web": Type = EServerType.Web; break;
-                case "udp": Type = EServerType.Udp; break;
+                case "tcp": Type = ESocketType.Tcp; break;
+                case "http": Type = ESocketType.Http; break;
+                case "web": Type = ESocketType.Web; break;
+                case "udp": Type = ESocketType.Udp; break;
             }
             Backlog = node.SelectSingleNode("backlog").GetValue(10000);
             MaxConnections = node.SelectSingleNode("max-connections").GetValue(1000);

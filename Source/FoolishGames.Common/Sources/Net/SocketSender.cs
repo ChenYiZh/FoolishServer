@@ -21,6 +21,16 @@ namespace FoolishGames.Net
         ISocket Socket { get; set; }
 
         /// <summary>
+        /// 增强类
+        /// </summary>
+        public SocketAsyncEventArgs EventArgs { get { return Socket.EventArgs; } }
+
+        /// <summary>
+        /// 数据管理对象
+        /// </summary>
+        internal UserToken UserToken { get; private set; }
+
+        /// <summary>
         /// 发送队列的锁
         /// </summary>
         private readonly object SendableSyncRoot = new object();
@@ -57,62 +67,64 @@ namespace FoolishGames.Net
         public SocketSender(ISocket socket)
         {
             Socket = socket;
+            if (socket.EventArgs == null) { throw new NullReferenceException("Fail to create socket sender, because the SocketAsyncEventArgs is null."); }
+            UserToken usertoken = socket.EventArgs.UserToken as UserToken;
+            if (usertoken == null) { throw new NullReferenceException("Fail to create socket sender, because the UserToken of SocketAsyncEventArgs is null."); }
+            UserToken = usertoken;
         }
 
         /// <summary>
         /// 消息发送
         /// </summary>
         /// <param name="message">发送的消息</param>
-        /// <param name="callback">消息回调</param>
-        public void Send(IMessageWriter message, SendCallback callback = null)
+        public void Send(IMessageWriter message/*, SendCallback callback = null*/)
         {
-            CheckIn(message, callback, false);
+            CheckIn(message, false);
         }
 
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
         /// </summary>
         /// <param name="message">发送的消息</param>
-        /// <param name="callback">消息回调</param>
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
-        public void SendImmediately(IMessageWriter message, SendCallback callback = null)
+        public void SendImmediately(IMessageWriter message/*, SendCallback callback = null*/)
         {
-            CheckIn(message, callback, true);
+            CheckIn(message, true);
         }
 
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
-        public void SendBytes(byte[] data, SendCallback callback = null)
+        public void SendBytes(byte[] data/*, SendCallback callback = null*/)
         {
-            CheckIn(data, callback, false);
+            CheckIn(data, false);
         }
 
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
-        public void SendBytesImmediately(byte[] data, SendCallback callback = null)
+        public void SendBytesImmediately(byte[] data/*, SendCallback callback = null*/)
         {
-            CheckIn(data, callback, true);
+            CheckIn(data, true);
         }
 
         /// <summary>
         /// 挤入消息队列
         /// </summary>
-        private void CheckIn(byte[] data, SendCallback callback, bool immediately)
+        private void CheckIn(byte[] data, /*SendCallback callback, */bool immediately)
         {
-            WaitToSendMessage worker = new WaitToSendMessage(this, data, callback);
+            WaitToSendMessage worker = new WaitToSendMessage(this, data);
             CheckIn(worker, immediately);
         }
 
         /// <summary>
         /// 挤入消息队列
         /// </summary>
-        private void CheckIn(IMessageWriter message, SendCallback callback, bool immediately)
+        private void CheckIn(IMessageWriter message,/* SendCallback callback,*/ bool immediately)
         {
             message.MsgId = MessageNumber;
             byte[] data = PackageFactory.Pack(message, Socket.MessageOffset, Socket.Compression, Socket.CryptoProvider);
-            WaitToSendMessage worker = new WaitToSendMessage(this, data, callback);
+            WaitToSendMessage worker = new WaitToSendMessage(this, data);
             CheckIn(worker, immediately);
         }
 
@@ -131,6 +143,11 @@ namespace FoolishGames.Net
                 {
                     WaitToSendMessages.AddLast(worker);
                 }
+                //未连接时返回
+                if (!Socket.Connected)
+                {
+                    return;
+                }
                 //当有消息正在执行时，直接退出
                 if (WaitToSendMessages.Count > 1)
                 {
@@ -145,22 +162,63 @@ namespace FoolishGames.Net
         /// <summary>
         /// 以同步方式发送
         /// </summary>
-        private bool Send(byte[] data, out IAsyncResult result)
+        private void Send(byte[] data)
         {
             if (data == null)
             {
-                result = null;
-                return false;
+                return;
             }
-            IAsyncResult asyncSend = Socket.Socket.BeginSend(data, 0, data.Length, SocketFlags.None, null, Socket);
-            result = asyncSend;
-            if (!asyncSend.AsyncWaitHandle.WaitOne(5000, true))
+            UserToken.SendingBuffer = data;
+            UserToken.SendedCount = 0;
+            ProcessSend();
+            //EventArgs.SetBuffer();
+            //IAsyncResult asyncSend = Socket.EventArgs.BeginSend(data, 0, data.Length, SocketFlags.None, null, Socket);
+            //result = asyncSend;
+            //if (!asyncSend.AsyncWaitHandle.WaitOne(5000, true))
+            //{
+            //    FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, "Process send error and close socket");
+            //    Socket.Close();
+            //    return false;
+            //}
+            //return true;
+        }
+
+        /// <summary>
+        /// 消息发送处理
+        /// </summary>
+        public void ProcessSend()
+        {
+            if (UserToken.SendingBuffer == null)
             {
-                FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, "Process send error and close socket");
-                Socket.Close();
-                return false;
+                SendCompleted();
+                return;
             }
-            return true;
+            byte[] argsBuffer = EventArgs.Buffer;
+            int argsCount = EventArgs.Count;
+            int argsOffset = EventArgs.Offset;
+            if (argsCount >= UserToken.SendingBuffer.Length - UserToken.SendedCount)
+            {
+                int length = UserToken.SendingBuffer.Length - UserToken.SendedCount;
+                Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, length);
+                EventArgs.SetBuffer(argsOffset, length);
+            }
+            else
+            {
+                Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, argsCount);
+                UserToken.SendedCount += argsCount;
+            }
+            if (!Socket.Socket.SendAsync(EventArgs))
+            {
+                ProcessSend();
+            }
+        }
+
+        /// <summary>
+        /// 开始执行发送
+        /// </summary>
+        public void BeginSend()
+        {
+            SendCompleted();
         }
 
         /// <summary>
@@ -192,21 +250,16 @@ namespace FoolishGames.Net
             /// </summary>
             public byte[] Message;
             /// <summary>
-            /// 回调
-            /// </summary>
-            public SendCallback Callback;
-            /// <summary>
             /// 发送接口的套接字
             /// </summary>
             public SocketSender Sender;
             /// <summary>
             /// 构造函数
             /// </summary>
-            public WaitToSendMessage(SocketSender sender, byte[] message, SendCallback callback)
+            public WaitToSendMessage(SocketSender sender, byte[] message)
             {
                 Sender = sender;
                 Message = message;
-                Callback = callback;
             }
             /// <summary>
             /// 执行函数
@@ -218,15 +271,16 @@ namespace FoolishGames.Net
                     IAsyncResult result;
                     try
                     {
-                        bool success = Sender.Send(Message, out result);
-                        SendCallback callback = Callback;
-                        ISocket socket = Sender.Socket;
-                        //执行消息回调
-                        ThreadPool.UnsafeQueueUserWorkItem((state) =>
-                        {
-                            socket.MessageEventProcessor.CheckIn(new MessageWorker(callback, success, result));
-                        }, null);
-                        Sender.SendCompleted();
+                        Sender.Send(Message);
+                        //bool success = Sender.Send(Message, out result);
+                        //SendCallback callback = Callback;
+                        //ISocket socket = Sender.Socket;
+                        ////执行消息回调
+                        //ThreadPool.UnsafeQueueUserWorkItem((state) =>
+                        //{
+                        //    socket.MessageEventProcessor.CheckIn(new MessageWorker(callback, success, result));
+                        //}, null);
+                        //Sender.SendCompleted();
                     }
                     catch (Exception e)
                     {
@@ -236,51 +290,51 @@ namespace FoolishGames.Net
                 }
             }
 
-            /// <summary>
-            /// 消息处理对象
-            /// </summary>
-            private struct MessageWorker : IWorker
-            {
-                /// <summary>
-                /// 回调
-                /// </summary>
-                public SendCallback Callback { get; private set; }
+            ///// <summary>
+            ///// 消息处理对象
+            ///// </summary>
+            //private struct MessageWorker : IWorker
+            //{
+            //    /// <summary>
+            //    /// 回调
+            //    /// </summary>
+            //    public SendCallback Callback { get; private set; }
 
-                /// <summary>
-                /// 处理是否成功
-                /// </summary>
-                public bool Success { get; private set; }
+            //    /// <summary>
+            //    /// 处理是否成功
+            //    /// </summary>
+            //    public bool Success { get; private set; }
 
-                /// <summary>
-                /// 处理结果
-                /// </summary>
-                public IAsyncResult Result { get; private set; }
+            //    /// <summary>
+            //    /// 处理结果
+            //    /// </summary>
+            //    public IAsyncResult Result { get; private set; }
 
-                /// <summary>
-                /// 初始化
-                /// </summary>
-                public MessageWorker(SendCallback callback, bool success, IAsyncResult result)
-                {
-                    Callback = callback;
-                    Success = success;
-                    Result = result;
-                }
+            //    /// <summary>
+            //    /// 初始化
+            //    /// </summary>
+            //    public MessageWorker(SendCallback callback, bool success, IAsyncResult result)
+            //    {
+            //        Callback = callback;
+            //        Success = success;
+            //        Result = result;
+            //    }
 
-                /// <summary>
-                /// 事务处理
-                /// </summary>
-                public void Work()
-                {
-                    try
-                    {
-                        Callback?.Invoke(Success, Result);
-                    }
-                    catch (Exception e)
-                    {
-                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Send callback execute error.", e);
-                    }
-                }
-            }
+            //    /// <summary>
+            //    /// 事务处理
+            //    /// </summary>
+            //    public void Work()
+            //    {
+            //        try
+            //        {
+            //            Callback?.Invoke(Success, Result);
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Send callback execute error.", e);
+            //        }
+            //    }
+            //}
         }
     }
 }

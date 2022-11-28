@@ -10,12 +10,12 @@ using FoolishGames.Security;
 
 namespace FoolishGames.Net
 {
-    /// <summary>
-    /// 数据发送的回调
-    /// </summary>
-    /// <param name="success">操作是否成功，不包含结果</param>
-    /// <param name="result">同步的结果</param>
-    public delegate void SendCallback(bool success, IAsyncResult result);
+    ///// <summary>
+    ///// 数据发送的回调
+    ///// </summary>
+    ///// <param name="success">操作是否成功，不包含结果</param>
+    ///// <param name="result">同步的结果</param>
+    //public delegate void SendCallback(bool success, IAsyncResult result);
 
     /// <summary>
     /// 套接字管理基类
@@ -34,26 +34,33 @@ namespace FoolishGames.Net
         {
             get
             {
-                return Socket != null
-                    && Socket.AcceptSocket != null
-                    && Socket.AcceptSocket.Connected;
+                return EventArgs != null
+                    && EventArgs.AcceptSocket != null
+                    && EventArgs.AcceptSocket.Connected;
             }
         }
 
         /// <summary>
         /// 地址
         /// </summary>
-        public virtual IPEndPoint Address { get; protected set; }
+        public abstract IPEndPoint Address { get; }
+
+        /// <summary>
+        /// 原生套接字
+        /// </summary>
+        public virtual Socket Socket { get { return EventArgs?.AcceptSocket; } }
 
         /// <summary>
         /// 内部关键原生Socket
+        /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
         /// </summary>
-        public virtual SocketAsyncEventArgs Socket { get; protected set; }
+        public virtual SocketAsyncEventArgs EventArgs { get; protected set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public virtual ESocketType Type { get; protected set; }
+        // TODO: 添加新的类型时需要修改构造函数
+        public abstract ESocketType Type { get; }
 
         /// <summary>
         /// 消息偏移值
@@ -78,17 +85,19 @@ namespace FoolishGames.Net
         /// <summary>
         /// 初始化
         /// </summary>
-        protected FSocket(SocketAsyncEventArgs socket)
+        protected FSocket(SocketAsyncEventArgs eventArgs)
         {
-            if (socket == null)
+            if (eventArgs == null)
             {
-                throw new NullReferenceException("SocketAsyncEventArgs is null! Create socket failed.");
+                //throw new NullReferenceException("SocketAsyncEventArgs is null! Create socket failed.");
+                return;
             }
+            EventArgs = eventArgs;
             UserToken userToken;
-            if ((userToken = socket.UserToken as UserToken) == null)
+            if ((userToken = eventArgs.UserToken as UserToken) == null)
             {
-                userToken = new UserToken();
-                socket.UserToken = userToken;
+                userToken = new UserToken(eventArgs);
+                eventArgs.UserToken = userToken;
             }
             userToken.Socket = this;
         }
@@ -96,18 +105,18 @@ namespace FoolishGames.Net
         /// <summary>
         /// 关闭函数
         /// </summary>
-        public virtual void Close()
+        public virtual void Close(EOpCode opCode = EOpCode.Close)
         {
             lock (this)
             {
                 IsRunning = false;
-                if (Socket != null && Socket.AcceptSocket != null)
+                if (EventArgs != null && EventArgs.AcceptSocket != null)
                 {
                     try
                     {
-                        Socket.AcceptSocket.Shutdown(SocketShutdown.Both);
-                        Socket.AcceptSocket.Close();
-                        Socket.AcceptSocket.Dispose();
+                        EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
+                        EventArgs.AcceptSocket.Close();
+                        EventArgs.AcceptSocket.Dispose();
                     }
                     catch (Exception e)
                     {
@@ -115,7 +124,7 @@ namespace FoolishGames.Net
                     }
                     finally
                     {
-                        Socket.AcceptSocket = null;
+                        EventArgs.AcceptSocket = null;
                     }
                 }
             }
@@ -124,11 +133,17 @@ namespace FoolishGames.Net
         /// <summary>
         /// 创建Socket的超类
         /// </summary>
-        public static SocketAsyncEventArgs MakeSocket(Socket socket, int bufferSize = 8192)
+        public static SocketAsyncEventArgs MakeEventArgs(Socket socket, byte[] buffer = null, int offset = 0, int bufferSize = 8192)
         {
+            if (buffer == null)
+            {
+                buffer = new byte[offset + bufferSize];
+            }
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.SetBuffer(new byte[bufferSize], 0, bufferSize);
-            UserToken userToken = new UserToken();
+            // 设置缓冲区大小
+            args.SetBuffer(buffer, offset % buffer.Length, bufferSize);
+            UserToken userToken = new UserToken(args);
+            userToken.SetOriginalOffset(offset);
             args.AcceptSocket = socket;
             return args;
         }

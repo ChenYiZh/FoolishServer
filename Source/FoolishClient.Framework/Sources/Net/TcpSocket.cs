@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using FoolishGames.Net;
 
 namespace FoolishClient.Net
 {
@@ -10,6 +11,19 @@ namespace FoolishClient.Net
     /// </summary>
     public class TcpSocket : ClientSocket
     {
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public TcpSocket() : base()
+        {
+
+        }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public override ESocketType Type { get { return ESocketType.Tcp; } }
+
         /// <summary>
         /// 建立原生套接字
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using FoolishServer.RPC;
+﻿using FoolishGames.Net;
+using FoolishServer.RPC;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,7 +21,7 @@ namespace FoolishServer.Config
         /// <summary>
         /// 类型
         /// </summary>
-        EServerType Type { get; }
+        ESocketType Type { get; }
 
         /// <summary>
         /// 执行类

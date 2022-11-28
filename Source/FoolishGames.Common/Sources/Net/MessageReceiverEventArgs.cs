@@ -1,16 +1,14 @@
-﻿using FoolishGames.IO;
-using FoolishServer.RPC;
-using FoolishServer.RPC.Sockets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FoolishGames.IO;
 
-namespace FoolishServer.RPC
+namespace FoolishGames.Net
 {
     /// <summary>
-    /// 消息发送
+    /// 接收到的消息处理
     /// </summary>
-    public class MessageEventArgs : IMessageEventArgs
+    public struct MessageReceiverEventArgs : IMessageEventArgs<ISocket>
     {
         /// <summary>
         /// 发送的套接字

@@ -1,6 +1,6 @@
 ﻿using FoolishGames.Collections;
 using FoolishGames.IO;
-using FoolishServer.RPC.Sockets;
+using FoolishServer.Net;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +28,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 创建会话窗口
         /// </summary>
-        internal static ISession CreateNew(Guid keyCode, ISocket socket, IServerSocket server)
+        internal static ISession CreateNew(Guid keyCode, IRemoteSocket socket, IServerSocket server)
         {
             if (socket == null)
             {
@@ -61,7 +61,7 @@ namespace FoolishServer.RPC
         {
             foreach (GameSession session in sessions)
             {
-                session.SendAsync(message);
+                session.Send(message);
             }
         }
     }

@@ -2,7 +2,6 @@
 using FoolishGames.Net;
 using FoolishGames.Security;
 using FoolishServer.Config;
-using FoolishServer.Delegate;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -67,9 +66,8 @@ namespace FoolishServer.Net
         void Start(IHostSetting setting);
 
         /// <summary>
-        /// 消息发送，
-        /// 会影响到客户端解析
+        /// 当远端连接关闭时，执行一些回收代码
         /// </summary>
-        void PostAsync(ISocket socket, byte[] buffer);
+        void OnRemoteSocketClosed(IRemoteSocket socket, EOpCode opCode);
     }
 }

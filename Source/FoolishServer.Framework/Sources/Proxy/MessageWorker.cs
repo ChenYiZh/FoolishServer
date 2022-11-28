@@ -1,7 +1,7 @@
 ﻿using FoolishGames.IO;
 using FoolishGames.Proxy;
+using FoolishServer.Net;
 using FoolishServer.RPC;
-using FoolishServer.RPC.Server;
 using System;
 using System.Collections.Generic;
 using System.Text;

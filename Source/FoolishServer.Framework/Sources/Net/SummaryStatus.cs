@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishServer.RPC.Sockets
+namespace FoolishServer.Net
 {
     internal struct SummaryStatus
     {

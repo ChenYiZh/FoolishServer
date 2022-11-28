@@ -96,6 +96,16 @@
             套接字父类
             </summary>
         </member>
+        <member name="F:FoolishClient.Net.ClientSocket.address">
+            <summary>
+            地址
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Net.ClientSocket.Address">
+            <summary>
+            地址
+            </summary>
+        </member>
         <member name="P:FoolishClient.Net.ClientSocket.Name">
             <summary>
             标识名称
@@ -134,16 +144,6 @@
         <member name="F:FoolishClient.Net.ClientSocket.heartbeatBuffer">
             <summary>
             心跳包
-            </summary>
-        </member>
-        <member name="F:FoolishClient.Net.ClientSocket.THREAD_SLEEP_TIMEOUT">
-            <summary>
-            线程循环等待时间
-            </summary>
-        </member>
-        <member name="P:FoolishClient.Net.ClientSocket.ThreadProcessReceive">
-            <summary>
-            数据接收线程
             </summary>
         </member>
         <member name="P:FoolishClient.Net.ClientSocket.Category">
@@ -186,6 +186,11 @@
             发送的管理类
             </summary>
         </member>
+        <member name="P:FoolishClient.Net.ClientSocket.Receiver">
+            <summary>
+            接收管理类
+            </summary>
+        </member>
         <member name="P:FoolishClient.Net.ClientSocket.MessageNumber">
             <summary>
             消息Id
@@ -205,6 +210,11 @@
             <param name="port"></param>
             <param name="heartbeatInterval">心跳间隔</param>
         </member>
+        <member name="M:FoolishClient.Net.ClientSocket.AutoConnect">
+            <summary>
+            自动连接
+            </summary>
+        </member>
         <member name="M:FoolishClient.Net.ClientSocket.ConnectAsync(System.Action{System.Boolean})">
             <summary>
             连接函数[内部异步实现]
@@ -215,9 +225,20 @@
             同步连接
             </summary>
         </member>
+        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#BeginSend">
+            <summary>
+            开始执行发送
+            </summary>
+        </member>
         <member name="M:FoolishClient.Net.ClientSocket.MakeSocket">
             <summary>
             创建原生套接字
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.ClientSocket.MessageSolved(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            当消息处理完执行
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.SendHeartbeatPackage(System.Object)">
@@ -236,12 +257,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.ProcessReceive">
-            <summary>
-            线程处理数据接收
-            </summary>
-        </member>
-        <member name="M:FoolishClient.Net.ClientSocket.Close">
+        <member name="M:FoolishClient.Net.ClientSocket.Close(FoolishGames.Net.EOpCode)">
             <summary>
             关闭函数
             </summary>
@@ -261,34 +277,57 @@
             设置解密方案
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.Send(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+        <member name="M:FoolishClient.Net.ClientSocket.Send(FoolishGames.IO.IMessageWriter)">
             <summary>
             数据发送<c>异步</c>
             </summary>
             <param name="message">大宋的消息</param>
-            <param name="callback">发送回调</param>
             <returns>判断有没有发送出去</returns>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.SendImmediately(FoolishGames.IO.IMessageWriter,FoolishGames.Net.SendCallback)">
+        <member name="M:FoolishClient.Net.ClientSocket.SendImmediately(FoolishGames.IO.IMessageWriter)">
             <summary>
             立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
             </summary>
             <param name="message">发送的消息</param>
-            <param name="callback">消息回调</param>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytes(System.Byte[],FoolishGames.Net.SendCallback)">
+        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytes(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytesImmediately(System.Byte[],FoolishGames.Net.SendCallback)">
+        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytesImmediately(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析，以及解析顺序
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#ProcessSend">
+            <summary>
+            消息发送处理
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.ClientSocket.BeginReceive">
+            <summary>
+            等待消息接收
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#IReceiver#ProcessReceive">
+            <summary>
+            处理数据接收回调
             </summary>
         </member>
         <member name="T:FoolishClient.Net.TcpSocket">
             <summary>
             Tcp连接池
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.TcpSocket.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Net.TcpSocket.Type">
+            <summary>
+            类型
             </summary>
         </member>
         <member name="M:FoolishClient.Net.TcpSocket.MakeSocket">

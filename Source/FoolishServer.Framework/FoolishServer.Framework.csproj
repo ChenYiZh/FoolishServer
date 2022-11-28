@@ -17,8 +17,8 @@
   <ItemGroup>
     <Folder Include="Interfaces\Runtime\" />
     <Folder Include="Sources\Config\" />
+    <Folder Include="Sources\Delegate\" />
     <Folder Include="Sources\Runtime\" />
-    <Folder Include="Sources\Net\" />
   </ItemGroup>
 
   <ItemGroup>

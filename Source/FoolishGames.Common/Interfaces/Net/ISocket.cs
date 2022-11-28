@@ -30,9 +30,15 @@ namespace FoolishGames.Net
         IPEndPoint Address { get; }
 
         /// <summary>
-        /// 内部原生Socket
+        /// 原生套接字
         /// </summary>
-        SocketAsyncEventArgs Socket { get; }
+        Socket Socket { get; }
+
+        /// <summary>
+        /// 套接字增强类
+        /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+        /// </summary>
+        SocketAsyncEventArgs EventArgs { get; }
 
         /// <summary>
         /// 获取类型
@@ -62,6 +68,6 @@ namespace FoolishGames.Net
         /// <summary>
         /// 关闭函数
         /// </summary>
-        void Close();
+        void Close(EOpCode opCode = EOpCode.Close);
     }
 }

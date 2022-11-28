@@ -1,15 +1,18 @@
 ﻿using FoolishGames.Collections;
-using FoolishServer.RPC;
-using FoolishServer.RPC.Server;
 using FoolishServer.Config;
 using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using FoolishServer.Log;
+using FoolishServer.Net;
+using FoolishGames.Net;
 
 namespace FoolishServer.RPC
 {
+    /// <summary>
+    /// 服务器管理类
+    /// </summary>
     public class ServerManager
     {
         private static IDictionary<string, IServer> hosts;
@@ -112,8 +115,8 @@ namespace FoolishServer.RPC
             IServer host = null;
             switch (setting.Type)
             {
-                case EServerType.Tcp: host = new TcpServer(); break;
-                case EServerType.Udp: host = new UdpServer(); break;
+                case ESocketType.Tcp: host = new TcpServer(); break;
+                case ESocketType.Udp: host = new UdpServer(); break;
             }
             return host;
         }

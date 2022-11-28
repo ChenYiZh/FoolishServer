@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoolishGames.RPC
+namespace FoolishGames.Net
 {
     /// <summary>
     /// 操作码
