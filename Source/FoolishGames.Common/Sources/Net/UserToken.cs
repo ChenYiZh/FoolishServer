@@ -74,7 +74,14 @@ namespace FoolishGames.Net
         /// </summary>
         internal void ResetSendOrReceiveState(int fromState)
         {
-            Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 0, fromState);
+            if (fromState == 0)
+            {
+                Interlocked.Exchange(ref isSendingOrReceivingFlag, 0);
+            }
+            else
+            {
+                Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 0, fromState);
+            }
         }
         #endregion
 

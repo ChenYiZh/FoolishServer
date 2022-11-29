@@ -1409,7 +1409,7 @@
             初始化
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketReceiver`1.BeginReceive">
+        <member name="M:FoolishGames.Net.SocketReceiver`1.BeginReceive(System.Boolean)">
             <summary>
             等待消息接收
             </summary>
@@ -1503,9 +1503,9 @@
             挤入消息队列
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketSender.Send(System.Byte[])">
+        <member name="M:FoolishGames.Net.SocketSender.Post(System.Byte[])">
             <summary>
-            以同步方式发送
+            最后的消息推送
             </summary>
         </member>
         <member name="M:FoolishGames.Net.SocketSender.ProcessSend">

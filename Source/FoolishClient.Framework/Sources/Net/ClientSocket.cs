@@ -286,6 +286,10 @@ namespace FoolishClient.Net
         /// </summary>
         private void MessageSolved(object sender, SocketAsyncEventArgs e)
         {
+            if (EventArgs == null)
+            {
+                return;
+            }
             // 等待操作处理
             bool bWaiting = false;
             // determine which type of operation just completed and call the associated handler
@@ -359,6 +363,17 @@ namespace FoolishClient.Net
         /// </summary>
         public override void Close(EOpCode opCode = EOpCode.Close)
         {
+            lock (this)
+            {
+                if (Sender != null)
+                {
+                    MessageWriter msg = new MessageWriter();
+                    msg.OpCode = (sbyte)EOpCode.Close;
+                    byte[] closeMessage = PackageFactory.Pack(msg, MessageOffset, null, null);
+                    //立即发送一条客户端关闭消息
+                    Sender.Post(closeMessage);
+                }
+            }
             base.Close(opCode);
             lock (this)
             {

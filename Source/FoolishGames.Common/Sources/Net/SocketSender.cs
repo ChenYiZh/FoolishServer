@@ -153,9 +153,9 @@ namespace FoolishGames.Net
         }
 
         /// <summary>
-        /// 以同步方式发送
+        /// 最后的消息推送
         /// </summary>
-        private void Send(byte[] data)
+        public void Post(byte[] data)
         {
             if (data == null)
             {
@@ -228,7 +228,7 @@ namespace FoolishGames.Net
                         //线程中需要重新加锁加判断
                         lock (SendableSyncRoot)
                         {
-                            if (!UserToken.IsSending && WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                            if (UserToken.IsSending && WaitToSendMessages.Count > 0 && UserToken.Sendable())
                             {
                                 //有消息就继续执行
                                 IWorker execution = WaitToSendMessages.First.Value;
@@ -248,6 +248,10 @@ namespace FoolishGames.Net
         /// </summary>
         private bool SendCompleted()
         {
+            if (UserToken.IsSending)
+            {
+                return true;
+            }
             if (UserToken.Sendable())
             {
                 lock (SendableSyncRoot)
@@ -255,9 +259,13 @@ namespace FoolishGames.Net
                     //没有消息就退出
                     if (WaitToSendMessages.Count == 0)
                     {
-                        EventArgs.SetBuffer(EventArgs.Offset, UserToken.OriginalLength);
-                        //重置状态
-                        UserToken.ResetSendOrReceiveState(1);
+                        try //防回收
+                        {
+                            EventArgs.SetBuffer(EventArgs.Offset, UserToken.OriginalLength);
+                            //重置状态
+                            UserToken.ResetSendOrReceiveState(1);
+                        }
+                        catch { }
                         return false;
                     }
                     //有消息就继续执行
@@ -301,7 +309,7 @@ namespace FoolishGames.Net
                     //IAsyncResult result;
                     try
                     {
-                        Sender.Send(Message);
+                        Sender.Post(Message);
                         //bool success = Sender.Send(Message, out result);
                         //SendCallback callback = Callback;
                         //ISocket socket = Sender.Socket;

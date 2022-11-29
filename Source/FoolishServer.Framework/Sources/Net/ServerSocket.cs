@@ -253,7 +253,7 @@ namespace FoolishServer.Net
                 Socket.Listen(setting.Backlog);
             }
             //服务器状态输出周期
-            summaryTask = new Timer(WriteSummary, null, 1000, 1000);
+            summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
             //待接收消息的套接字管理线程
             int waitingInterval = 10;

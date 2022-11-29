@@ -329,6 +329,11 @@
             消息Id
             </summary>
         </member>
+        <member name="P:FoolishServer.Net.RemoteSocket.RefreshTime">
+            <summary>
+            上次心跳时间
+            </summary>
+        </member>
         <member name="M:FoolishServer.Net.RemoteSocket.#ctor(FoolishServer.Net.IServerSocket,System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             构造函数

@@ -65,7 +65,12 @@ namespace FoolishGames.Net
         /// <returns>是否维持等待状态</returns>
         public bool BeginReceive(bool force = false)
         {
-            if (Socket != null && Socket.Socket != null && !Socket.Connected) { Socket.Close(); return false; }
+            if (Socket == null || Socket.Socket == null || !Socket.Connected)
+            {
+                Socket?.Close();
+                return false;
+            }
+            if (EventArgs == null) { return false; }
             if (UserToken.IsReceiving) { return false; }
             if (UserToken.Receivable())
             {
@@ -85,7 +90,7 @@ namespace FoolishGames.Net
                             ProcessReceive();
                         }
                     }
-                    catch (Exception e)
+                    catch /*(Exception e)*/
                     {
                         Socket.Close();
                     }

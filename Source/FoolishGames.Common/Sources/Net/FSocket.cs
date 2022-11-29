@@ -110,21 +110,25 @@ namespace FoolishGames.Net
             lock (this)
             {
                 IsRunning = false;
-                if (EventArgs != null && EventArgs.AcceptSocket != null)
+                if (EventArgs != null)
                 {
-                    try
+                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
+                    if (EventArgs.AcceptSocket != null)
                     {
-                        EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
-                        EventArgs.AcceptSocket.Close();
-                        EventArgs.AcceptSocket.Dispose();
-                    }
-                    catch (Exception e)
-                    {
-                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
-                    }
-                    finally
-                    {
-                        EventArgs.AcceptSocket = null;
+                        try
+                        {
+                            EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
+                            EventArgs.AcceptSocket.Close();
+                            EventArgs.AcceptSocket.Dispose();
+                        }
+                        catch (Exception e)
+                        {
+                            FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
+                        }
+                        finally
+                        {
+                            EventArgs.AcceptSocket = null;
+                        }
                     }
                 }
             }

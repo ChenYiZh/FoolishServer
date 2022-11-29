@@ -17,6 +17,10 @@ namespace FoolishServer.Actions
         public override void TakeAction(IMessageReader reader)
         {
             FConsole.Write(reader.ReadString());
+            MessageWriter msg = new MessageWriter();
+            msg.ActionId = 1000;
+            msg.WriteString(Session.SessionId);
+            Session.Send(msg);
         }
     }
 }
