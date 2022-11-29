@@ -96,7 +96,7 @@ namespace FoolishServer.Runtime
                     CustomRuntime = ObjectFactory.Create<IRuntime>(Settings.MainClass);
                     if (CustomRuntime == null)
                     {
-                        throw new Exception(Settings.MainClass + " is not exists.");
+                        //throw new Exception(Settings.MainClass + " is not exists.");
                     }
                 }
 

@@ -17,6 +17,8 @@ namespace Example
         static void Main(string[] args)
         {
             FConsole.LogStackTracker = true;
+            FConsole.LogStackLevels.Add("Debug");
+            FConsole.LogStackLevels.Add("Warn");
             FConsole.RegistLogger(new Logger());
             TcpSocket socket = new TcpSocket();
             //socket.MessageOffset = 2;
@@ -28,11 +30,11 @@ namespace Example
             //message.Compress = false;
             message.MsgId = 1;
             message.OpCode = -1;
-            message.ActionId = 1;
+            message.ActionId = 1000;
             message.WriteString("Hello World!");
             //Console.Read();
             socket.Send(message);
-            Console.Read();
+            //Console.Read();
             socket.Send(message);
             socket.Send(message);
             socket.Send(message);

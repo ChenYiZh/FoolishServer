@@ -111,13 +111,16 @@ namespace FoolishServer.Data.Entity
             ConcurrentDictionary<EntityKey, T> entities = new ConcurrentDictionary<EntityKey, T>(Environment.ProcessorCount, dic.Count);
             lock (dic.SyncRoot)
             {
-                Parallel.ForEach(dic, (KeyValuePair<EntityKey, T> kv) =>
-                {
-                    if (condition(kv.Value))
-                    {
-                        entities[kv.Key] = kv.Value;
-                    }
-                });
+                ParallelOptions options = new ParallelOptions();
+                //以5000条数据为一组任务进行处理
+                options.MaxDegreeOfParallelism = dic.Count / 5000 + 1;
+                Parallel.ForEach(dic, options, (KeyValuePair<EntityKey, T> kv) =>
+                 {
+                     if (condition(kv.Value))
+                     {
+                         entities[kv.Key] = kv.Value;
+                     }
+                 });
             }
             return entities.Values.ToList();
         }

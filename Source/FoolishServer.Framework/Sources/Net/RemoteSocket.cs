@@ -10,6 +10,7 @@ using FoolishGames.Log;
 using FoolishGames.Net;
 using FoolishGames.IO;
 using FoolishGames.Security;
+using FoolishGames.Timer;
 
 namespace FoolishServer.Net
 {
@@ -84,6 +85,11 @@ namespace FoolishServer.Net
         public long MessageNumber { get { return Sender.MessageNumber; } set { Sender.MessageNumber = value; } }
 
         /// <summary>
+        /// 上次心跳时间
+        /// </summary>
+        internal DateTime RefreshTime { get; set; } = TimeLord.Now;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public RemoteSocket(IServerSocket server, SocketAsyncEventArgs eventArgs) : base(eventArgs)
@@ -133,9 +139,9 @@ namespace FoolishServer.Net
         /// <summary>
         /// 开始执行发送
         /// </summary>
-        void ISender.BeginSend()
+        internal bool BeginSend()
         {
-            Sender.BeginSend();
+            return Sender.BeginSend();
         }
 
         /// <summary>
@@ -161,7 +167,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
-        void ISender.SendBytes(byte[] data)
+        internal void SendBytes(byte[] data)
         {
             Sender.SendBytes(data);
         }
@@ -169,53 +175,48 @@ namespace FoolishServer.Net
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
-        void ISender.SendBytesImmediately(byte[] data)
+        internal void SendBytesImmediately(byte[] data)
         {
             Sender.SendBytesImmediately(data);
         }
 
         /// <summary>
-        /// 消息发送处理
-        /// </summary>
-        bool ISender.ProcessSend()
-        {
-            return Sender.ProcessSend();
-        }
-
-        /// <summary>
         /// 等待消息接收
         /// </summary>
-        public void BeginReceive()
+        internal bool BeginReceive()
         {
-            Receiver.BeginReceive();
-        }
-
-        /// <summary>
-        /// 处理数据接收回调
-        /// </summary>
-        bool IReceiver.ProcessReceive()
-        {
-            return Receiver.ProcessReceive();
+            return Receiver.BeginReceive();
         }
 
         /// <summary>
         /// 当消息处理完执行
         /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
         /// </summary>
-        internal void MessageSolved(object sender, SocketAsyncEventArgs e)
+        internal bool MessageSolved(object sender, SocketAsyncEventArgs e)
         {
+            // 等待操作处理
+            bool bWaiting = false;
             // determine which type of operation just completed and call the associated handler
             switch (e.LastOperation)
             {
                 case SocketAsyncOperation.Receive:
-                    Receiver.ProcessReceive();
+                    bWaiting = !Receiver.ProcessReceive();
                     break;
                 case SocketAsyncOperation.Send:
-                    Sender.ProcessSend();
+                    bWaiting = !Sender.ProcessSend();
                     break;
                 default:
                     throw new ArgumentException("The last operation completed on the socket was not a receive or send");
             }
+            return bWaiting;
+        }
+
+        /// <summary>
+        /// 是否可以从等待接收的列表中移除
+        /// </summary>
+        internal bool CanRemoveFromWaitingList()
+        {
+            return Receiver == null || Sender == null || !Receiver.BeginReceive((TimeLord.Now - RefreshTime).TotalSeconds > 10) || !Sender.BeginSend();
         }
 
         private void OnMessageReceived(IMessageEventArgs<IRemoteSocket> e)

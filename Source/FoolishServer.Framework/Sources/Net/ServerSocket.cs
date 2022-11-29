@@ -61,7 +61,11 @@ namespace FoolishServer.Net
         /// 心跳回应事件
         /// </summary>
         public event MessageEventHandler OnPong;
-        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args) { OnPong?.Invoke(this, args); }
+        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args)
+        {
+            ((RemoteSocket)args.Socket).RefreshTime = TimeLord.Now;
+            OnPong?.Invoke(this, args);
+        }
 
         /// <summary>
         /// 内部关键原生Socket
@@ -174,6 +178,11 @@ namespace FoolishServer.Net
         private ThreadSafeStack<SocketAsyncEventArgs> ioEventArgsPool;
 
         /// <summary>
+        /// 等待消息处理的缓存列表，主要用于单线程处理
+        /// </summary>
+        private ThreadSafeHashSet<RemoteSocket> Sockets = new ThreadSafeHashSet<RemoteSocket>();
+
+        /// <summary>
         /// 生成的所有套接字管理对象都缓存在这里
         /// </summary>
         private ThreadSafeList<SocketAsyncEventArgs> AllEventArgsPool = new ThreadSafeList<SocketAsyncEventArgs>();
@@ -182,6 +191,11 @@ namespace FoolishServer.Net
         /// 字节流池
         /// </summary>
         private BytePool BytePool { get; set; }
+
+        /// <summary>
+        /// 待处理的Socket的等待线程
+        /// </summary>
+        private Timer WaitingSocketTimer;
 
         /// <summary>
         /// 初始化
@@ -239,7 +253,11 @@ namespace FoolishServer.Net
                 Socket.Listen(setting.Backlog);
             }
             //服务器状态输出周期
-            summaryTask = new Timer(WriteSummary, null, 60000, 60000);
+            summaryTask = new Timer(WriteSummary, null, 1000, 1000);
+
+            //待接收消息的套接字管理线程
+            int waitingInterval = 10;
+            WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
 
             //启动监听
             PostAccept();
@@ -298,6 +316,7 @@ namespace FoolishServer.Net
                         //ArrangeSocketBuffer(ioEventArgs);
                         socket = new RemoteSocket(this, ioEventArgs);
                         socket.AccessTime = TimeLord.Now;
+                        Sockets.Add(socket);
                         //userToken.Socket = socket;
                     }
                     acceptEventArgs.AcceptSocket = null;
@@ -381,7 +400,10 @@ namespace FoolishServer.Net
                 IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
                 RemoteSocket socket = (RemoteSocket)userToken.Socket;
                 socket.AccessTime = TimeLord.Now;
-                socket.MessageSolved(sender, ioEventArgs);
+                if (socket.MessageSolved(sender, ioEventArgs))
+                {
+                    Sockets.Add(socket);
+                }
             }
             catch (ObjectDisposedException)
             {
@@ -394,6 +416,22 @@ namespace FoolishServer.Net
         }
 
         /// <summary>
+        /// 待接收的套接字处理线程
+        /// </summary>
+        private void ProcessWaiting(object state)
+        {
+            List<RemoteSocket> sockets;
+            lock (Sockets.SyncRoot)
+            {
+                sockets = new List<RemoteSocket>(Sockets);
+            }
+            foreach (RemoteSocket socket in sockets)
+            {
+                socket.CanRemoveFromWaitingList();
+            }
+        }
+
+        /// <summary>
         /// 释放消息事件
         /// </summary>
         private void ReleaseIOEventArgs(SocketAsyncEventArgs ioEventArgs)
@@ -402,6 +440,7 @@ namespace FoolishServer.Net
             IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
             if (userToken != null)
             {
+                Sockets.Remove((RemoteSocket)userToken.Socket);
                 userToken.Reset();
                 //userToken.Socket = null;
             }
@@ -452,6 +491,8 @@ namespace FoolishServer.Net
         {
             Interlocked.Decrement(ref summary.CurrentConnectCount);
             Interlocked.Increment(ref summary.CloseConnectCount);
+
+            Sockets.Remove((RemoteSocket)socket);
 
             IUserToken token = (IUserToken)socket.EventArgs.UserToken;
             if (opCode != EOpCode.Empty)
@@ -549,6 +590,12 @@ namespace FoolishServer.Net
         public void Close()
         {
             IsRunning = false;
+            Sockets.Clear();
+            if (WaitingSocketTimer != null)
+            {
+                WaitingSocketTimer.Dispose();
+                WaitingSocketTimer = null;
+            }
             if (summaryTask != null)
             {
                 summaryTask.Dispose();

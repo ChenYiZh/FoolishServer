@@ -251,14 +251,19 @@
             同步连接
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#BeginSend">
+        <member name="M:FoolishClient.Net.ClientSocket.Awake">
             <summary>
-            开始执行发送
+            初始化执行
             </summary>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.MakeSocket">
             <summary>
             创建原生套接字
+            </summary>
+        </member>
+        <member name="F:FoolishClient.Net.ClientSocket.waitingFlag">
+            <summary>
+            等待的线程锁，防止产生多组线程
             </summary>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.MessageSolved(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
@@ -316,29 +321,14 @@
             </summary>
             <param name="message">发送的消息</param>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytes(System.Byte[])">
+        <member name="M:FoolishClient.Net.ClientSocket.SendBytes(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#SendBytesImmediately(System.Byte[])">
+        <member name="M:FoolishClient.Net.ClientSocket.SendBytesImmediately(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析，以及解析顺序
-            </summary>
-        </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#ISender#ProcessSend">
-            <summary>
-            消息发送处理
-            </summary>
-        </member>
-        <member name="M:FoolishClient.Net.ClientSocket.BeginReceive">
-            <summary>
-            等待消息接收
-            </summary>
-        </member>
-        <member name="M:FoolishClient.Net.ClientSocket.FoolishGames#Net#IReceiver#ProcessReceive">
-            <summary>
-            处理数据接收回调
             </summary>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.OnMessageReceived(FoolishGames.Net.IMessageEventArgs{FoolishClient.Net.IClientSocket})">

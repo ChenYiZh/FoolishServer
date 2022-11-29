@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace FoolishGames.Net
 {
@@ -61,14 +62,37 @@ namespace FoolishGames.Net
         /// <summary>
         /// 等待消息接收
         /// </summary>
-        public void BeginReceive()
+        /// <returns>是否维持等待状态</returns>
+        public bool BeginReceive(bool force = false)
         {
-            if (Socket.EventArgs == null || Socket.Socket == null) { return; }
-            //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync
-            if (!Socket.Socket.ReceiveAsync(Socket.EventArgs))
+            if (Socket != null && Socket.Socket != null && !Socket.Connected) { Socket.Close(); return false; }
+            if (UserToken.IsReceiving) { return false; }
+            if (UserToken.Receivable())
             {
-                ProcessReceive();
+                if (!force && Socket.Socket.Available == 0)
+                {
+                    UserToken.ResetSendOrReceiveState(2);
+                    return true;
+                }
+                ThreadPool.UnsafeQueueUserWorkItem((state) =>
+                {
+                    try
+                    {
+                        //线程中需要重新加锁加判断
+                        //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
+                        if (UserToken.IsReceiving && UserToken.Receivable() && (force || Socket.Socket.Available > 0) && !Socket.Socket.ReceiveAsync(Socket.EventArgs))
+                        {
+                            ProcessReceive();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Socket.Close();
+                    }
+                }, null);
+                return false;
             }
+            return false;
         }
 
         /// <summary>
@@ -76,6 +100,7 @@ namespace FoolishGames.Net
         /// </summary>
         public bool ProcessReceive()
         {
+            if (EventArgs == null || Socket.Socket == null) { return false; }
             if (EventArgs.BytesTransferred == 0)
             {
                 Socket.Close(EOpCode.Empty);
@@ -242,7 +267,16 @@ namespace FoolishGames.Net
                 return false;
             }
 
-            BeginReceive();
+            if (Socket.Socket.Available == 0)
+            {
+                UserToken.ResetSendOrReceiveState(2);
+                return false;
+            }
+            //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
+            if (!Socket.Socket.ReceiveAsync(Socket.EventArgs))
+            {
+                ProcessReceive();
+            }
 
             //延迟关闭
             if (Socket == null || !Socket.IsRunning)

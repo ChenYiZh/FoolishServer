@@ -32,7 +32,7 @@ namespace FoolishServer.Config
 
             //打印启动信息
             RuntimeHost.PrintStartInfo();
-
+            return;
             //编译脚本
             if (Directory.Exists(FPath.GetFullPath(Settings.CSScriptsPath)))
             {

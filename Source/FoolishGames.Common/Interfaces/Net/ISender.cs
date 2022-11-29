@@ -10,10 +10,11 @@ namespace FoolishGames.Net
     /// </summary>
     public interface ISender
     {
-        /// <summary>
-        /// 开始执行发送
-        /// </summary>
-        void BeginSend();
+        ///// <summary>
+        ///// 开始执行发送
+        ///// </summary>
+        ///// <returns>是否维持等待状态</returns>
+        //bool BeginSend();
         /// <summary>
         /// 消息Id
         /// </summary>
@@ -30,17 +31,17 @@ namespace FoolishGames.Net
         /// <param name="message">发送的消息</param>
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
         void SendImmediately(IMessageWriter message);
-        /// <summary>
-        /// 内部函数，直接传bytes，会影响数据解析
-        /// </summary>
-        void SendBytes(byte[] data);
-        /// <summary>
-        /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
-        /// </summary>
-        void SendBytesImmediately(byte[] data);
-        /// <summary>
-        /// 消息发送处理
-        /// </summary>
-        bool ProcessSend();
+        ///// <summary>
+        ///// 内部函数，直接传bytes，会影响数据解析
+        ///// </summary>
+        //void SendBytes(byte[] data);
+        ///// <summary>
+        ///// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
+        ///// </summary>
+        //void SendBytesImmediately(byte[] data);
+        ///// <summary>
+        ///// 消息发送处理
+        ///// </summary>
+        //bool ProcessSend();
     }
 }

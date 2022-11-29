@@ -240,19 +240,23 @@ namespace FoolishClient.Net
             //ThreadProcessReceive = new Thread(new ThreadStart(ProcessReceive));
             //ThreadProcessReceive.Start();
 
-            BeginReceive();
-            //Sender.BeginSend();
+            //BeginReceive();
+            Sender.BeginSend();
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
             return true;
         }
 
+        /// <summary>
+        /// 初始化执行
+        /// </summary>
         protected virtual void Awake()
         {
             if (Socket == null)
             {
                 Socket socket = MakeSocket();
+                //socket.ReceiveTimeout = 50;//此方法只能在同步模式下使用
                 EventArgs = MakeEventArgs(socket);
             }
             if (Sender == null)
@@ -267,17 +271,14 @@ namespace FoolishClient.Net
         }
 
         /// <summary>
-        /// 开始执行发送
-        /// </summary>
-        void ISender.BeginSend()
-        {
-            Sender.BeginSend();
-        }
-
-        /// <summary>
         /// 创建原生套接字
         /// </summary>
         protected abstract Socket MakeSocket();
+
+        /// <summary>
+        /// 等待的线程锁，防止产生多组线程
+        /// </summary>
+        private int waitingFlag = 0;
 
         /// <summary>
         /// 当消息处理完执行
@@ -285,24 +286,27 @@ namespace FoolishClient.Net
         /// </summary>
         private void MessageSolved(object sender, SocketAsyncEventArgs e)
         {
-            FConsole.Write(e.LastOperation);
+            // 等待操作处理
+            bool bWaiting = false;
             // determine which type of operation just completed and call the associated handler
             switch (e.LastOperation)
             {
                 case SocketAsyncOperation.Receive:
-                    if (!Receiver.ProcessReceive())
-                    {
-                        Sender.ProcessSend();
-                    }
+                    bWaiting = !Receiver.ProcessReceive();
                     break;
                 case SocketAsyncOperation.Send:
-                    if (!Sender.ProcessSend())
-                    {
-                        Receiver.ProcessReceive();
-                    }
+                    bWaiting = !Sender.ProcessSend();
                     break;
                 default:
                     throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+            }
+            if (bWaiting && Interlocked.CompareExchange(ref waitingFlag, 1, 0) == 0)
+            {
+                while (Receiver != null && Sender != null && Receiver.BeginReceive() && Sender.BeginSend())
+                {
+                    Thread.Sleep(10);
+                }
+                Interlocked.Exchange(ref waitingFlag, 0);
             }
         }
 
@@ -314,11 +318,14 @@ namespace FoolishClient.Net
             const string error = "Send heartbeat package failed.";
             try
             {
+                if (!Socket.Connected)
+                {
+                    throw new SocketException((int)SocketError.NotConnected);
+                }
                 // 心跳包
                 if (heartbeatBuffer != null)
                 {
                     Sender.SendBytesImmediately(heartbeatBuffer);
-                    FConsole.WriteErrorFormatWithCategory(Category, error);
                 }
             }
             catch (Exception e)
@@ -381,7 +388,10 @@ namespace FoolishClient.Net
                 //}          
 
                 //管理类回收
-                EventArgs.Dispose();
+                if (EventArgs != null)
+                {
+                    EventArgs.Dispose();
+                }
                 EventArgs = null;
 
                 Sender = null;
@@ -433,7 +443,7 @@ namespace FoolishClient.Net
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
-        void ISender.SendBytes(byte[] data)
+        internal protected void SendBytes(byte[] data)
         {
             AutoConnect();
             Sender.SendBytes(data);
@@ -441,31 +451,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
-        void ISender.SendBytesImmediately(byte[] data)
+        internal protected void SendBytesImmediately(byte[] data)
         {
             AutoConnect();
             Sender.SendBytesImmediately(data);
-        }
-        /// <summary>
-        /// 消息发送处理
-        /// </summary>
-        bool ISender.ProcessSend()
-        {
-            return Sender.ProcessSend();
-        }
-        /// <summary>
-        /// 等待消息接收
-        /// </summary>
-        public void BeginReceive()
-        {
-            Receiver.BeginReceive();
-        }
-        /// <summary>
-        /// 处理数据接收回调
-        /// </summary>
-        bool IReceiver.ProcessReceive()
-        {
-            return Receiver.ProcessReceive();
         }
 
         /// <summary>
@@ -503,6 +492,7 @@ namespace FoolishClient.Net
             }
             try
             {
+                FConsole.Write("MsgId: " + message.ActionId);
                 ClientAction action = ActionProvider.Provide(message.ActionId);
                 try
                 {

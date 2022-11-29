@@ -29,10 +29,13 @@ namespace FoolishGames.Collections
         public ThreadSafeDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary.Count)
         {
             //this.dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, dictionary.Count);
-            Parallel.ForEach(dictionary, (KeyValuePair<TKey, TValue> kv) =>
-            {
-                this.dictionary[kv.Key] = kv.Value;
-            });
+            ParallelOptions options = new ParallelOptions();
+            //以5000条数据为一组任务进行处理
+            options.MaxDegreeOfParallelism = dictionary.Count / 5000 + 1;
+            Parallel.ForEach(dictionary, options, (KeyValuePair<TKey, TValue> kv) =>
+             {
+                 this.dictionary[kv.Key] = kv.Value;
+             });
         }
 
         public TValue this[TKey key]
@@ -82,7 +85,7 @@ namespace FoolishGames.Collections
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            //ConcurrentDictionary<TKey,TValue>
+            ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -312,7 +315,10 @@ namespace FoolishGames.Collections
 
         //public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         //{
-        //    throw new NotImplementedException();
+        //    lock (SyncRoot)
+        //    {
+        //        ((ICollection<KeyValuePair<TKey, TValue>>)_cache).CopyTo(array, arrayIndex);
+        //    }
         //}
         #endregion
     }

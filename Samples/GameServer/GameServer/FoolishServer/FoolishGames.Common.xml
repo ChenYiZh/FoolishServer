@@ -994,16 +994,6 @@
             消息接收处理类
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.IReceiver.BeginReceive">
-            <summary>
-            等待消息接收
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.IReceiver.ProcessReceive">
-            <summary>
-            处理数据接收回调
-            </summary>
-        </member>
         <member name="T:FoolishGames.Net.ISendableSocket">
             <summary>
             带有发送函数的套接字接口定义
@@ -1012,11 +1002,6 @@
         <member name="T:FoolishGames.Net.ISender">
             <summary>
             套接字消息发送的接口定义
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.ISender.BeginSend">
-            <summary>
-            开始执行发送
             </summary>
         </member>
         <member name="P:FoolishGames.Net.ISender.MessageNumber">
@@ -1036,21 +1021,6 @@
             立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
             </summary>
             <param name="message">发送的消息</param>
-        </member>
-        <member name="M:FoolishGames.Net.ISender.SendBytes(System.Byte[])">
-            <summary>
-            内部函数，直接传bytes，会影响数据解析
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.ISender.SendBytesImmediately(System.Byte[])">
-            <summary>
-            内部函数，直接传bytes，会影响数据解析，以及解析顺序
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.ISender.ProcessSend">
-            <summary>
-            消息发送处理
-            </summary>
         </member>
         <member name="T:FoolishGames.Net.ISocket">
             <summary>
@@ -1443,6 +1413,7 @@
             <summary>
             等待消息接收
             </summary>
+            <returns>是否维持等待状态</returns>
         </member>
         <member name="M:FoolishGames.Net.SocketReceiver`1.ProcessReceive">
             <summary>
@@ -1546,6 +1517,7 @@
             <summary>
             开始执行发送
             </summary>
+            <returns>是否维持等待状态</returns>
         </member>
         <member name="M:FoolishGames.Net.SocketSender.SendCompleted">
             <summary>
@@ -1612,6 +1584,42 @@
             嵌套的Socket
             </summary>
         </member>
+        <member name="F:FoolishGames.Net.UserToken.isSendingOrReceivingFlag">
+            <summary>
+            收发数据的标识
+            <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.UserToken.IsWaitingSendOrReceive">
+            <summary>
+            是否是待处理状态
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.UserToken.IsSending">
+            <summary>
+            是否正在发送数据
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.UserToken.IsReceiving">
+            <summary>
+            是否正在接收数据
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.Sendable">
+            <summary>
+            判断是否可以发送，如果可以则切换至发送状态
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.Receivable">
+            <summary>
+            判断是否可以接收，如果可以则切换至接收状态
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.ResetSendOrReceiveState(System.Int32)">
+            <summary>
+            重置收发标识
+            </summary>
+        </member>
         <member name="P:FoolishGames.Net.UserToken.ReceivedStartIndex">
             <summary>
             已经接收的数据长度
@@ -1637,6 +1645,11 @@
             原本的生成时的offset
             </summary>
         </member>
+        <member name="P:FoolishGames.Net.UserToken.OriginalLength">
+            <summary>
+            原本缓存的字节长度
+            </summary>
+        </member>
         <member name="M:FoolishGames.Net.UserToken.#ctor(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             初始化
@@ -1647,7 +1660,7 @@
             重置数据
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.UserToken.SetOriginalOffset(System.Int32)">
+        <member name="M:FoolishGames.Net.UserToken.SetOriginalOffset(System.Int32,System.Int32)">
             <summary>
             设置原本的生成时的offset
             </summary>

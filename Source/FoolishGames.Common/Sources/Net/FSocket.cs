@@ -144,7 +144,7 @@ namespace FoolishGames.Net
             args.SetBuffer(buffer, offset % buffer.Length, bufferSize);
             UserToken userToken = new UserToken(args);
             args.UserToken = userToken;
-            userToken.SetOriginalOffset(offset);
+            userToken.SetOriginalOffset(offset, bufferSize);
             args.AcceptSocket = socket;
             return args;
         }

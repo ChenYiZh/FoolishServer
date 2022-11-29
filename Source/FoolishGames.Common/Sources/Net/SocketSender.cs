@@ -148,14 +148,7 @@ namespace FoolishGames.Net
                 {
                     return;
                 }
-                //当有消息正在执行时，直接退出
-                if (WaitToSendMessages.Count > 1)
-                {
-                    return;
-                }
-                IWorker execution = WaitToSendMessages.First.Value;
-                WaitToSendMessages.RemoveFirst();
-                ThreadPool.UnsafeQueueUserWorkItem((state) => { execution.Work(); }, null);
+                ThreadPool.UnsafeQueueUserWorkItem((state) => { BeginSend(); }, null);
             }
         }
 
@@ -192,19 +185,24 @@ namespace FoolishGames.Net
             {
                 return SendCompleted();
             }
-            byte[] argsBuffer = EventArgs.Buffer;
-            int argsCount = EventArgs.Count;
-            int argsOffset = EventArgs.Offset;
-            if (argsCount >= UserToken.SendingBuffer.Length - UserToken.SendedCount)
+            lock (EventArgs)
             {
-                int length = UserToken.SendingBuffer.Length - UserToken.SendedCount;
-                Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, length);
-                EventArgs.SetBuffer(argsOffset, length);
-            }
-            else
-            {
-                Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, argsCount);
-                UserToken.SendedCount += argsCount;
+                byte[] argsBuffer = EventArgs.Buffer;
+                int argsCount = EventArgs.Count;
+                int argsOffset = EventArgs.Offset;
+                if (argsCount >= UserToken.SendingBuffer.Length - UserToken.SendedCount)
+                {
+                    int length = UserToken.SendingBuffer.Length - UserToken.SendedCount;
+                    Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, length);
+                    EventArgs.SetBuffer(argsOffset, length);
+                    ((UserToken)EventArgs.UserToken).Reset();
+                }
+                else
+                {
+                    Buffer.BlockCopy(UserToken.SendingBuffer, UserToken.SendedCount, argsBuffer, argsOffset, argsCount);
+                    EventArgs.SetBuffer(argsOffset, argsCount);
+                    UserToken.SendedCount += argsCount;
+                }
             }
             if (!Socket.Socket.SendAsync(EventArgs))
             {
@@ -216,9 +214,33 @@ namespace FoolishGames.Net
         /// <summary>
         /// 开始执行发送
         /// </summary>
-        public void BeginSend()
+        /// <returns>是否维持等待状态</returns>
+        public bool BeginSend()
         {
-            SendCompleted();
+            if (UserToken.IsSending) { return false; }
+            lock (SendableSyncRoot)
+            {
+                //没有消息就退出
+                if (WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                {
+                    ThreadPool.UnsafeQueueUserWorkItem((state) =>
+                    {
+                        //线程中需要重新加锁加判断
+                        lock (SendableSyncRoot)
+                        {
+                            if (!UserToken.IsSending && WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                            {
+                                //有消息就继续执行
+                                IWorker execution = WaitToSendMessages.First.Value;
+                                WaitToSendMessages.RemoveFirst();
+                                execution.Work();
+                            }
+                        }
+                    }, null);
+                    return false;
+                }
+                return true;
+            }
         }
 
         /// <summary>
@@ -226,19 +248,26 @@ namespace FoolishGames.Net
         /// </summary>
         private bool SendCompleted()
         {
-            lock (SendableSyncRoot)
+            if (UserToken.Sendable())
             {
-                //没有消息就退出
-                if (WaitToSendMessages.Count == 0)
+                lock (SendableSyncRoot)
                 {
-                    return false;
+                    //没有消息就退出
+                    if (WaitToSendMessages.Count == 0)
+                    {
+                        EventArgs.SetBuffer(EventArgs.Offset, UserToken.OriginalLength);
+                        //重置状态
+                        UserToken.ResetSendOrReceiveState(1);
+                        return false;
+                    }
+                    //有消息就继续执行
+                    IWorker execution = WaitToSendMessages.First.Value;
+                    WaitToSendMessages.RemoveFirst();
+                    execution.Work();
+                    return true;
                 }
-                //有消息就继续执行
-                IWorker execution = WaitToSendMessages.First.Value;
-                WaitToSendMessages.RemoveFirst();
-                execution.Work();
-                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -269,7 +298,7 @@ namespace FoolishGames.Net
             {
                 if (Sender.Socket.Connected)
                 {
-                    IAsyncResult result;
+                    //IAsyncResult result;
                     try
                     {
                         Sender.Send(Message);

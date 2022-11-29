@@ -345,7 +345,7 @@
             </summary>
             <param name="key">新的id</param>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#BeginSend">
+        <member name="M:FoolishServer.Net.RemoteSocket.BeginSend">
             <summary>
             开始执行发送
             </summary>
@@ -363,19 +363,14 @@
             </summary>
             <param name="message">发送的消息</param>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#SendBytes(System.Byte[])">
+        <member name="M:FoolishServer.Net.RemoteSocket.SendBytes(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析
             </summary>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#SendBytesImmediately(System.Byte[])">
+        <member name="M:FoolishServer.Net.RemoteSocket.SendBytesImmediately(System.Byte[])">
             <summary>
             内部函数，直接传bytes，会影响数据解析，以及解析顺序
-            </summary>
-        </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#ISender#ProcessSend">
-            <summary>
-            消息发送处理
             </summary>
         </member>
         <member name="M:FoolishServer.Net.RemoteSocket.BeginReceive">
@@ -383,15 +378,15 @@
             等待消息接收
             </summary>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.FoolishGames#Net#IReceiver#ProcessReceive">
-            <summary>
-            处理数据接收回调
-            </summary>
-        </member>
         <member name="M:FoolishServer.Net.RemoteSocket.MessageSolved(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             当消息处理完执行
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.RemoteSocket.CanRemoveFromWaitingList">
+            <summary>
+            是否可以从等待接收的列表中移除
             </summary>
         </member>
         <member name="T:FoolishServer.Net.ConnectionEventHandler">
@@ -549,6 +544,11 @@
             回复并发对象池
             </summary>
         </member>
+        <member name="F:FoolishServer.Net.ServerSocket.Sockets">
+            <summary>
+            等待消息处理的缓存列表，主要用于单线程处理
+            </summary>
+        </member>
         <member name="F:FoolishServer.Net.ServerSocket.AllEventArgsPool">
             <summary>
             生成的所有套接字管理对象都缓存在这里
@@ -557,6 +557,11 @@
         <member name="P:FoolishServer.Net.ServerSocket.BytePool">
             <summary>
             字节流池
+            </summary>
+        </member>
+        <member name="F:FoolishServer.Net.ServerSocket.WaitingSocketTimer">
+            <summary>
+            待处理的Socket的等待线程
             </summary>
         </member>
         <member name="M:FoolishServer.Net.ServerSocket.#ctor">
@@ -598,6 +603,11 @@
         <member name="M:FoolishServer.Net.ServerSocket.IOCompleted(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             消息接收处理
+            </summary>
+        </member>
+        <member name="M:FoolishServer.Net.ServerSocket.ProcessWaiting(System.Object)">
+            <summary>
+            待接收的套接字处理线程
             </summary>
         </member>
         <member name="M:FoolishServer.Net.ServerSocket.ReleaseIOEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">
