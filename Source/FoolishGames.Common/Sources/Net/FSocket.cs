@@ -93,8 +93,8 @@ namespace FoolishGames.Net
                 return;
             }
             EventArgs = eventArgs;
-            UserToken userToken;
-            if ((userToken = eventArgs.UserToken as UserToken) == null)
+            UserToken userToken = eventArgs.UserToken as UserToken;
+            if (userToken == null)
             {
                 userToken = new UserToken(eventArgs);
                 eventArgs.UserToken = userToken;
@@ -129,6 +129,11 @@ namespace FoolishGames.Net
                         {
                             EventArgs.AcceptSocket = null;
                         }
+                    }
+                    UserToken userToken;
+                    if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
+                    {
+                        userToken.Socket = null;
                     }
                 }
             }

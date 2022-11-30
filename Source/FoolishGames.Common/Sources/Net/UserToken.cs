@@ -143,7 +143,7 @@ namespace FoolishGames.Net
             ReceivedBuffer = null;
             //ReceiverStream.Flush();
             //AsyncResult = null;
-            Socket = null;
+            //Socket = null;
         }
 
         /// <summary>

@@ -133,7 +133,6 @@ namespace FoolishServer.Net
         {
             try
             {
-                FConsole.Write("ProcessMessage");
                 ISession session = GameSession.Get(args.Socket?.HashCode);
                 if (session != null)
                 {

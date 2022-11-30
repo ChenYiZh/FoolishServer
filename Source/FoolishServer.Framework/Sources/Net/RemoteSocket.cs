@@ -11,6 +11,7 @@ using FoolishGames.Net;
 using FoolishGames.IO;
 using FoolishGames.Security;
 using FoolishGames.Timer;
+using FoolishGames.Common;
 
 namespace FoolishServer.Net
 {
@@ -121,10 +122,14 @@ namespace FoolishServer.Net
         /// </summary>
         public override void Close(EOpCode opCode = EOpCode.Close)
         {
+            bool isRuning = IsRunning;
             base.Close(opCode);
             Sender = null;
             Receiver = null;
-            Server.OnRemoteSocketClosed(this, opCode);
+            if (isRuning)
+            {
+                Server.OnRemoteSocketClosed(this, opCode);
+            }
         }
 
         /// <summary>
@@ -151,7 +156,7 @@ namespace FoolishServer.Net
         /// <returns>判断有没有发送出去</returns>
         public void Send(IMessageWriter message)
         {
-            Sender.Send(message);
+            Sender?.Send(message);
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace FoolishServer.Net
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
         public void SendImmediately(IMessageWriter message)
         {
-            Sender.SendImmediately(message);
+            Sender?.SendImmediately(message);
         }
 
         /// <summary>
@@ -169,7 +174,7 @@ namespace FoolishServer.Net
         /// </summary>
         internal void SendBytes(byte[] data)
         {
-            Sender.SendBytes(data);
+            Sender?.SendBytes(data);
         }
 
         /// <summary>
@@ -177,7 +182,7 @@ namespace FoolishServer.Net
         /// </summary>
         internal void SendBytesImmediately(byte[] data)
         {
-            Sender.SendBytesImmediately(data);
+            Sender?.SendBytesImmediately(data);
         }
 
         /// <summary>
@@ -212,11 +217,11 @@ namespace FoolishServer.Net
         }
 
         /// <summary>
-        /// 是否可以从等待接收的列表中移除
+        /// 定时处理消息
         /// </summary>
-        internal bool CanRemoveFromWaitingList()
+        internal bool CheckSendOrReceive()
         {
-            return Receiver == null || Sender == null || !Receiver.BeginReceive((TimeLord.Now - RefreshTime).TotalSeconds > 10) || !Sender.BeginSend();
+            return Receiver == null || Sender == null || !Receiver.BeginReceive((TimeLord.Now - RefreshTime).TotalMilliseconds > Constants.HeartBeatsInterval) || !Sender.BeginSend();
         }
 
         private void OnMessageReceived(IMessageEventArgs<IRemoteSocket> e)
@@ -226,6 +231,7 @@ namespace FoolishServer.Net
 
         private void OnPong(IMessageEventArgs<IRemoteSocket> e)
         {
+            RefreshTime = TimeLord.Now;
             ((IServerMessageProcessor)Server).Pong(e);
         }
 

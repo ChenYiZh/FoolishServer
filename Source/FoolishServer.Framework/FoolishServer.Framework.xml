@@ -389,9 +389,9 @@
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.CanRemoveFromWaitingList">
+        <member name="M:FoolishServer.Net.RemoteSocket.CheckSendOrReceive">
             <summary>
-            是否可以从等待接收的列表中移除
+            定时处理消息
             </summary>
         </member>
         <member name="T:FoolishServer.Net.ConnectionEventHandler">
@@ -564,7 +564,7 @@
             字节流池
             </summary>
         </member>
-        <member name="F:FoolishServer.Net.ServerSocket.WaitingSocketTimer">
+        <member name="F:FoolishServer.Net.ServerSocket.WaitingSocketThread">
             <summary>
             待处理的Socket的等待线程
             </summary>

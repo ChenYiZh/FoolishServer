@@ -181,8 +181,13 @@ namespace FoolishGames.Net
         /// </summary>
         public bool ProcessSend()
         {
+            if (EventArgs == null) { return true; }
             if (UserToken.SendingBuffer == null)
             {
+                //if (UserToken.IsSending)
+                //{
+                //    return true;
+                //}
                 return SendCompleted();
             }
             lock (EventArgs)
@@ -204,7 +209,16 @@ namespace FoolishGames.Net
                     UserToken.SendedCount += argsCount;
                 }
             }
-            if (!Socket.Socket.SendAsync(EventArgs))
+            if (Socket == null || Socket.Socket == null)
+            {
+                return false;
+            }
+            bool willRaiseEvent = true;
+            lock (EventArgs)
+            {
+                willRaiseEvent = Socket.Socket.SendAsync(EventArgs);
+            }
+            if (!willRaiseEvent)
             {
                 return ProcessSend();
             }
@@ -216,10 +230,10 @@ namespace FoolishGames.Net
         /// </summary>
         /// <returns>是否维持等待状态</returns>
         public bool BeginSend()
-        {
-            if (UserToken.IsSending) { return false; }
+        {           
             lock (SendableSyncRoot)
             {
+                if (UserToken.IsSending) { return false; }
                 //没有消息就退出
                 if (WaitToSendMessages.Count > 0 && UserToken.Sendable())
                 {
@@ -228,7 +242,7 @@ namespace FoolishGames.Net
                         //线程中需要重新加锁加判断
                         lock (SendableSyncRoot)
                         {
-                            if (UserToken.IsSending && WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                            if (/*UserToken.IsSending && */WaitToSendMessages.Count > 0 && UserToken.Sendable())
                             {
                                 //有消息就继续执行
                                 IWorker execution = WaitToSendMessages.First.Value;
@@ -248,10 +262,10 @@ namespace FoolishGames.Net
         /// </summary>
         private bool SendCompleted()
         {
-            if (UserToken.IsSending)
-            {
-                return true;
-            }
+            //if (UserToken.IsSending)
+            //{
+            //    return true;
+            //}
             if (UserToken.Sendable())
             {
                 lock (SendableSyncRoot)
@@ -261,7 +275,10 @@ namespace FoolishGames.Net
                     {
                         try //防回收
                         {
-                            EventArgs.SetBuffer(EventArgs.Offset, UserToken.OriginalLength);
+                            lock (EventArgs)
+                            {
+                                EventArgs.SetBuffer(EventArgs.Offset, UserToken.OriginalLength);
+                            }
                             //重置状态
                             UserToken.ResetSendOrReceiveState(1);
                         }

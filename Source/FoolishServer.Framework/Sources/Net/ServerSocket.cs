@@ -1,4 +1,5 @@
 ﻿using FoolishGames.Collections;
+using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Net;
@@ -61,11 +62,7 @@ namespace FoolishServer.Net
         /// 心跳回应事件
         /// </summary>
         public event MessageEventHandler OnPong;
-        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args)
-        {
-            ((RemoteSocket)args.Socket).RefreshTime = TimeLord.Now;
-            OnPong?.Invoke(this, args);
-        }
+        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args) { OnPong?.Invoke(this, args); }
 
         /// <summary>
         /// 内部关键原生Socket
@@ -195,7 +192,8 @@ namespace FoolishServer.Net
         /// <summary>
         /// 待处理的Socket的等待线程
         /// </summary>
-        private Timer WaitingSocketTimer;
+        //private Timer WaitingSocketTimer;
+        private Thread WaitingSocketThread;
 
         /// <summary>
         /// 初始化
@@ -256,8 +254,10 @@ namespace FoolishServer.Net
             summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
             //待接收消息的套接字管理线程
-            int waitingInterval = 10;
-            WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
+            //int waitingInterval = 10;
+            //WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
+            WaitingSocketThread = new Thread(() => { while (IsRunning) { ProcessWaiting(null); Thread.Sleep(1); } });
+            WaitingSocketThread.Start();
 
             //启动监听
             PostAccept();
@@ -312,7 +312,7 @@ namespace FoolishServer.Net
                     {
                         ioEventArgs = ioEventArgsPool.Pop();
                         ioEventArgs.AcceptSocket = acceptEventArgs.AcceptSocket;
-                        IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
+                        //IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
                         //ArrangeSocketBuffer(ioEventArgs);
                         socket = new RemoteSocket(this, ioEventArgs);
                         socket.AccessTime = TimeLord.Now;
@@ -427,7 +427,13 @@ namespace FoolishServer.Net
             }
             foreach (RemoteSocket socket in sockets)
             {
-                socket.CanRemoveFromWaitingList();
+                if ((TimeLord.Now - socket.RefreshTime).TotalMilliseconds > 2 * Constants.HeartBeatsInterval)
+                {
+                    //心跳超时2倍，直接关闭
+                    socket.Close();
+                    continue;
+                }
+                socket.CheckSendOrReceive();
             }
         }
 
@@ -590,12 +596,26 @@ namespace FoolishServer.Net
         public void Close()
         {
             IsRunning = false;
+            base.Close();
             Sockets.Clear();
-            if (WaitingSocketTimer != null)
+            //if (WaitingSocketTimer != null)
+            //{
+            //    WaitingSocketTimer.Dispose();
+            //    WaitingSocketTimer = null;
+            //}
+            if (WaitingSocketThread != null)
             {
-                WaitingSocketTimer.Dispose();
-                WaitingSocketTimer = null;
+                try
+                {
+                    WaitingSocketThread.Abort();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                }
+                WaitingSocketThread = null;
             }
+
             if (summaryTask != null)
             {
                 summaryTask.Dispose();

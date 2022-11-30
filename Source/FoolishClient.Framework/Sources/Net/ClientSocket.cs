@@ -69,6 +69,12 @@ namespace FoolishClient.Net
         internal protected virtual Timer HeartbeatTimer { get; set; } = null;
 
         /// <summary>
+        /// 数据处理线程
+        /// </summary>
+        //internal protected virtual Timer SendOrReceiveTimer { get; set; } = null;
+        internal protected virtual Thread SendOrReceiveThread { get; set; } = null;
+
+        /// <summary>
         /// 心跳包
         /// </summary>
         private byte[] heartbeatBuffer;
@@ -160,7 +166,7 @@ namespace FoolishClient.Net
         /// <param name="heartbeatInterval">心跳间隔</param>
         public virtual void Ready(string name, string host, int port,
             string actionClassFullName,
-            int heartbeatInterval = 10000)
+            int heartbeatInterval = Constants.HeartBeatsInterval)
         {
             Name = name;
             Host = host;
@@ -236,12 +242,36 @@ namespace FoolishClient.Net
                 HeartbeatTimer = new Timer(SendHeartbeatPackage, null, HeartbeatInterval, HeartbeatInterval);
                 RebuildHeartbeatPackage();
             }
+
+            //if (SendOrReceiveTimer == null)
+            //{
+            //    SendOrReceiveTimer = new Timer(CheckSendOrReceive, null, 15, 15);
+            //}
+
+            if (SendOrReceiveThread == null)
+            {
+                SendOrReceiveThread = new Thread(() =>
+                {
+                    Thread.Sleep(50);
+                    while (IsRunning)
+                    {
+                        CheckSendOrReceive(null);
+                        Thread.Sleep(1);
+                    }
+                });
+                try
+                {
+                    SendOrReceiveThread.Start();
+                }
+                catch { return false; }
+            }
+
             ////开始监听数据
             //ThreadProcessReceive = new Thread(new ThreadStart(ProcessReceive));
             //ThreadProcessReceive.Start();
 
             //BeginReceive();
-            Sender.BeginSend();
+            Sender?.BeginSend();
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
@@ -292,17 +322,24 @@ namespace FoolishClient.Net
             }
             // 等待操作处理
             bool bWaiting = false;
-            // determine which type of operation just completed and call the associated handler
-            switch (e.LastOperation)
+            try
             {
-                case SocketAsyncOperation.Receive:
-                    bWaiting = !Receiver.ProcessReceive();
-                    break;
-                case SocketAsyncOperation.Send:
-                    bWaiting = !Sender.ProcessSend();
-                    break;
-                default:
-                    throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+                // determine which type of operation just completed and call the associated handler
+                switch (e.LastOperation)
+                {
+                    case SocketAsyncOperation.Receive:
+                        bWaiting = !Receiver.ProcessReceive();
+                        break;
+                    case SocketAsyncOperation.Send:
+                        bWaiting = !Sender.ProcessSend();
+                        break;
+                    default:
+                        throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+                }
+            }
+            catch (Exception ex)
+            {
+                FConsole.WriteExceptionWithCategory(Categories.SOCKET, ex);
             }
             if (bWaiting && Interlocked.CompareExchange(ref waitingFlag, 1, 0) == 0)
             {
@@ -312,6 +349,14 @@ namespace FoolishClient.Net
                 }
                 Interlocked.Exchange(ref waitingFlag, 0);
             }
+        }
+
+        /// <summary>
+        /// 定时处理消息
+        /// </summary>
+        internal void CheckSendOrReceive(object state)
+        {
+            if (Receiver != null && !Receiver.BeginReceive()) { Sender?.BeginSend(); }
         }
 
         /// <summary>
@@ -363,6 +408,12 @@ namespace FoolishClient.Net
         /// </summary>
         public override void Close(EOpCode opCode = EOpCode.Close)
         {
+            if (!IsRunning)
+            {
+                return;
+            }
+            FConsole.Write(new System.Diagnostics.StackTrace(true).ToString());
+            IsRunning = false;
             lock (this)
             {
                 if (Sender != null)
@@ -371,7 +422,11 @@ namespace FoolishClient.Net
                     msg.OpCode = (sbyte)EOpCode.Close;
                     byte[] closeMessage = PackageFactory.Pack(msg, MessageOffset, null, null);
                     //立即发送一条客户端关闭消息
-                    Sender.Post(closeMessage);
+                    try
+                    {
+                        Sender.Post(closeMessage);
+                    }
+                    catch { }
                 }
             }
             base.Close(opCode);
@@ -400,7 +455,33 @@ namespace FoolishClient.Net
                 //        FConsole.WriteExceptionWithCategory(Category, "ThreadProcessReceive abort error.", e);
                 //    }
                 //    ThreadProcessReceive = null;
-                //}          
+                //}    
+
+                //if (SendOrReceiveTimer != null)
+                //{
+                //    try
+                //    {
+                //        SendOrReceiveTimer.Dispose();
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        FConsole.WriteExceptionWithCategory(Category, "SendOrReceiveTimer dispose error.", e);
+                //    }
+                //    SendOrReceiveTimer = null;
+                //}
+
+                if (SendOrReceiveThread != null)
+                {
+                    try
+                    {
+                        SendOrReceiveThread.Abort();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Category, "SendOrReceiveThread abort error.", e);
+                    }
+                    SendOrReceiveThread = null;
+                }
 
                 //管理类回收
                 if (EventArgs != null)
@@ -443,7 +524,7 @@ namespace FoolishClient.Net
         public void Send(IMessageWriter message)
         {
             AutoConnect();
-            Sender.Send(message);
+            Sender?.Send(message);
         }
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
@@ -453,7 +534,7 @@ namespace FoolishClient.Net
         public void SendImmediately(IMessageWriter message)
         {
             AutoConnect();
-            Sender.SendImmediately(message);
+            Sender?.SendImmediately(message);
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
@@ -461,7 +542,7 @@ namespace FoolishClient.Net
         internal protected void SendBytes(byte[] data)
         {
             AutoConnect();
-            Sender.SendBytes(data);
+            Sender?.SendBytes(data);
         }
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
@@ -469,7 +550,7 @@ namespace FoolishClient.Net
         internal protected void SendBytesImmediately(byte[] data)
         {
             AutoConnect();
-            Sender.SendBytesImmediately(data);
+            Sender?.SendBytesImmediately(data);
         }
 
         /// <summary>
@@ -507,7 +588,6 @@ namespace FoolishClient.Net
             }
             try
             {
-                FConsole.Write("MsgId: " + message.ActionId);
                 ClientAction action = ActionProvider.Provide(message.ActionId);
                 try
                 {

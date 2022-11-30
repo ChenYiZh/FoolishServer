@@ -67,6 +67,7 @@ namespace FoolishGames.Net
         {
             if (Socket == null || Socket.Socket == null || !Socket.Connected)
             {
+                FConsole.WriteWarnWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display disconnected.");
                 Socket?.Close();
                 return false;
             }
@@ -83,11 +84,22 @@ namespace FoolishGames.Net
                 {
                     try
                     {
+
                         //线程中需要重新加锁加判断
                         //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
-                        if (UserToken.IsReceiving && UserToken.Receivable() && (force || Socket.Socket.Available > 0) && !Socket.Socket.ReceiveAsync(Socket.EventArgs))
+                        if (/*UserToken.IsReceiving && */UserToken.Receivable()
+                        && (force || Socket.Socket.Available > 0)
+                        && Socket.EventArgs != null)
                         {
-                            ProcessReceive();
+                            bool willRaiseEvent = true;
+                            lock (Socket.EventArgs)
+                            {
+                                willRaiseEvent = Socket.Socket.ReceiveAsync(Socket.EventArgs);
+                            }
+                            if (!willRaiseEvent)
+                            {
+                                ProcessReceive();
+                            }
                         }
                     }
                     catch /*(Exception e)*/
@@ -126,11 +138,17 @@ namespace FoolishGames.Net
             if (EventArgs.BytesTransferred > 0)
             {
                 //先缓存数据
-                //byte[] buffer;// = new byte[EventArgs.BytesTransferred];
-                //Buffer.BlockCopy(EventArgs.Buffer, EventArgs.Offset, buffer, 0, buffer.Length);
-                byte[] argsBuffer = EventArgs.Buffer;
-                int argsOffset = EventArgs.Offset;
-                int argsLength = EventArgs.BytesTransferred;
+                byte[] buffer = new byte[EventArgs.BytesTransferred];
+                lock (EventArgs)
+                {
+                    Buffer.BlockCopy(EventArgs.Buffer, EventArgs.Offset, buffer, 0, buffer.Length);
+                }
+                //byte[] argsBuffer = EventArgs.Buffer;
+                //int argsOffset = EventArgs.Offset;
+                //int argsLength = EventArgs.BytesTransferred;
+                byte[] argsBuffer = buffer;
+                int argsOffset = 0;
+                int argsLength = buffer.Length;
 
                 //从当前位置数据开始解析
                 int offset = argsOffset;
@@ -145,14 +163,14 @@ namespace FoolishGames.Net
                         //上次连报头都没接收完
                         if (UserToken.ReceivedStartIndex < 0)
                         {
-                            byte[] buffer = new byte[argsLength + UserToken.ReceivedBuffer.Length];
-                            Buffer.BlockCopy(UserToken.ReceivedBuffer, 0, buffer, 0, UserToken.ReceivedBuffer.Length);
-                            Buffer.BlockCopy(argsBuffer, argsOffset, buffer, UserToken.ReceivedBuffer.Length, argsLength);
+                            byte[] data = new byte[argsLength + UserToken.ReceivedBuffer.Length];
+                            Buffer.BlockCopy(UserToken.ReceivedBuffer, 0, data, 0, UserToken.ReceivedBuffer.Length);
+                            Buffer.BlockCopy(argsBuffer, argsOffset, data, UserToken.ReceivedBuffer.Length, argsLength);
                             UserToken.ReceivedBuffer = null;
 
-                            argsBuffer = buffer;
+                            argsBuffer = data;
                             offset = argsOffset = 0;
-                            argsLength = buffer.Length;
+                            argsLength = data.Length;
                         }
                         //数据仍然接收不完
                         else if (UserToken.ReceivedStartIndex + argsLength < UserToken.ReceivedBuffer.Length)
@@ -208,7 +226,7 @@ namespace FoolishGames.Net
                         {
                             UserToken.ReceivedStartIndex = argsLength + argsOffset - offset;
                             UserToken.ReceivedBuffer = new byte[totalLength - offset];
-                            Buffer.BlockCopy(argsBuffer, offset, UserToken.ReceivedBuffer, 0, UserToken.ReceivedStartIndex - offset);
+                            Buffer.BlockCopy(argsBuffer, offset, UserToken.ReceivedBuffer, 0, totalLength - offset);
                             break;
                         }
 
@@ -272,17 +290,24 @@ namespace FoolishGames.Net
                 return false;
             }
 
-            if (Socket.Socket.Available == 0)
+            if (Socket.Socket == null || Socket.Socket.Available == 0)
             {
                 UserToken.ResetSendOrReceiveState(2);
                 return false;
             }
             //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
-            if (!Socket.Socket.ReceiveAsync(Socket.EventArgs))
+            bool willRaiseEvent = true;
+            if (Socket != null)
             {
-                ProcessReceive();
+                lock (Socket.EventArgs)
+                {
+                    willRaiseEvent = Socket.Socket.ReceiveAsync(Socket.EventArgs);
+                }
+                if (!willRaiseEvent)
+                {
+                    ProcessReceive();
+                }
             }
-
             //延迟关闭
             if (Socket == null || !Socket.IsRunning)
             {

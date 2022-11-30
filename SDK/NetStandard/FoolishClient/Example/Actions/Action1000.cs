@@ -13,7 +13,7 @@ namespace Example.Actions
     {
         public override void TakeAction(IMessageReader reader)
         {
-            FConsole.Write(reader.ReadString());
+            FConsole.Write("SessionId: " + reader.ReadString());
         }
     }
 }

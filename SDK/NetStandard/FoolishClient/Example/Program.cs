@@ -17,7 +17,7 @@ namespace Example
         static void Main(string[] args)
         {
             FConsole.LogStackTracker = true;
-            FConsole.LogStackLevels.Add("Debug");
+            //FConsole.LogStackLevels.Add("Debug");
             FConsole.LogStackLevels.Add("Warn");
             FConsole.RegistLogger(new Logger());
             TcpSocket socket = new TcpSocket();
