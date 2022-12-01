@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,7 +57,7 @@ namespace FoolishServer.Config
 
             //打印启动信息
             RuntimeHost.PrintStartInfo();
-            return;
+            //return;
             //编译脚本
             if (Directory.Exists(FPath.GetFullPath(Settings.CSScriptsPath)))
             {

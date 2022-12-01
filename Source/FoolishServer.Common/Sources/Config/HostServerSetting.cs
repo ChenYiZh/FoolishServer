@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,6 +55,12 @@ namespace FoolishServer.Config
         /// 执行类
         /// </summary>
         public string MainClass { get; private set; }
+
+
+        /// <summary>
+        /// 自定义脚本的完整名称，可以不设置，使用原生的管理类
+        /// </summary>
+        public string ClassFullname { get; private set; }
 
         /// <summary>
         /// 消息处理的完整类名，用{0}嵌入id
@@ -124,6 +130,7 @@ namespace FoolishServer.Config
             BufferSize = node.SelectSingleNode("buffer-size").GetValue(8192);
             Offset = node.SelectSingleNode("offset").GetValue(8192);
             UseGZip = node.SelectSingleNode("use-gzip").GetValue(true);
+            ClassFullname = node.SelectSingleNode("server-class-fullname").GetValue(null);
             ActionClassFullName = node.SelectSingleNode("action-class-fullname").GetValue(null);
         }
         /// <summary>

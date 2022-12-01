@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -169,7 +169,7 @@ namespace FoolishServer.RPC
         public void Close()
         {
             ISession session;
-            if (sessions.TryGetValue(KeyCode, out session) && session.Socket != null)
+            if (Sessions.TryGetValue(KeyCode, out session) && session.Socket != null)
             {
                 //设置Socket为Closed的状态, 并未将物理连接马上中断
                 ((RemoteSocket)session.Socket).SetIsRunning(false);
@@ -178,8 +178,10 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 异步发送一条数据
         /// </summary>
-        public void Send(IMessageWriter message)
+        public void Send(int actionId, IMessageWriter message)
         {
+            message.ActionId = actionId;
+            message.OpCode = 0;
             try
             {
                 Socket.Send(message);

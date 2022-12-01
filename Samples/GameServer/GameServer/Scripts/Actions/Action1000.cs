@@ -43,9 +43,8 @@ namespace FoolishServer.Actions
         {
             FConsole.Write(reader.ReadString());
             MessageWriter msg = new MessageWriter();
-            msg.ActionId = 1000;
             msg.WriteString(Session.SessionId);
-            Session.Send(msg);
+            Session.Send(1000, msg);
         }
     }
 }

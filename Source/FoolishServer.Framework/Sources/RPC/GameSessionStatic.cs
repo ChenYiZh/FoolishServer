@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -40,15 +40,33 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 会话窗口池
         /// </summary>
-        private static IDictionary<Guid, ISession> sessions;
+        internal static ThreadSafeDictionary<Guid, ISession> Sessions;
 
         /// <summary>
         /// 静态初始化
         /// </summary>
         static GameSession()
         {
-            sessions = new ThreadSafeDictionary<Guid, ISession>();
+            Sessions = new ThreadSafeDictionary<Guid, ISession>();
         }
+
+        ///// <summary>
+        ///// 服务器使用添加新的组别
+        ///// </summary>
+        ///// <param name="serverName"></param>
+        //internal static void OnServerStarted(string serverName)
+        //{
+        //    Sessions[serverName] = new ThreadSafeDictionary<Guid, ISession>();
+        //}
+
+        ///// <summary>
+        ///// 服务器使用添加新的组别
+        ///// </summary>
+        ///// <param name="serverName"></param>
+        //internal static void CreateSessionGroup(string serverName)
+        //{
+        //    Sessions[serverName] = new ThreadSafeDictionary<Guid, ISession>();
+        //}
 
         /// <summary>
         /// 创建会话窗口
@@ -64,7 +82,7 @@ namespace FoolishServer.RPC
                 throw new ArgumentNullException("server", "session create failed because the server socket is null.");
             }
             GameSession session = new GameSession(keyCode, socket, server);
-            sessions[keyCode] = session;
+            Sessions[keyCode] = session;
             return session;
         }
 
@@ -74,20 +92,42 @@ namespace FoolishServer.RPC
         public static ISession Get(Guid? KeyCode)
         {
             ISession session;
-            return KeyCode != null && sessions.TryGetValue(KeyCode.Value, out session) ? session : null;
+            return KeyCode != null && Sessions.TryGetValue(KeyCode.Value, out session) ? session : null;
         }
 
         /// <summary>
         /// 异步给一堆客户端发消息
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="sessions"></param>
-        public static void SendAsync(IMessageWriter message, IEnumerable<GameSession> sessions)
+        /// <param name="actionId">协议id</param>
+        /// <param name="message">消息</param>
+        /// <param name="sessions">目标Session</param>
+        public static void Send(int actionId, IMessageWriter message, IEnumerable<GameSession> sessions)
         {
+            message.ActionId = actionId;
             foreach (GameSession session in sessions)
             {
-                session.Send(message);
+                session.Send(actionId, message);
             }
+        }
+
+        /// <summary>
+        /// 获取同服的session
+        /// </summary>
+        /// <param name="session"></param>
+        public static IReadOnlyList<ISession> GetSessions(ISession session)
+        {
+            List<ISession> sessions = new List<ISession>();
+            lock (Sessions.SyncRoot)
+            {
+                foreach (ISession ses in Sessions.Values)
+                {
+                    if (ses.ServerName == session.ServerName)
+                    {
+                        sessions.Add(ses);
+                    }
+                }
+            }
+            return sessions;
         }
     }
 }

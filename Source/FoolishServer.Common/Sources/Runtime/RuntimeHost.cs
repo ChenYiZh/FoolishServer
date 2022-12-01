@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -121,7 +121,7 @@ namespace FoolishServer.Runtime
                     CustomRuntime = ObjectFactory.Create<IRuntime>(Settings.MainClass);
                     if (CustomRuntime == null)
                     {
-                        //throw new Exception(Settings.MainClass + " is not exists.");
+                        throw new Exception(Settings.MainClass + " is not exists.");
                     }
                 }
 

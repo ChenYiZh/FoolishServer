@@ -25,6 +25,7 @@ SOFTWARE.
 ****************************************************************************/
 using Example.Log;
 using FoolishClient.Net;
+using FoolishClient.RPC;
 using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
@@ -45,24 +46,23 @@ namespace Example
             //FConsole.LogStackLevels.Add("Debug");
             FConsole.LogStackLevels.Add("Warn");
             FConsole.RegistLogger(new Logger());
-            TcpSocket socket = new TcpSocket();
+
+            //IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+            IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
             //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
-            socket.Ready("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+
             MessageWriter message = new MessageWriter();
             //message.Secret = false;
             //message.Compress = false;
-            message.MsgId = 1;
-            message.OpCode = -1;
-            message.ActionId = 1000;
             message.WriteString("Hello World!");
             //Console.Read();
-            socket.Send(message);
+            Network.Send(1000, message);
             //Console.Read();
-            socket.Send(message);
-            socket.Send(message);
-            socket.Send(message);
+            Network.Send(1000, message);
+            Network.Send(1000, message);
+            Network.Send(1000, message);
             while (true)
             {
                 Console.ReadLine();
@@ -72,10 +72,10 @@ namespace Example
                 }
                 else
                 {
-                    socket.Send(message);
-                    socket.Send(message);
-                    socket.Send(message);
-                    socket.Send(message);
+                    Network.Send(1000, message);
+                    Network.Send(1000, message);
+                    Network.Send(1000, message);
+                    Network.Send(1000, message);
                 }
             }
         }

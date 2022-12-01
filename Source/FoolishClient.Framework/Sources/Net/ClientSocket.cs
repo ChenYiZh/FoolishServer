@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -437,7 +437,7 @@ namespace FoolishClient.Net
             {
                 return;
             }
-            FConsole.Write(new System.Diagnostics.StackTrace(true).ToString());
+            //FConsole.Write(new System.Diagnostics.StackTrace(true).ToString());
             IsRunning = false;
             lock (this)
             {

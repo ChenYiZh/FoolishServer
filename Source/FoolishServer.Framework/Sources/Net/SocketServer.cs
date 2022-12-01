@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -237,7 +237,7 @@ namespace FoolishServer.Net
         protected virtual void OnSessionConnected(ISession session)
         {
             //在客户端连接时执行
-            FConsole.WriteFormat("Hello {0}!", session.SessionId);
+            //FConsole.WriteFormat("Hello {0}!", session.SessionId);
         }
 
         private void OnSocketDisconnected(IServerSocket socket, IRemoteSocket remoteSocket)
@@ -270,7 +270,7 @@ namespace FoolishServer.Net
         protected virtual void OnSessionDisonnected(ISession session)
         {
             //在客户端断开时执行
-            FConsole.WriteFormat("Bye {0}!", session.SessionId);
+            //FConsole.WriteFormat("Bye {0}!", session.SessionId);
         }
 
         private void OnSocketReceiveHeartbeat(IServerSocket socket, IMessageEventArgs<IRemoteSocket> args)
@@ -296,7 +296,7 @@ namespace FoolishServer.Net
         protected virtual void OnSessionHeartbeat(ISession session)
         {
             //收到客户端的心跳包时执行
-            FConsole.WriteFormat("Beat {0}!", session.SessionId);
+            //FConsole.WriteFormat("Beat {0}!", session.SessionId);
         }
 
         /// <summary>

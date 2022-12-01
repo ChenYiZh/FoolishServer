@@ -2,7 +2,7 @@
 THIS FILE IS PART OF Foolish Server PROJECT
 THIS PROGRAM IS FREE SOFTWARE, IS LICENSED UNDER MIT
 
-Copyright (c) 2022-2025 ChenYiZh
+Copyright (c) 2022-2030 ChenYiZh
 https://space.bilibili.com/9308172
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,6 +32,7 @@ using System.Text;
 using FoolishServer.Log;
 using FoolishServer.Net;
 using FoolishGames.Net;
+using FoolishGames.Reflection;
 
 namespace FoolishServer.RPC
 {
@@ -140,8 +141,8 @@ namespace FoolishServer.RPC
             IServer host = null;
             switch (setting.Type)
             {
-                case ESocketType.Tcp: host = new TcpServer(); break;
-                case ESocketType.Udp: host = new UdpServer(); break;
+                case ESocketType.Tcp: host = string.IsNullOrEmpty(setting.ClassFullname) ? new TcpServer() : ObjectFactory.Create<TcpServer>(setting.ClassFullname); break;
+                case ESocketType.Udp: host = string.IsNullOrEmpty(setting.ClassFullname) ? new UdpServer() : ObjectFactory.Create<UdpServer>(setting.ClassFullname); break;
             }
             return host;
         }

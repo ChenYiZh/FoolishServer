@@ -2167,6 +2167,16 @@
             线程释放，所有数据释放
             </summary>
         </member>
+        <member name="T:FoolishGames.Common.Constants">
+            <summary>
+            一些常量
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.Constants.HeartBeatsInterval">
+            <summary>
+            心跳包间隔
+            </summary>
+        </member>
         <member name="T:FoolishGames.Common.FType`1">
             <summary>
             Type缓存类，防止多次调用GetType或者typeof
