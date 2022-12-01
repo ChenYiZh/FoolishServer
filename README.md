@@ -8,6 +8,6 @@
 哔哩哔哩 [ChenYiZh](https://space.bilibili.com/9308172)
 
 ## 帮助文档
-[Wiki](../../Wikis/Home)
+[Wiki](../../wikis/Home)
 ## 开源协议
 参见根目录 [LICENSE](LICENSE) 文件。
