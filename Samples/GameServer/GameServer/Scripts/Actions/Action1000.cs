@@ -47,6 +47,7 @@ namespace FoolishServer.Actions
             FConsole.Write(reader.ReadString());
             IEntitySet<Test> set = DataContext.GetEntity<Test>();
             Test entity = set.Find(1000, "Hello World!");
+            entity.Password = "123456789";
             MessageWriter msg = new MessageWriter();
             msg.WriteString("Server Response: " + entity.UserName);
             Session.Send(1000, msg);
