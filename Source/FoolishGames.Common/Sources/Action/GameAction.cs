@@ -57,15 +57,20 @@ namespace FoolishGames.Action
         /// </summary>
         public int AlertTimeout { get; protected set; } = 1000;
 
-        /// <summary>
-        /// 计时器
-        /// </summary>
-        private Stopwatch watch = null;
+        ///// <summary>
+        ///// 计时器
+        ///// </summary>
+        //private Stopwatch watch = null;
+
+        ///// <summary>
+        ///// 是否在计时
+        ///// </summary>
+        //private bool IsTiming { get { return watch != null && watch.IsRunning; } }
 
         /// <summary>
-        /// 是否在计时
+        /// Action执行的时机
         /// </summary>
-        private bool IsTiming { get { return watch != null && watch.IsRunning; } }
+        private DateTime EnterTime { get; set; }
 
         /// <summary>
         /// 接收到的消息
@@ -112,20 +117,22 @@ namespace FoolishGames.Action
             try
             {
                 Awake();
-                if (AnalysisTime)
-                {
-                    if (watch == null) { watch = new Stopwatch(); }
-                    watch.Restart();
-                }
+                //if (AnalysisTime)
+                //{
+                //    if (watch == null) { watch = new Stopwatch(); }
+                //    watch.Restart();
+                //}
+                EnterTime = DateTime.Now;
                 SetReader(reader);
                 if (Check())
                 {
                     TakeAction(reader);
                 }
-                if (IsTiming)
+                if (AnalysisTime)
                 {
-                    watch.Stop();
-                    TimeSpan deltaTime = watch.Elapsed;
+                    //watch.Stop();
+                    //TimeSpan deltaTime = watch.Elapsed;
+                    TimeSpan deltaTime = DateTime.Now - EnterTime;
                     if (deltaTime.TotalMilliseconds > AlertTimeout)
                     {
                         FConsole.WriteWarnFormatWithCategory(Categories.ACTION, "{0} is timeout, {1}ms.", TypeName, (int)deltaTime.TotalMilliseconds);
@@ -136,10 +143,10 @@ namespace FoolishGames.Action
             {
                 FConsole.WriteExceptionWithCategory(Categories.ACTION, "An error occurred on process action", e);
             }
-            if (watch != null)
-            {
-                watch.Reset();
-            }
+            //if (watch != null)
+            //{
+            //    watch.Reset();
+            //}
         }
 
         /// <summary>

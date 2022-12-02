@@ -28,7 +28,7 @@ namespace FoolishClient.RPC
         /// <summary>
         /// 创建套接字
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">标识名称</param>
         /// <param name="host"></param>
         /// <param name="port"></param>
         /// <param name="actionClassFullName">Action协议类的完整名称</param>
@@ -83,8 +83,7 @@ namespace FoolishClient.RPC
         }
 
         /// <summary>
-        /// 使用默认套接字来发送消息
-        /// <para>通过DefaultUsableSocketName来配置默认的套接字名称</para>
+        /// 使用套接字来发送消息
         /// </summary>
         public static void Send(string socketName, int actionId, IMessageWriter message)
         {
