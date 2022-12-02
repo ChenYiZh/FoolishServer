@@ -1,7 +1,9 @@
-﻿using FoolishClient.Net;
+﻿using FoolishClient.Log;
+using FoolishClient.Net;
 using FoolishGames.Collections;
 using FoolishGames.Common;
 using FoolishGames.IO;
+using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +13,7 @@ namespace FoolishClient.RPC
     /// <summary>
     /// 网络处理类
     /// </summary>
-    public static class Network
+    public static class FNetwork
     {
         /// <summary>
         /// 默认使用的套接字名称
@@ -89,6 +91,24 @@ namespace FoolishClient.RPC
             message.ActionId = actionId;
             message.OpCode = 0;
             GetSocket(socketName)?.Send(message);
+        }
+
+        /// <summary>
+        /// 关闭所有套接字连接
+        /// </summary>
+        public static void Shutdown()
+        {
+            foreach (KeyValuePair<string, IClientSocket> socket in Sockets)
+            {
+                try
+                {
+                    socket.Value.Close();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Categories.SOCKET, e);
+                }
+            }
         }
     }
 }

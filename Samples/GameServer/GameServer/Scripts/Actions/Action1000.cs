@@ -26,6 +26,9 @@ SOFTWARE.
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishServer.Action;
+using FoolishServer.Data;
+using FoolishServer.Data.Entity;
+using FoolishServer.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -42,8 +45,10 @@ namespace FoolishServer.Actions
         public override void TakeAction(IMessageReader reader)
         {
             FConsole.Write(reader.ReadString());
+            IEntitySet<Test> set = DataContext.GetEntity<Test>();
+            Test entity = set.Find(1000, "Hello World!");
             MessageWriter msg = new MessageWriter();
-            msg.WriteString(Session.SessionId);
+            msg.WriteString("Server Response: " + entity.UserName);
             Session.Send(1000, msg);
         }
     }

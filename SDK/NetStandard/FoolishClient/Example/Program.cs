@@ -48,7 +48,7 @@ namespace Example
             FConsole.RegistLogger(new Logger());
 
             //IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
-            IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+            IClientSocket socket = FNetwork.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
             //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
@@ -58,11 +58,11 @@ namespace Example
             //message.Compress = false;
             message.WriteString("Hello World!");
             //Console.Read();
-            Network.Send(1000, message);
+            FNetwork.Send(1000, message);
             //Console.Read();
-            Network.Send(1000, message);
-            Network.Send(1000, message);
-            Network.Send(1000, message);
+            FNetwork.Send(1000, message);
+            FNetwork.Send(1000, message);
+            FNetwork.Send(1000, message);
             while (true)
             {
                 Console.ReadLine();
@@ -72,10 +72,10 @@ namespace Example
                 }
                 else
                 {
-                    Network.Send(1000, message);
-                    Network.Send(1000, message);
-                    Network.Send(1000, message);
-                    Network.Send(1000, message);
+                    FNetwork.Send(1000, message);
+                    FNetwork.Send(1000, message);
+                    FNetwork.Send(1000, message);
+                    FNetwork.Send(1000, message);
                 }
             }
         }

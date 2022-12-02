@@ -53,56 +53,6 @@ namespace FoolishServer.Model
         [EntityField(Nullable = false, DefaultValue = 100)]
         [JsonProperty, ProtoMember(5)]
         public long TestID { get; set; }
-
-        private long testStr;
-        public long TestStr
-        {
-            get
-            {
-                object syncRoot = SyncRoot;
-                bool lockTaken = false;
-                try
-                {
-                    Monitor.TryEnter(syncRoot, 1000, ref lockTaken);
-                    return testStr;
-                }
-                finally
-                {
-                    if (lockTaken)
-                    {
-                        Monitor.Exit(syncRoot);
-                    }
-                }
-            }
-            set
-            {
-                bool equals = true;
-                object oldValue = null;
-                object syncRoot = SyncRoot;
-                bool lockTaken = false;
-                try
-                {
-                    Monitor.TryEnter(syncRoot, 1000, ref lockTaken);
-                    equals = object.Equals(testStr, value);
-                    if (!equals)
-                    {
-                        oldValue = testStr;
-                        testStr = value;
-                    }
-                }
-                finally
-                {
-                    if (lockTaken)
-                    {
-                        Monitor.Exit(syncRoot);
-                    }
-                }
-                if (!equals)
-                {
-                    NotifyPropertyModified("TestStr", oldValue, value);
-                }
-            }
-        }
     }
 }
 

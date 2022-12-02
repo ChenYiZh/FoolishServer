@@ -105,7 +105,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 消息处理方案
         /// </summary>
-        public virtual IBoss MessageEventProcessor { get; protected set; } = new DirectMessageProcessor();
+        public virtual IBoss MessageEventProcessor { get; set; } = new DirectMessageProcessor();
 
         /// <summary>
         /// 初始化

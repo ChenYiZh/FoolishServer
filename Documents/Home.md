@@ -1,6 +1,4 @@
----
-
-Foolish Server 是基于C#的平台，快速开发搭建网络连接的服务器框架。原型是参考[Scut](https://github.com/ScutGame/Scut)进行开发。基于多年开发总结下来的经验，有许多功能被删改，并且不会纳入服务器功能。例如，分布式需要开发者自己实现，热更功能被移除，Lua以及Python被移除，数据从完全依赖Redis，改为程序内部管理，等等。
+Foolish Server 是基于C#的平台，快速开发搭建网络连接的服务器框架。原型是参考[Scut](https://github.com/ScutGame/Scut)进行开发。基于多年开发总结下来的经验，有许多功能被删改，并且不会纳入服务器功能。例如，从 Net4.6 改为 Netstandard 2.0，更容易部署到Linux；分布式需要开发者自己实现；热更功能被移除；Lua以及Python被移除；数据从完全依赖Redis；改为程序内部管理；等等。
 
 ## 库文件说明
 
@@ -23,7 +21,7 @@ Foolish Server 是基于C#的平台，快速开发搭建网络连接的服务器
 - [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/)
 
 ## 服务器框架结构图
-[![Framework](Documents/Images/Framework.jpg)]
+![Framework](../raw/main/Documents/Images/Framework.jpg)
 
 - Sockets层 根据Config的配置开启多组服务器
 - Action层 用于执行Socket收到的协议，根据Socket中配置进行管理
