@@ -25,6 +25,7 @@ SOFTWARE.
 ****************************************************************************/
 using FoolishGames.Common;
 using FoolishGames.Net;
+using FoolishGames.Sources.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -110,7 +111,11 @@ namespace FoolishGames.IO
         /// 写入消息头数据
         /// </summary>
         public void WriteHeader(byte[] buffer, int offset)
-        {
+        {            
+            for (int i = 0; i < offset; i++)
+            {
+                buffer[i] = RandomUtil.RandomByte();
+            }
             int index = offset;
             byte[] data = BitConverter.GetBytes(MsgId);
             for (int i = 0; i < data.Length; i++)

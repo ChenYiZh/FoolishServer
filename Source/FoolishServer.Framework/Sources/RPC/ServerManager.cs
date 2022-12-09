@@ -138,6 +138,7 @@ namespace FoolishServer.RPC
         /// <returns></returns>
         private static IServer CreateServer(IHostSetting setting)
         {
+            //return new TcpServer();
             IServer host = null;
             switch (setting.Type)
             {

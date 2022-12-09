@@ -237,7 +237,7 @@ namespace FoolishClient.Net
             if (!IsReady)
             {
                 IsRunning = false;
-                FConsole.WriteInfoFormatWithCategory(Categories.SOCKET, "Socket is not ready!");
+                FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, "Socket is not ready!");
                 return false;
             }
             IsRunning = true;

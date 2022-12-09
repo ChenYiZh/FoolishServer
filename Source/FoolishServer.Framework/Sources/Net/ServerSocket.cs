@@ -423,6 +423,7 @@ namespace FoolishServer.Net
             try
             {
                 IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
+                if (userToken == null) { return; }//TODO:不知道为什么会有空的情况
                 RemoteSocket socket = (RemoteSocket)userToken.Socket;
                 socket.AccessTime = TimeLord.Now;
                 if (socket.MessageSolved(sender, ioEventArgs))
@@ -458,7 +459,11 @@ namespace FoolishServer.Net
                     socket.Close();
                     continue;
                 }
+                ////不做这个处理会认为连接失败
+                //if ((TimeLord.Now - socket.AccessTime).TotalSeconds > 1)
+                //{
                 socket.CheckSendOrReceive();
+                //}
             }
         }
 

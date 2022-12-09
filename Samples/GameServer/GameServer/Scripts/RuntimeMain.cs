@@ -48,7 +48,9 @@ namespace FoolishServer
         public override void OnStartup()
         {
             FConsole.LogStackTracker = true;
-            FConsole.LogStackLevels.Add(LogLevel.WARN);
+            //FConsole.LogStackLevels.Add(LogLevel.WARN);
+            //FConsole.LogStackLevels.Add(LogLevel.INFO);
+            //FConsole.LogStackLevels.Add(LogLevel.DEBUG);
             base.OnStartup();
             FConsole.WriteWarn("RuntimeMain OnStartup: " + Settings.IsDebug);
             return;

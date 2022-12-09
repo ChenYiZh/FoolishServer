@@ -37,7 +37,7 @@ namespace FoolishGames.Proxy
     public static class ActionBoss
     {
         /// <summary>
-        /// 剥削劳动力
+        /// 剥削
         /// </summary>
         public static void Exploit(GameAction action, int actionId, IMessageReader reader)
         {

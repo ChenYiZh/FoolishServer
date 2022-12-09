@@ -114,7 +114,6 @@ namespace FoolishGames.Common
         /// <summary>
         /// 解包
         /// </summary>
-        /// <returns>返回剩余字节位置</returns>
         public static IMessageReader Unpack(byte[] package, int offset, ICompression compression, ICryptoProvider cryptography)
         {
             int pos = 0;

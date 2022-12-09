@@ -60,8 +60,8 @@ namespace FoolishGames.Net
             get
             {
                 return EventArgs != null
-                    && EventArgs.AcceptSocket != null
-                    && EventArgs.AcceptSocket.Connected;
+                    && Socket != null
+                    && Socket.Connected;
             }
         }
 
@@ -73,7 +73,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 原生套接字
         /// </summary>
-        public virtual Socket Socket { get { return EventArgs?.AcceptSocket; } }
+        public virtual Socket Socket { get; protected set; }
 
         /// <summary>
         /// 内部关键原生Socket
@@ -118,6 +118,7 @@ namespace FoolishGames.Net
                 return;
             }
             EventArgs = eventArgs;
+            Socket = EventArgs.AcceptSocket;
             UserToken userToken = eventArgs.UserToken as UserToken;
             if (userToken == null)
             {
@@ -138,13 +139,13 @@ namespace FoolishGames.Net
                 if (EventArgs != null)
                 {
                     ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
-                    if (EventArgs.AcceptSocket != null)
+                    if (Socket != null)
                     {
                         try
                         {
-                            EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
-                            EventArgs.AcceptSocket.Close();
-                            EventArgs.AcceptSocket.Dispose();
+                            Socket.Shutdown(SocketShutdown.Both);
+                            Socket.Close();
+                            Socket.Dispose();
                         }
                         catch (Exception e)
                         {
@@ -153,6 +154,7 @@ namespace FoolishGames.Net
                         finally
                         {
                             EventArgs.AcceptSocket = null;
+                            Socket = null;
                         }
                     }
                     UserToken userToken;

@@ -92,7 +92,8 @@ namespace FoolishGames.Net
         {
             if (Socket == null || Socket.Socket == null || !Socket.Connected)
             {
-                FConsole.WriteWarnWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display disconnected.");
+                FConsole.WriteWarnFormatWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display {0}.", 
+                    Socket != null && Socket.Socket != null ? (Socket.Socket.Connected ? "connected" : "disconnected") : "socket is null");
                 Socket?.Close();
                 return false;
             }

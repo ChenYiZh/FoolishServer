@@ -161,7 +161,9 @@ namespace FoolishGames.Action
         /// 消息预处理
         /// </summary>
         public virtual void SetReader(IMessageReader reader) { }
-
+        /// <summary>
+        /// 消息处理
+        /// </summary>
         public abstract void TakeAction(IMessageReader reader);
     }
 }
