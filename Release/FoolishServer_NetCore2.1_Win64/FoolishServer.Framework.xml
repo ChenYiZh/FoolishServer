@@ -40,6 +40,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:FoolishServer.Config.IHostSetting">
+            <summary>
+            服务器配置
+            </summary>
+        </member>
         <member name="P:FoolishServer.Config.IHostSetting.Name">
             <summary>
             服务器标识
@@ -53,6 +58,11 @@
         <member name="P:FoolishServer.Config.IHostSetting.Type">
             <summary>
             类型
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Config.IHostSetting.ClassFullname">
+            <summary>
+            自定义脚本的完整名称，可以不设置，使用原生的管理类
             </summary>
         </member>
         <member name="P:FoolishServer.Config.IHostSetting.ActionClassFullName">
@@ -937,7 +947,7 @@
             关闭会话窗口
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.ISession.Send(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.RPC.ISession.Send(System.Int32,FoolishGames.IO.IMessageWriter)">
             <summary>
             异步发送一条数据
             </summary>
@@ -1051,12 +1061,12 @@
             关闭Session
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.Send(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.IMessageWriter)">
             <summary>
             异步发送一条数据
             </summary>
         </member>
-        <member name="F:FoolishServer.RPC.GameSession.sessions">
+        <member name="F:FoolishServer.RPC.GameSession.Sessions">
             <summary>
             会话窗口池
             </summary>
@@ -1076,12 +1086,19 @@
             通过Guid获取Session
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.SendAsync(FoolishGames.IO.IMessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
+        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.IMessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
             <summary>
             异步给一堆客户端发消息
             </summary>
-            <param name="message"></param>
-            <param name="sessions"></param>
+            <param name="actionId">协议id</param>
+            <param name="message">消息</param>
+            <param name="sessions">目标Session</param>
+        </member>
+        <member name="M:FoolishServer.RPC.GameSession.GetSessions(FoolishServer.RPC.ISession)">
+            <summary>
+            获取同服的session
+            </summary>
+            <param name="session"></param>
         </member>
         <member name="T:FoolishServer.RPC.ServerManager">
             <summary>

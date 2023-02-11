@@ -124,6 +124,11 @@
             执行类
             </summary>
         </member>
+        <member name="P:FoolishServer.Config.HostServerSetting.ClassFullname">
+            <summary>
+            自定义脚本的完整名称，可以不设置，使用原生的管理类
+            </summary>
+        </member>
         <member name="P:FoolishServer.Config.HostServerSetting.ActionClassFullName">
             <summary>
             消息处理的完整类名，用{0}嵌入id
