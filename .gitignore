@@ -13,3 +13,10 @@ bin
 /Samples/Unity/obj
 /Samples/Unity/Packages
 /Samples/Unity/ProjectSettings
+/Samples/UE/.vsconfig
+/Samples/UE/.idea
+/Samples/UE/.vs
+/Samples/UE/DerivedDataCache
+/Samples/UE/Intermediate
+/Samples/UE/Saved
+/Samples/UE/Plugins/Developer
