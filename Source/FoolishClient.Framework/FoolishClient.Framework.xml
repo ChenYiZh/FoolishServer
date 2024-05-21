@@ -373,6 +373,27 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:FoolishClient.Net.UdpSocket">
+            <summary>
+            Tcp连接池
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.UdpSocket.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Net.UdpSocket.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.UdpSocket.MakeSocket">
+            <summary>
+            建立原生套接字
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:FoolishClient.Proxy.IClientActionDispatcher">
             <summary>
             Action工厂
@@ -454,6 +475,16 @@
             </summary>
         </member>
         <member name="M:FoolishClient.RPC.FNetwork.MakeTcpSocket(System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            创建套接字
+            </summary>
+            <param name="name">标识名称</param>
+            <param name="host"></param>
+            <param name="port"></param>
+            <param name="actionClassFullName">Action协议类的完整名称</param>
+            <param name="heartbeatInterval">心跳间隔</param>
+        </member>
+        <member name="M:FoolishClient.RPC.FNetwork.MakeUdpSocket(System.String,System.String,System.Int32,System.String,System.Int32)">
             <summary>
             创建套接字
             </summary>

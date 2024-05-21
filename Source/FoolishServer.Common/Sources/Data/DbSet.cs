@@ -371,12 +371,15 @@ namespace FoolishServer.Data
             {
                 if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromRawDb))
                 {
-                    IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
-                    rawEntities.Clear();
-                    foreach (T entity in iterator)
+                    if (DataContext.RawDatabase != null)
                     {
-                        entity.OnPulledFromDb();
-                        rawEntities[entity.GetEntityKey()] = entity;
+                        IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
+                        rawEntities.Clear();
+                        foreach (T entity in iterator)
+                        {
+                            entity.OnPulledFromDb();
+                            rawEntities[entity.GetEntityKey()] = entity;
+                        }
                     }
                 }
             }
@@ -434,7 +437,7 @@ namespace FoolishServer.Data
                             commitions.Add(new DbCommition(kv.Key, kv.Value == null ? EModifyType.Remove : kv.Value.ModifiedType, kv.Value));
                             kv.Value?.ResetModifiedType();
                         }
-                        if (TableScheme.StorageType.HasFlag(EStorageType.WriteToRawDb))
+                        if (TableScheme.StorageType.HasFlag(EStorageType.WriteToRawDb) && DataContext.RawDatabase != null)
                         {
                             DataContext.RawDatabase.CommitModifiedEntitys(commitions);
                         }

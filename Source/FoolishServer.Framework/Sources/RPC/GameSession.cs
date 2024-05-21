@@ -55,7 +55,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 绑定的UserId
         /// </summary>
-        public long UserId { get; private set; }
+        public long UserId { get; set; }
 
         /// <summary>
         /// 远端地址

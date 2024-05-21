@@ -54,5 +54,9 @@ namespace FoolishServer.Config
         /// 连接Timeout
         /// </summary>
         int Timeout { get; }
+        /// <summary>
+        /// 数据是否有效
+        /// </summary>
+        bool IsValid { get; }
     }
 }

@@ -457,7 +457,7 @@
             <summary>
             创建套接字
             </summary>
-            <param name="name"></param>
+            <param name="name">标识名称</param>
             <param name="host"></param>
             <param name="port"></param>
             <param name="actionClassFullName">Action协议类的完整名称</param>
@@ -481,8 +481,7 @@
         </member>
         <member name="M:FoolishClient.RPC.FNetwork.Send(System.String,System.Int32,FoolishGames.IO.IMessageWriter)">
             <summary>
-            使用默认套接字来发送消息
-            <para>通过DefaultUsableSocketName来配置默认的套接字名称</para>
+            使用套接字来发送消息
             </summary>
         </member>
         <member name="M:FoolishClient.RPC.FNetwork.Shutdown">

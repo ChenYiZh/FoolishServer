@@ -75,14 +75,9 @@
             警告超时时间毫秒，0为全部统计
             </summary>
         </member>
-        <member name="F:FoolishGames.Action.GameAction.watch">
+        <member name="P:FoolishGames.Action.GameAction.EnterTime">
             <summary>
-            计时器
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Action.GameAction.IsTiming">
-            <summary>
-            是否在计时
+            Action执行的时机
             </summary>
         </member>
         <member name="P:FoolishGames.Action.GameAction.Reader">
@@ -120,6 +115,11 @@
         <member name="M:FoolishGames.Action.GameAction.SetReader(FoolishGames.IO.IMessageReader)">
             <summary>
             消息预处理
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Action.GameAction.TakeAction(FoolishGames.IO.IMessageReader)">
+            <summary>
+            消息处理
             </summary>
         </member>
         <member name="T:FoolishGames.Collections.IReadOnlyQueue`1">
@@ -1692,7 +1692,7 @@
         </member>
         <member name="M:FoolishGames.Proxy.ActionBoss.Exploit(FoolishGames.Action.GameAction,System.Int32,FoolishGames.IO.IMessageReader)">
             <summary>
-            剥削劳动力
+            剥削
             </summary>
         </member>
         <member name="T:FoolishGames.Proxy.DirectMessageProcessor">
@@ -2242,7 +2242,6 @@
             <summary>
             解包
             </summary>
-            <returns>返回剩余字节位置</returns>
         </member>
         <member name="M:FoolishGames.Common.PackageFactory.GetTotalLength(System.Byte[],System.Int32)">
             <summary>

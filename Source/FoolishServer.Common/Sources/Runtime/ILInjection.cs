@@ -53,6 +53,10 @@ namespace FoolishServer.Runtime
         /// <returns></returns>
         public static bool InjectEntityChangeEvent()
         {
+            if (string.IsNullOrEmpty(Settings.AssemblyName))
+            {
+                return false;
+            }
             //判断dll是否存在
             string assemblyFullname = FPath.GetFullPath(Settings.AssemblyName);
             if (!File.Exists(assemblyFullname))

@@ -310,9 +310,9 @@ namespace FoolishClient.Net
         {
             if (Socket == null)
             {
-                Socket socket = MakeSocket();
+                Socket = MakeSocket();
                 //socket.ReceiveTimeout = 50;//此方法只能在同步模式下使用
-                EventArgs = MakeEventArgs(socket);
+                EventArgs = MakeEventArgs(Socket);
             }
             if (Sender == null)
             {

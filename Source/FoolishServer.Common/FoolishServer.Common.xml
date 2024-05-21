@@ -64,6 +64,11 @@
             连接Timeout
             </summary>
         </member>
+        <member name="P:FoolishServer.Config.IRedisSetting.IsValid">
+            <summary>
+            数据是否有效
+            </summary>
+        </member>
         <member name="M:FoolishServer.Config.Configeration.Initialize">
             <summary>
             初始化
@@ -208,6 +213,11 @@
         <member name="P:FoolishServer.Config.RedisSetting.Timeout">
             <summary>
             连接Timeout
+            </summary>
+        </member>
+        <member name="P:FoolishServer.Config.RedisSetting.IsValid">
+            <summary>
+            数据是否有效
             </summary>
         </member>
         <member name="T:FoolishServer.Config.Settings">

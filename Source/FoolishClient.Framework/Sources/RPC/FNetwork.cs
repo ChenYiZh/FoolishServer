@@ -49,6 +49,27 @@ namespace FoolishClient.RPC
         /// <summary>
         /// 创建套接字
         /// </summary>
+        /// <param name="name">标识名称</param>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
+        /// <param name="actionClassFullName">Action协议类的完整名称</param>
+        /// <param name="heartbeatInterval">心跳间隔</param>
+        public static UdpSocket MakeUdpSocket(string name, string host, int port,
+            string actionClassFullName,
+            int heartbeatInterval = Constants.HeartBeatsInterval)
+        {
+            UdpSocket socket = new UdpSocket();
+            if (!MakeSocket(name, socket))
+            {
+                throw new Exception("The same key: " + name + " exists in Network sockets.");
+            }
+            socket.Ready(name, host, port, actionClassFullName, heartbeatInterval);
+            return socket;
+        }
+
+        /// <summary>
+        /// 创建套接字
+        /// </summary>
         private static bool MakeSocket(string name, IClientSocket socket)
         {
             IClientSocket exists;

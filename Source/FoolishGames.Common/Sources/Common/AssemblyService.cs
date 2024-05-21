@@ -50,6 +50,7 @@ namespace FoolishGames.Common
         /// <returns></returns>
         public static Assembly Load(string dllPath)
         {
+            if (string.IsNullOrEmpty(dllPath)) return null;
             if (!dllPath.EndsWith(".dll")) return null;
             string dllName = Path.GetFileNameWithoutExtension(dllPath);
             if (assemblies.ContainsKey(dllName))

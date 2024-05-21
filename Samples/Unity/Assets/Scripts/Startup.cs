@@ -17,7 +17,7 @@ public class Startup : MonoBehaviour
 
         FConsole.RegistLogger(logger);
 
-        FNetwork.MakeTcpSocket("default", "127.0.0.1", 9001, "Action{0}").MessageEventProcessor = proxy;
+        FNetwork.MakeUdpSocket("default", "127.0.0.1", 9001, "Action{0}").MessageEventProcessor = proxy;
 
         MessageWriter message = new MessageWriter();
         message.WriteString("Client Message: Hello World!");

@@ -141,7 +141,7 @@ namespace FoolishServer.Data
             }
 
             //建立Redis连接
-            if (RawDatabase == null)
+            if (RawDatabase == null && Settings.RedisSetting != null && Settings.RedisSetting.IsValid)
             {
                 RawDatabase = new RedisDatabase(Settings.RedisSetting);
             }
@@ -151,16 +151,19 @@ namespace FoolishServer.Data
             {
                 Databases = new Dictionary<string, ISQLDatabase>();
             }
-            IDictionary<string, ISQLDatabase> batabases = (IDictionary<string, ISQLDatabase>)Databases;
-            foreach (KeyValuePair<string, IDatabaseSetting> setting in Settings.DatabaseSettings)
+            if (Settings.DatabaseSettings != null)
             {
-                if (batabases.ContainsKey(setting.Key))
+                IDictionary<string, ISQLDatabase> batabases = (IDictionary<string, ISQLDatabase>)Databases;
+                foreach (KeyValuePair<string, IDatabaseSetting> setting in Settings.DatabaseSettings)
                 {
-                    FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "The connectkey: '{0}' is exists, and database connection will not create.", setting.Key);
-                    continue;
+                    if (batabases.ContainsKey(setting.Key))
+                    {
+                        FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "The connectkey: '{0}' is exists, and database connection will not create.", setting.Key);
+                        continue;
+                    }
+                    batabases[setting.Key] = Database.Make(setting.Value);
+                    batabases[setting.Key].SetSettings(setting.Value);
                 }
-                batabases[setting.Key] = Database.Make(setting.Value);
-                batabases[setting.Key].SetSettings(setting.Value);
             }
         }
 
@@ -189,9 +192,11 @@ namespace FoolishServer.Data
         /// </summary>
         internal static void Start()
         {
-            // Redis 连接
-            RawDatabase.Connect();
-
+            if (RawDatabase != null)
+            {
+                // Redis 连接
+                RawDatabase.Connect();
+            }
             // 数据库连接
             foreach (KeyValuePair<string, ISQLDatabase> database in Databases)
             {

@@ -275,6 +275,7 @@ namespace FoolishServer.Net
                 //设置最大挂载连接数量
                 Socket.Listen(setting.Backlog);
             }
+
             //服务器状态输出周期
             summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
@@ -283,7 +284,6 @@ namespace FoolishServer.Net
             //WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
             WaitingSocketThread = new Thread(() => { while (IsRunning) { ProcessWaiting(null); Thread.Sleep(1); } });
             WaitingSocketThread.Start();
-
             //启动监听
             PostAccept();
         }
@@ -298,10 +298,23 @@ namespace FoolishServer.Net
                 if (!IsRunning) { return; }
                 //对象池里拿结构
                 SocketAsyncEventArgs acceptEventArgs = acceptEventArgsPool.Pop() ?? CreateAcceptEventArgs();
-                //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.acceptasync?view=net-6.0
-                if (!Socket.AcceptAsync(acceptEventArgs))
+                if (Socket.ProtocolType == ProtocolType.Tcp)
                 {
-                    ProcessAccept(acceptEventArgs);
+                    //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.acceptasync?view=net-6.0
+                    if (!Socket.AcceptAsync(acceptEventArgs))
+                    {
+                        ProcessAccept(acceptEventArgs);
+                    }
+                }
+                else
+                {
+                    //acceptEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    //acceptEventArgs.AcceptSocket = Socket;
+                    //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.acceptasync?view=net-6.0
+                    if (!Socket.AcceptAsync(acceptEventArgs))
+                    {
+                        ProcessAccept(acceptEventArgs);
+                    }
                 }
             }
             catch (Exception e)

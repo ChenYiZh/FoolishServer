@@ -59,7 +59,7 @@ namespace FoolishServer.Config
             RuntimeHost.PrintStartInfo();
             //return;
             //编译脚本
-            if (Directory.Exists(FPath.GetFullPath(Settings.CSScriptsPath)))
+            if (!string.IsNullOrWhiteSpace(Settings.CSScriptsPath) && Directory.Exists(FPath.GetFullPath(Settings.CSScriptsPath)))
             {
                 FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Compiling scripts...");
                 if (!ScriptEngine.CompileByRoslyn(Settings.CSScriptsPath, Settings.IsDebug, Settings.AssemblyName))
@@ -83,7 +83,7 @@ namespace FoolishServer.Config
             Assembly assembly;
             if ((assembly = AssemblyService.Load(Settings.AssemblyName)) == null)
             {
-                throw new Exception("Failed to load the assembly: " + Settings.AssemblyName);
+                FConsole.WriteWarnFormatWithCategory(Categories.FOOLISH_SERVER, "Failed to load the assembly: " + Settings.AssemblyName);
             }
 
             FConsole.WriteInfoFormatWithCategory(Categories.FOOLISH_SERVER, "Ready to start servers...");

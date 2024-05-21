@@ -56,15 +56,25 @@ namespace FoolishServer.Config
         /// 连接Timeout
         /// </summary>
         public int Timeout { get; private set; }
+        /// <summary>
+        /// 数据是否有效
+        /// </summary>
+        public bool IsValid { get; private set; }
 
         public RedisSetting(XmlNode node)
         {
+            IsValid = false;
+            if (node == null)
+            {
+                return;
+            }
             Host = node.GetValue("host", "127.0.0.1");
             Port = node.GetValue("port", 6379);
             Password = node.GetValue("password", null);
             DbIndex = node.GetValue("db", 0);
             Timeout = node.SelectSingleNode("timeout").GetValue(5000);
             HostCheck();
+            IsValid = true;
         }
 
         private void HostCheck()

@@ -137,7 +137,7 @@ namespace FoolishServer.Config
             ServerID = xml.SelectSingleNode("/configuration/settings/server").GetValue(1);
             ConvertVersion(xml.SelectSingleNode("/configuration/settings/version").GetValue(null));
             CSScriptsPath = xml.SelectSingleNode("/configuration/script/cs-script-path").GetValue(null);
-            AssemblyName = xml.SelectSingleNode("/configuration/script/assembly").GetValue("FoolishServer.Runtime.dll");
+            AssemblyName = xml.SelectSingleNode("/configuration/script/assembly").GetValue(null);
             MainClass = xml.SelectSingleNode("/configuration/script/main-class-fullname").GetValue(null);
             //ModelNamespace = xml.SelectSingleNode("/configuration/script/model-namespace").GetValue("FoolishServer.Model");
             DataReleasePeriod = xml.SelectSingleNode("/configuration/settings/data-release-period").GetValue(15000);
@@ -172,22 +172,33 @@ namespace FoolishServer.Config
 
             //if (ModifiedCacheCount < 1) { ModifiedCacheCount = 3; }
             LoadHostSettings(xml);
-            RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
-
-            XmlNode dbNodes = xml.SelectSingleNode("/configuration/connections");
-            Dictionary<string, IDatabaseSetting> dbSettings = new Dictionary<string, IDatabaseSetting>();
-            DatabaseSettings = dbSettings;
-            foreach (XmlNode node in dbNodes)
+            try
             {
-                DatabaseSetting setting = new DatabaseSetting(node);
-                if (setting.Kind != Data.EDatabase.Unknow)
+                RedisSetting = new RedisSetting(xml.SelectSingleNode("/configuration/redis"));
+            }
+            catch { }
+
+            try
+            {
+                XmlNode dbNodes = xml.SelectSingleNode("/configuration/connections");
+                Dictionary<string, IDatabaseSetting> dbSettings = new Dictionary<string, IDatabaseSetting>();
+                DatabaseSettings = dbSettings;
+                foreach (XmlNode node in dbNodes)
                 {
-                    dbSettings.Add(setting.ConnectKey, setting);
+                    DatabaseSetting setting = new DatabaseSetting(node);
+                    if (setting.Kind != Data.EDatabase.Unknow)
+                    {
+                        dbSettings.Add(setting.ConnectKey, setting);
+                    }
+                    else
+                    {
+                        FConsole.WriteError("Fail to load db setting!");
+                    }
                 }
-                else
-                {
-                    FConsole.WriteError("Fail to load db setting!");
-                }
+            }
+            catch
+            {
+                //DatabaseSettings = new Dictionary<string, IDatabaseSetting>();
             }
         }
 
