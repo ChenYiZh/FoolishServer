@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using FoolishGames.IO;
 using FoolishGames.Log;
 using FoolishGames.Proxy;
@@ -136,33 +137,85 @@ namespace FoolishGames.Net
             lock (this)
             {
                 IsRunning = false;
-                if (EventArgs != null)
+
+                DisposeEventArgs();
+
+                if (Socket != null)
                 {
-                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
-                    if (Socket != null)
+                    try
                     {
-                        try
-                        {
-                            Socket.Shutdown(SocketShutdown.Both);
-                            Socket.Close();
-                            Socket.Dispose();
-                        }
-                        catch (Exception e)
-                        {
-                            FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
-                        }
-                        finally
-                        {
-                            EventArgs.AcceptSocket = null;
-                            Socket = null;
-                        }
+                        Socket.Shutdown(SocketShutdown.Both);
                     }
-                    UserToken userToken;
-                    if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
+                    catch (Exception e)
                     {
-                        userToken.Socket = null;
+                        //FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket shutdown error.", e);
+                    }
+                    //try
+                    //{
+                    //    Socket.Disconnect(false);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket disconnect error.", e);
+                    //}
+                    try
+                    {
+                        Socket.Close();
+                        Socket.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
+                    }
+                    finally
+                    {
+                        Socket = null;
                     }
                 }
+            }
+        }
+
+        protected void DisposeEventArgs()
+        {
+            if (EventArgs != null)
+            {
+                try
+                {
+                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Categories.SOCKET, "UserToken reset error.", e);
+                }
+
+                UserToken userToken;
+                if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
+                {
+                    userToken.Socket = null;
+                }
+
+                if (EventArgs.ConnectSocket != null)
+                {
+                    try
+                    {
+                        EventArgs.ConnectSocket.Close();
+                        EventArgs.ConnectSocket.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "EventArgs close socket error.", e);
+                    }
+                }
+
+                try
+                {
+                    EventArgs.Dispose();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Categories.SOCKET, "EventArgs dispose error.", e);
+                }
+                EventArgs = null;
             }
         }
 

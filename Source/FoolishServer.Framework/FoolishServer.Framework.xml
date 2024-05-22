@@ -664,7 +664,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:FoolishServer.Net.ServerSocket.Close">
+        <member name="M:FoolishServer.Net.ServerSocket.Close(FoolishGames.Net.EOpCode)">
             <summary>
             关闭操作
             </summary>

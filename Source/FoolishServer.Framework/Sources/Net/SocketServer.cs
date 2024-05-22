@@ -328,10 +328,10 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "An error occurred on close.", e);
             }
-            if (Setting == null)
-            {
-                return;
-            }
+            //if (Setting == null)
+            //{
+            //    return;
+            //}
             if (ServerSocket != null)
             {
                 try

@@ -636,10 +636,23 @@ namespace FoolishServer.Net
         /// <summary>
         /// 关闭操作
         /// </summary>
-        public void Close()
+        public override void Close(EOpCode opCode = EOpCode.Close)
         {
             IsRunning = false;
-            base.Close();
+            DisposeEventArgs();
+            List<RemoteSocket> sockets = new List<RemoteSocket>();
+            foreach (RemoteSocket socket in Sockets)
+            {
+                sockets.Add(socket);
+            }
+            foreach (RemoteSocket socket in sockets)
+            {
+                try
+                {
+                    socket.Close();
+                }
+                catch { }
+            }
             Sockets.Clear();
             //if (WaitingSocketTimer != null)
             //{
@@ -661,14 +674,31 @@ namespace FoolishServer.Net
 
             if (summaryTask != null)
             {
-                summaryTask.Dispose();
-                summaryTask = null;
-            }
-            if (Socket != null)
-            {
                 try
                 {
-                    Socket.Close();
+                    summaryTask.Dispose();
+                }
+                catch { }
+                summaryTask = null;
+            }
+
+            base.Close();
+
+
+            if (socket != null)
+            {
+                //try
+                //{
+                //    socket.Shutdown(SocketShutdown.Both);
+                //}
+                //catch (Exception e)
+                //{
+                //    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
+                //}
+                try
+                {
+                    socket.Close();
+                    socket.Dispose();
                 }
                 catch (Exception e)
                 {

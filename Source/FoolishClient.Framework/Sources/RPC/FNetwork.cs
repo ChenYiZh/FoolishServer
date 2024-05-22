@@ -78,7 +78,12 @@ namespace FoolishClient.RPC
                 Sockets[name] = socket;
                 return true;
             }
-            return false;
+            if (exists.IsRunning)
+            {
+                return false;
+            }
+            Sockets[name] = socket;
+            return true;
         }
 
         /// <summary>
@@ -129,6 +134,7 @@ namespace FoolishClient.RPC
                     FConsole.WriteExceptionWithCategory(Categories.SOCKET, e);
                 }
             }
+            Sockets.Clear();
         }
     }
 }
