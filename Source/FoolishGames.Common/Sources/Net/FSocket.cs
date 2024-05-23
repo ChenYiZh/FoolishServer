@@ -137,39 +137,31 @@ namespace FoolishGames.Net
             lock (this)
             {
                 IsRunning = false;
-
-                DisposeEventArgs();
-
-                if (Socket != null)
+                if (EventArgs != null)
                 {
-                    try
+                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
+                    if (Socket != null)
                     {
-                        Socket.Shutdown(SocketShutdown.Both);
+                        try
+                        {
+                            Socket.Shutdown(SocketShutdown.Both);
+                            Socket.Close();
+                            Socket.Dispose();
+                        }
+                        catch (Exception e)
+                        {
+                            FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
+                        }
+                        finally
+                        {
+                            EventArgs.AcceptSocket = null;
+                            Socket = null;
+                        }
                     }
-                    catch (Exception e)
+                    UserToken userToken;
+                    if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
                     {
-                        //FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket shutdown error.", e);
-                    }
-                    //try
-                    //{
-                    //    Socket.Disconnect(false);
-                    //}
-                    //catch (Exception e)
-                    //{
-                    //    FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket disconnect error.", e);
-                    //}
-                    try
-                    {
-                        Socket.Close();
-                        Socket.Dispose();
-                    }
-                    catch (Exception e)
-                    {
-                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "Socket close error.", e);
-                    }
-                    finally
-                    {
-                        Socket = null;
+                        userToken.Socket = null;
                     }
                 }
             }
