@@ -540,30 +540,39 @@ namespace FoolishServer.Net
         {
             Interlocked.Decrement(ref summary.CurrentConnectCount);
             Interlocked.Increment(ref summary.CloseConnectCount);
-
-            Sockets.Remove((RemoteSocket)socket);
-
-            IUserToken token = (IUserToken)socket.EventArgs.UserToken;
-            if (opCode != EOpCode.Empty)
+            try
             {
-                try
-                {
-                    // TODO: 处理关闭握手协议 CloseHandshake(dataToken.Socket, reason);
-                }
-                catch (Exception e)
-                {
-                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
-                }
+                throw new Exception("OnRemoteSocketClosed");
             }
-            if (socket.EventArgs.AcceptSocket != null)
+            catch (Exception e)
             {
-                try
+                FConsole.WriteException(e);
+            }
+            Sockets.Remove((RemoteSocket)socket);
+            if (socket.EventArgs != null)
+            {
+                IUserToken token = (IUserToken)socket.EventArgs.UserToken;
+                if (opCode != EOpCode.Empty)
                 {
-                    socket.EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
+                    try
+                    {
+                        // TODO: 处理关闭握手协议 CloseHandshake(dataToken.Socket, reason);
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
+                    }
                 }
-                catch (Exception e)
+                if (socket.EventArgs.AcceptSocket != null)
                 {
-                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
+                    try
+                    {
+                        socket.EventArgs.AcceptSocket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
+                    }
                 }
             }
             try
@@ -576,7 +585,6 @@ namespace FoolishServer.Net
                     summary.TotalConnectCount, summary.CurrentConnectCount, summary.CloseConnectCount, summary.RejectedConnectCount);
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), errorMessage, e);
             }
-
             try
             {
                 Disconnected(socket);
@@ -585,8 +593,11 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "OnDisconnected error:", e);
             }
-            ResetSocketAsyncEventArgs(socket.EventArgs);
-            ReleaseIOEventArgs(socket.EventArgs);
+            if (socket.EventArgs != null)
+            {
+                ResetSocketAsyncEventArgs(socket.EventArgs);
+                ReleaseIOEventArgs(socket.EventArgs);
+            }
         }
 
         /// <summary>

@@ -35,10 +35,13 @@ namespace FoolishServer
         static void Main(string[] args)
         {
             RuntimeHost.Startup();
-            while (true)
-            {
-                Console.Read();
-            }
+            //while (true)
+            //{
+            //    Console.Read();
+            //}
+            Console.ReadLine();
+            RuntimeHost.Shutdown();
+            Console.ReadLine();
         }
     }
 }

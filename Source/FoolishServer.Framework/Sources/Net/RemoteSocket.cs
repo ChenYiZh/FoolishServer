@@ -148,13 +148,13 @@ namespace FoolishServer.Net
         public override void Close(EOpCode opCode = EOpCode.Close)
         {
             bool isRuning = IsRunning;
-            base.Close(opCode);
             Sender = null;
             Receiver = null;
             if (isRuning)
             {
                 Server.OnRemoteSocketClosed(this, opCode);
             }
+            base.Close(opCode);
         }
 
         /// <summary>
