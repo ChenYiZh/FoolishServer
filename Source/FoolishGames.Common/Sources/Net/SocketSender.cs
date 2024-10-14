@@ -58,17 +58,17 @@ namespace FoolishGames.Net
         /// <summary>
         /// 发送队列的锁
         /// </summary>
-        private readonly object SendableSyncRoot = new object();
+        private readonly object _sendableSyncRoot = new object();
 
         /// <summary>
         /// 待发送的消息列表
         /// </summary>
-        private LinkedList<IWorker> WaitToSendMessages = new LinkedList<IWorker>();
+        private LinkedList<IWorker> _waitToSendMessages = new LinkedList<IWorker>();
 
         /// <summary>
         /// 消息Id，需要加原子锁
         /// </summary>
-        private long messageNumber = DateTime.Now.Ticks;
+        private long _messageNumber = DateTime.Now.Ticks;
 
         /// <summary>
         /// 消息Id
@@ -78,11 +78,11 @@ namespace FoolishGames.Net
         {
             get
             {
-                return Interlocked.Increment(ref messageNumber);
+                return Interlocked.Increment(ref _messageNumber);
             }
             set
             {
-                Interlocked.Exchange(ref messageNumber, value);
+                Interlocked.Exchange(ref _messageNumber, value);
             }
         }
 
@@ -158,15 +158,15 @@ namespace FoolishGames.Net
         /// </summary>
         private void CheckIn(WaitToSendMessage worker, bool immediately)
         {
-            lock (SendableSyncRoot)
+            lock (_sendableSyncRoot)
             {
                 if (immediately)
                 {
-                    WaitToSendMessages.AddFirst(worker);
+                    _waitToSendMessages.AddFirst(worker);
                 }
                 else
                 {
-                    WaitToSendMessages.AddLast(worker);
+                    _waitToSendMessages.AddLast(worker);
                 }
                 //未连接时返回
                 if (!Socket.Connected)
@@ -241,7 +241,7 @@ namespace FoolishGames.Net
             bool willRaiseEvent = true;
             lock (EventArgs)
             {
-                willRaiseEvent = Socket.Socket.SendAsync(EventArgs);
+                willRaiseEvent = Socket.Type == ESocketType.Udp ? Socket.Socket.SendAsync(EventArgs) : Socket.Socket.SendAsync(EventArgs);
             }
             if (!willRaiseEvent)
             {
@@ -255,23 +255,23 @@ namespace FoolishGames.Net
         /// </summary>
         /// <returns>是否维持等待状态</returns>
         public bool BeginSend()
-        {           
-            lock (SendableSyncRoot)
+        {
+            lock (_sendableSyncRoot)
             {
                 if (UserToken.IsSending) { return false; }
                 //没有消息就退出
-                if (WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                if (_waitToSendMessages.Count > 0 && UserToken.Sendable())
                 {
                     ThreadPool.UnsafeQueueUserWorkItem((state) =>
                     {
                         //线程中需要重新加锁加判断
-                        lock (SendableSyncRoot)
+                        lock (_sendableSyncRoot)
                         {
-                            if (/*UserToken.IsSending && */WaitToSendMessages.Count > 0 && UserToken.Sendable())
+                            if (/*UserToken.IsSending && */_waitToSendMessages.Count > 0 && UserToken.Sendable())
                             {
                                 //有消息就继续执行
-                                IWorker execution = WaitToSendMessages.First.Value;
-                                WaitToSendMessages.RemoveFirst();
+                                IWorker execution = _waitToSendMessages.First.Value;
+                                _waitToSendMessages.RemoveFirst();
                                 execution.Work();
                             }
                         }
@@ -293,10 +293,10 @@ namespace FoolishGames.Net
             //}
             if (UserToken.Sendable())
             {
-                lock (SendableSyncRoot)
+                lock (_sendableSyncRoot)
                 {
                     //没有消息就退出
-                    if (WaitToSendMessages.Count == 0)
+                    if (_waitToSendMessages.Count == 0)
                     {
                         try //防回收
                         {
@@ -311,8 +311,8 @@ namespace FoolishGames.Net
                         return false;
                     }
                     //有消息就继续执行
-                    IWorker execution = WaitToSendMessages.First.Value;
-                    WaitToSendMessages.RemoveFirst();
+                    IWorker execution = _waitToSendMessages.First.Value;
+                    _waitToSendMessages.RemoveFirst();
                     execution.Work();
                     return true;
                 }

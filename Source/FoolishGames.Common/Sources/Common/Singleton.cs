@@ -35,7 +35,7 @@ namespace FoolishGames.Common
     /// <typeparam name="T"></typeparam>
     public class Singleton<T> where T : class, new()
     {
-        private static T instance = null;
+        private static T _instance = null;
         /// <summary>
         /// 单例
         /// </summary>
@@ -43,11 +43,11 @@ namespace FoolishGames.Common
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new T();
+                    _instance = new T();
                 }
-                return instance;
+                return _instance;
             }
         }
         /// <summary>
@@ -55,7 +55,7 @@ namespace FoolishGames.Common
         /// </summary>
         public static void Reset()
         {
-            instance = null;
+            _instance = null;
         }
     }
 }

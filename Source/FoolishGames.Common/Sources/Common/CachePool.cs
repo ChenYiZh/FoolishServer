@@ -41,15 +41,15 @@ namespace FoolishGames.Common
         /// <summary>
         /// 队列操作
         /// </summary>
-        private Action<IReadOnlyQueue<T>> Execution = null;
+        private Action<IReadOnlyQueue<T>> _execution = null;
         /// <summary>
         /// 缓存池
         /// </summary>
-        private TQueue<T>[] Pools;
+        private TQueue<T>[] _pools;
         /// <summary>
         /// 当前压入的缓存池索引
         /// </summary>
-        private int CurrentPoolIndex = 0;
+        private int _currentPoolIndex = 0;
         /// <summary>
         /// 线程对象
         /// </summary>
@@ -69,7 +69,7 @@ namespace FoolishGames.Common
         /// <summary>
         /// 工作状态标识
         /// </summary>
-        private int isReleased = 0;
+        private int _isReleased = 0;
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -82,16 +82,16 @@ namespace FoolishGames.Common
             {
                 throw new ArgumentNullException("Can not create cache pool, because the exection is null.");
             }
-            isReleased = 0;
+            _isReleased = 0;
             SyncRoot = new object();
-            Execution = execution;
+            _execution = execution;
             LockerTimeout = lockerTimeout;
-            Pools = new TQueue<T>[3];
-            for (int i = 0; i < Pools.Length; i++)
+            _pools = new TQueue<T>[3];
+            for (int i = 0; i < _pools.Length; i++)
             {
-                Pools[i] = new TQueue<T>();
+                _pools[i] = new TQueue<T>();
             }
-            CurrentPoolIndex = 0;
+            _currentPoolIndex = 0;
             DeltaMilliseconds = deltaMilliseconds;
             Thread = new Thread(Processing);
             Thread.Start();
@@ -103,7 +103,7 @@ namespace FoolishGames.Common
         {
             lock (SyncRoot)
             {
-                Pools[CurrentPoolIndex].Enqueue(entity);
+                _pools[_currentPoolIndex].Enqueue(entity);
             }
         }
         /// <summary>
@@ -111,7 +111,7 @@ namespace FoolishGames.Common
         /// </summary>
         private void Processing()
         {
-            while (isReleased == 0)
+            while (_isReleased == 0)
             {
                 //bool lockToken = false;
                 try
@@ -119,18 +119,18 @@ namespace FoolishGames.Common
                     //Monitor.TryEnter(SyncRoot, LockerTimeout, ref lockToken);
                     //if (lockToken)
                     //{
-                    int nextIndex = CurrentPoolIndex + 1;
-                    if (nextIndex >= Pools.Length)
+                    int nextIndex = _currentPoolIndex + 1;
+                    if (nextIndex >= _pools.Length)
                     {
                         nextIndex = 0;
                     }
-                    int commitIndex = CurrentPoolIndex - 1;
+                    int commitIndex = _currentPoolIndex - 1;
                     if (commitIndex < 0)
                     {
-                        commitIndex = Pools.Length - 1;
+                        commitIndex = _pools.Length - 1;
                     }
-                    Interlocked.Exchange(ref CurrentPoolIndex, nextIndex);
-                    TryCommit(Pools[commitIndex]);
+                    Interlocked.Exchange(ref _currentPoolIndex, nextIndex);
+                    TryCommit(_pools[commitIndex]);
                 }
                 catch (Exception e)
                 {
@@ -146,7 +146,7 @@ namespace FoolishGames.Common
             {
                 try
                 {
-                    Execution?.Invoke(set);
+                    _execution?.Invoke(set);
                 }
                 catch (Exception e)
                 {
@@ -167,7 +167,7 @@ namespace FoolishGames.Common
             {
                 try
                 {
-                    Interlocked.Exchange(ref isReleased, 1);
+                    Interlocked.Exchange(ref _isReleased, 1);
                     while (Thread.IsAlive)
                     {
                         Thread.Sleep(10);
@@ -179,9 +179,9 @@ namespace FoolishGames.Common
                 }
                 Thread = null;
             }
-            for (int i = 0; i < Pools.Length; i++)
+            for (int i = 0; i < _pools.Length; i++)
             {
-                TryCommit(Pools[i]);
+                TryCommit(_pools[i]);
             }
         }
     }

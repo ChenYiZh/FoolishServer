@@ -23,7 +23,7 @@ namespace FoolishClient.RPC
         /// <summary>
         /// 客户端套接字列表
         /// </summary>
-        private static IDictionary<string, IClientSocket> Sockets = new ThreadSafeDictionary<string, IClientSocket>();
+        private static IDictionary<string, IClientSocket> _sockets = new ThreadSafeDictionary<string, IClientSocket>();
 
         /// <summary>
         /// 创建套接字
@@ -73,16 +73,16 @@ namespace FoolishClient.RPC
         private static bool MakeSocket(string name, IClientSocket socket)
         {
             IClientSocket exists;
-            if (!Sockets.TryGetValue(name, out exists))
+            if (!_sockets.TryGetValue(name, out exists))
             {
-                Sockets[name] = socket;
+                _sockets[name] = socket;
                 return true;
             }
             if (exists.IsRunning)
             {
                 return false;
             }
-            Sockets[name] = socket;
+            _sockets[name] = socket;
             return true;
         }
 
@@ -92,7 +92,7 @@ namespace FoolishClient.RPC
         public static IClientSocket GetSocket(string name)
         {
             IClientSocket socket;
-            if (Sockets.TryGetValue(name, out socket))
+            if (_sockets.TryGetValue(name, out socket))
             {
                 return socket;
             }
@@ -123,7 +123,7 @@ namespace FoolishClient.RPC
         /// </summary>
         public static void Shutdown()
         {
-            foreach (KeyValuePair<string, IClientSocket> socket in Sockets)
+            foreach (KeyValuePair<string, IClientSocket> socket in _sockets)
             {
                 try
                 {
@@ -134,7 +134,7 @@ namespace FoolishClient.RPC
                     FConsole.WriteExceptionWithCategory(Categories.SOCKET, e);
                 }
             }
-            Sockets.Clear();
+            _sockets.Clear();
         }
     }
 }

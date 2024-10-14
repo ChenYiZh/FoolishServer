@@ -78,32 +78,32 @@ namespace FoolishGames.IO
         /// <summary>
         /// 读取的数据指针
         /// </summary>
-        private int readIndex = 0;
+        private int _readIndex = 0;
 
         /// <summary>
         /// 通信包内容
         /// </summary>
-        private byte[] context = null;
+        private byte[] _context = null;
 
         /// <summary>
         /// 内容信息
         /// </summary>
         public byte[] GetContext()
         {
-            return context;
+            return _context;
         }
 
         /// <summary>
         /// 包体长度
         /// </summary>
-        private int packetLength = 0;
+        private int _packetLength = 0;
 
         /// <summary>
         /// 包体长度
         /// </summary>
         public int GetPacketLength()
         {
-            return packetLength;
+            return _packetLength;
         }
 
         /// <summary>
@@ -115,8 +115,8 @@ namespace FoolishGames.IO
         {
             Compress = compress;
             Secret = secret;
-            packetLength = package.Length - offset;
-            if (packetLength < HeaderLength)
+            _packetLength = package.Length - offset;
+            if (_packetLength < HeaderLength)
             {
                 Error = "The message's length is error.";
                 return;
@@ -126,9 +126,9 @@ namespace FoolishGames.IO
             ReadHeader(package, offset);
 
             //内容获取
-            ContextLength = packetLength - HeaderLength;
-            context = new byte[ContextLength];
-            Buffer.BlockCopy(package, offset + HeaderLength, context, 0, ContextLength);
+            ContextLength = _packetLength - HeaderLength;
+            _context = new byte[ContextLength];
+            Buffer.BlockCopy(package, offset + HeaderLength, _context, 0, ContextLength);
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public byte ReadByte()
         {
-            byte b = context[readIndex];
-            readIndex += 1;
+            byte b = _context[_readIndex];
+            _readIndex += 1;
             return b;
         }
 
@@ -170,8 +170,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public char ReadChar()
         {
-            char c = BitConverter.ToChar(context, readIndex);
-            readIndex += SizeUtil.CharSize;
+            char c = BitConverter.ToChar(_context, _readIndex);
+            _readIndex += SizeUtil.CharSize;
             return c;
         }
 
@@ -204,8 +204,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public double ReadDouble()
         {
-            double d = BitConverter.ToDouble(context, readIndex);
-            readIndex += SizeUtil.DoubleSize;
+            double d = BitConverter.ToDouble(_context, _readIndex);
+            _readIndex += SizeUtil.DoubleSize;
             return d;
         }
 
@@ -215,8 +215,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public float ReadFloat()
         {
-            float f = BitConverter.ToSingle(context, readIndex);
-            readIndex += SizeUtil.FloatSize;
+            float f = BitConverter.ToSingle(_context, _readIndex);
+            _readIndex += SizeUtil.FloatSize;
             return f;
         }
 
@@ -226,8 +226,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public int ReadInt()
         {
-            int i = BitConverter.ToInt32(context, readIndex);
-            readIndex += SizeUtil.IntSize;
+            int i = BitConverter.ToInt32(_context, _readIndex);
+            _readIndex += SizeUtil.IntSize;
             return i;
         }
 
@@ -237,8 +237,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public long ReadLong()
         {
-            long l = BitConverter.ToInt64(context, readIndex);
-            readIndex += SizeUtil.LongSize;
+            long l = BitConverter.ToInt64(_context, _readIndex);
+            _readIndex += SizeUtil.LongSize;
             return l;
         }
 
@@ -257,8 +257,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public short ReadShort()
         {
-            short s = BitConverter.ToInt16(context, readIndex);
-            readIndex += SizeUtil.ShortSize;
+            short s = BitConverter.ToInt16(_context, _readIndex);
+            _readIndex += SizeUtil.ShortSize;
             return s;
         }
 
@@ -269,8 +269,8 @@ namespace FoolishGames.IO
         public string ReadString()
         {
             int length = ReadInt();
-            string str = Encoding.UTF8.GetString(context, readIndex, length);
-            readIndex += length;
+            string str = Encoding.UTF8.GetString(_context, _readIndex, length);
+            _readIndex += length;
             return str;
         }
 
@@ -280,8 +280,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public uint ReadUInt()
         {
-            uint ui = BitConverter.ToUInt32(context, readIndex);
-            readIndex += SizeUtil.UIntSize;
+            uint ui = BitConverter.ToUInt32(_context, _readIndex);
+            _readIndex += SizeUtil.UIntSize;
             return ui;
         }
 
@@ -291,8 +291,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public ulong ReadULong()
         {
-            ulong ul = BitConverter.ToUInt64(context, readIndex);
-            readIndex += SizeUtil.ULongSize;
+            ulong ul = BitConverter.ToUInt64(_context, _readIndex);
+            _readIndex += SizeUtil.ULongSize;
             return ul;
         }
 
@@ -302,8 +302,8 @@ namespace FoolishGames.IO
         /// <returns></returns>
         public ushort ReadUShort()
         {
-            ushort us = BitConverter.ToUInt16(context, readIndex);
-            readIndex += SizeUtil.UShortSize;
+            ushort us = BitConverter.ToUInt16(_context, _readIndex);
+            _readIndex += SizeUtil.UShortSize;
             return us;
         }
     }

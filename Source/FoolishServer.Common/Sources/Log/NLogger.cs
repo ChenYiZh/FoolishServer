@@ -32,11 +32,11 @@ namespace FoolishServer.Log
 {
     internal class NLogger : ILogger
     {
-        private NLog.Logger logger;
+        private NLog.Logger _logger;
 
         public NLogger()
         {
-            logger = NLog.LogManager.GetCurrentClassLogger();
+            _logger = NLog.LogManager.GetCurrentClassLogger();
         }
 
         public void SaveLog(string level, string message)
@@ -44,10 +44,10 @@ namespace FoolishServer.Log
             SetColor(GetColor(level));
             switch (level)
             {
-                case LogLevel.DEBUG: logger.Debug(message); break;
-                case LogLevel.INFO: logger.Info(message); break;
-                case LogLevel.WARN: logger.Warn(message); break;
-                case LogLevel.ERROR: logger.Error(message); break;
+                case LogLevel.DEBUG: _logger.Debug(message); break;
+                case LogLevel.INFO: _logger.Info(message); break;
+                case LogLevel.WARN: _logger.Warn(message); break;
+                case LogLevel.ERROR: _logger.Error(message); break;
                 default:
                     {
                         NLog.Logger customLogger = NLog.LogManager.GetLogger(level);

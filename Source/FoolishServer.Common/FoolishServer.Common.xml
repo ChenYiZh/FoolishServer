@@ -602,7 +602,7 @@
             主键管理类，主要用于Redis
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntityKey.type">
+        <member name="F:FoolishServer.Data.Entity.EntityKey._type">
             <summary>
             数据类型
             </summary>
@@ -612,7 +612,7 @@
             数据类型
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntityKey.tableName">
+        <member name="F:FoolishServer.Data.Entity.EntityKey._tableName">
             <summary>
             表名
             </summary>
@@ -632,7 +632,7 @@
             主键
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntityKey.keyName">
+        <member name="F:FoolishServer.Data.Entity.EntityKey._keyName">
             <summary>
             完整Key名称，用于判断
             </summary>
@@ -642,7 +642,7 @@
             完整Key名称，用于判断
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntityKey.fullName">
+        <member name="F:FoolishServer.Data.Entity.EntityKey._fullName">
             <summary>
             全名
             </summary>
@@ -735,7 +735,7 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntitySet`1.DbSet">
+        <member name="F:FoolishServer.Data.Entity.EntitySet`1._dbSet">
             <summary>
             全局管理的数据对象池
             </summary>
@@ -745,7 +745,7 @@
             泛型的类
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.EntitySet`1.FullData">
+        <member name="F:FoolishServer.Data.Entity.EntitySet`1._fullData">
             <summary>
             全数据
             </summary>
@@ -902,7 +902,7 @@
             基于表的类区别于Minor
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.MajorEntity.state">
+        <member name="F:FoolishServer.Data.Entity.MajorEntity._state">
             <summary>
             当前实例的存储状态
             </summary>
@@ -923,12 +923,12 @@
             表名
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.MajorEntity.oldEntityKey">
+        <member name="F:FoolishServer.Data.Entity.MajorEntity._oldEntityKey">
             <summary>
             EntityKey被修改前的数据
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.Entity.MajorEntity.entityKey">
+        <member name="F:FoolishServer.Data.Entity.MajorEntity._entityKey">
             <summary>
             Redis主键名称
             </summary>
@@ -1381,7 +1381,7 @@
             连接着的数据库
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DataContext.tableSchemes">
+        <member name="F:FoolishServer.Data.DataContext._tableSchemes">
             <summary>
             表结构
             </summary>
@@ -1391,7 +1391,7 @@
             表结构映射
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DataContext.entityPool">
+        <member name="F:FoolishServer.Data.DataContext._entityPool">
             <summary>
             缓存中的数据
             </summary>
@@ -1406,7 +1406,7 @@
             计时器间隔设为100ms
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DataContext.Timer">
+        <member name="F:FoolishServer.Data.DataContext._timer">
             <summary>
             计时器
             </summary>
@@ -1441,7 +1441,7 @@
             开始读取数据
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DataContext.DbSetType">
+        <member name="F:FoolishServer.Data.DataContext._dbSetType">
             <summary>
             反射用的
             </summary>
@@ -1512,7 +1512,7 @@
             表结构配置
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.rawEntities">
+        <member name="F:FoolishServer.Data.DbSet`1._rawEntities">
             <summary>
             缓存中的数据，热数据
             </summary>
@@ -1522,17 +1522,17 @@
             缓存中的数据，热数据
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPoolIndex">
+        <member name="F:FoolishServer.Data.DbSet`1._modifiedEntitiesPoolIndex">
             <summary>
             现在真在使用的修改缓存池id
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPoolLocker">
+        <member name="F:FoolishServer.Data.DbSet`1._modifiedEntitiesPoolLocker">
             <summary>
             修改池的锁
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.modifiedEntitiesPool">
+        <member name="F:FoolishServer.Data.DbSet`1._modifiedEntitiesPool">
             <summary>
             已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
             防止多线程阻塞，所以使用集合池
@@ -1549,7 +1549,7 @@
             防止多线程阻塞，所以使用集合池
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.coldEntities">
+        <member name="F:FoolishServer.Data.DbSet`1._coldEntities">
             <summary>
             冷数据
             </summary>
@@ -1559,7 +1559,7 @@
             冷数据
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.releaseCountdown">
+        <member name="F:FoolishServer.Data.DbSet`1._releaseCountdown">
             <summary>
             原子锁
             </summary>
@@ -1579,7 +1579,7 @@
             用于锁的对象
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.commitFlag">
+        <member name="F:FoolishServer.Data.DbSet`1._commitFlag">
             <summary>
             提交判断标示
             </summary>
@@ -1651,7 +1651,7 @@
             推送集合中的数据
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.DbSet`1.loadingAllFlag">
+        <member name="F:FoolishServer.Data.DbSet`1._loadingAllFlag">
             <summary>
             执行读取全部数据的函数锁
             </summary>
@@ -1727,27 +1727,27 @@
             set global max_allowed_packet = 1073741824;
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.CommitionPool">
+        <member name="F:FoolishServer.Data.MySQLDatabase._commitionPool">
             <summary>
             事务队列
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.writeConnection">
+        <member name="F:FoolishServer.Data.MySQLDatabase._writeConnection">
             <summary>
             读写连接
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.readConnection">
+        <member name="F:FoolishServer.Data.MySQLDatabase._readConnection">
             <summary>
             读写连接
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.isExecuting">
+        <member name="F:FoolishServer.Data.MySQLDatabase._isExecuting">
             <summary>
             是否正在事务处理
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.isClosed">
+        <member name="F:FoolishServer.Data.MySQLDatabase._isClosed">
             <summary>
             准备关闭
             </summary>
@@ -1838,7 +1838,7 @@
             MySQL管理表的数据库
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.MySQLDatabase.ColumnReadInfo">
+        <member name="F:FoolishServer.Data.MySQLDatabase._columnReadInfo">
             <summary>
             需要读取的列表信息
             </summary>
@@ -1923,22 +1923,22 @@
             是否还连接着
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.RedisDatabase.HeartbeatTime">
+        <member name="F:FoolishServer.Data.RedisDatabase._heartbeatTime">
             <summary>
             心跳检测
             </summary>
         </member>
-        <member name="P:FoolishServer.Data.RedisDatabase.RedisServer">
+        <member name="P:FoolishServer.Data.RedisDatabase._redisServer">
             <summary>
             Redis的连接服务器
             </summary>
         </member>
-        <member name="P:FoolishServer.Data.RedisDatabase.Database">
+        <member name="P:FoolishServer.Data.RedisDatabase._database">
             <summary>
             连接中的数据库
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.RedisDatabase.isExecuting">
+        <member name="F:FoolishServer.Data.RedisDatabase._isExecuting">
             <summary>
             判断是否正在事务处理
             </summary>
@@ -2198,22 +2198,22 @@
             <para>默认 StorageType.WriteToRedis | EStorageType.ReadFromRedis | EStorageType.WriteToDb | EStorageType.ReadFromDb</para>
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.TableScheme.PrivateTempTableName">
+        <member name="F:FoolishServer.Data.TableScheme._privateTempTableName">
             <summary>
             缓存的临时表名
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.TableScheme.PrivateGlobalTableName">
+        <member name="F:FoolishServer.Data.TableScheme._privateGlobalTableName">
             <summary>
             缓存全局表名
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.TableScheme.TableNameChanged">
+        <member name="F:FoolishServer.Data.TableScheme._tableNameChanged">
             <summary>
             判断表名是否发生变化
             </summary>
         </member>
-        <member name="F:FoolishServer.Data.TableScheme.SyncRoot">
+        <member name="F:FoolishServer.Data.TableScheme._syncRoot">
             <summary>
             事务处理锁
             </summary>
@@ -2373,7 +2373,7 @@
             赋值
             </summary>
         </member>
-        <member name="F:FoolishServer.Runtime.ILInjection.MethodTypes">
+        <member name="F:FoolishServer.Runtime.ILInjection._methodTypes">
             <summary>
             全局引用
             </summary>
@@ -2501,7 +2501,7 @@
             是否已经发生变化
             </summary>
         </member>
-        <member name="F:FoolishServer.Struct.Entity.modifiedTime">
+        <member name="F:FoolishServer.Struct.Entity._modifiedTime">
             <summary>
             上次修改的时间
             </summary>
@@ -2512,7 +2512,7 @@
             Set: 只在初始化时起作用
             </summary>        
         </member>
-        <member name="F:FoolishServer.Struct.Entity.modifiedType">
+        <member name="F:FoolishServer.Struct.Entity._modifiedType">
             <summary>
             操作类型
             </summary>
@@ -2568,7 +2568,7 @@
             用于属性的结构类
             </summary>
         </member>
-        <member name="F:FoolishServer.Struct.PropertyEntity.parent">
+        <member name="F:FoolishServer.Struct.PropertyEntity._parent">
             <summary>
             父实例
             </summary>
@@ -2578,7 +2578,7 @@
             父实例
             </summary>
         </member>
-        <member name="F:FoolishServer.Struct.PropertyEntity.state">
+        <member name="F:FoolishServer.Struct.PropertyEntity._state">
             <summary>
             当前实例的存储状态
             </summary>
@@ -2588,7 +2588,7 @@
             当前实例的存储状态
             </summary>
         </member>
-        <member name="F:FoolishServer.Struct.PropertyEntity.propertyNameInParent">
+        <member name="F:FoolishServer.Struct.PropertyEntity._propertyNameInParent">
             <summary>
             当前实例在父实例中的属性名称
             </summary>

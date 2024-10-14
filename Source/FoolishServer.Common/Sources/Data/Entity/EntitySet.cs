@@ -47,7 +47,7 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 全局管理的数据对象池
         /// </summary>
-        private IDbSet<T> DbSet;
+        private IDbSet<T> _dbSet;
 
         /// <summary>
         /// 泛型的类
@@ -57,14 +57,14 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 全数据
         /// </summary>
-        private ThreadSafeDictionary<EntityKey, T> FullData = null;
+        private ThreadSafeDictionary<EntityKey, T> _fullData = null;
 
         /// <summary>
         /// 这个类的缓存数据
         /// </summary>
         private ThreadSafeDictionary<EntityKey, T> Dictionary
         {
-            get { return FullData != null ? FullData : (ThreadSafeDictionary<EntityKey, T>)DbSet.RawEntities; }
+            get { return _fullData != null ? _fullData : (ThreadSafeDictionary<EntityKey, T>)_dbSet.RawEntities; }
         }
 
         /// <summary>
@@ -72,12 +72,12 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         internal EntitySet(IDbSet<T> dbSet)
         {
-            DbSet = dbSet;
+            _dbSet = dbSet;
             ThreadSafeDictionary<EntityKey, T> source = (ThreadSafeDictionary<EntityKey, T>)dbSet.RawEntities;
 
             lock (source.SyncRoot)
             {
-                FullData = new ThreadSafeDictionary<EntityKey, T>(source);
+                _fullData = new ThreadSafeDictionary<EntityKey, T>(source);
             }
 
             lock (dbSet.SyncRoot)
@@ -91,7 +91,7 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         ~EntitySet()
         {
-            DbSet.OnDataModified -= OnDbSetDataModified;
+            _dbSet.OnDataModified -= OnDbSetDataModified;
         }
 
         ///// <summary>
@@ -123,7 +123,7 @@ namespace FoolishServer.Data.Entity
             T result;
             if (Dictionary.TryGetValue(key, out result)) { return result; }
             //if (FullData != null && FullData.TryGetValue(key, out result)) { return result; }
-            return DbSet.Find(key);
+            return _dbSet.Find(key);
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace FoolishServer.Data.Entity
             //刷新Key
             entity.RefreshEntityKey();
             //通知数据中心更新数据
-            DbSet.OnModified(entity.GetEntityKey(), entity);
+            _dbSet.OnModified(entity.GetEntityKey(), entity);
             return true;
         }
 
@@ -223,7 +223,7 @@ namespace FoolishServer.Data.Entity
         {
             bool result = Dictionary.Remove(key);
             //通知数据中心更新数据
-            DbSet.OnModified(key, null);
+            _dbSet.OnModified(key, null);
             return result;
         }
 
@@ -250,13 +250,13 @@ namespace FoolishServer.Data.Entity
         {
             lock (this)
             {
-                IReadOnlyDictionary<EntityKey, T> entities = DbSet.LoadAll();
+                IReadOnlyDictionary<EntityKey, T> entities = _dbSet.LoadAll();
                 //Dictionary.Clear();
                 //foreach (KeyValuePair<EntityKey, T> kv in entities)
                 //{
                 //    Dictionary.Add(kv.Key, kv.Value);
                 //}
-                FullData = new ThreadSafeDictionary<EntityKey, T>((IDictionary<EntityKey, T>)entities);
+                _fullData = new ThreadSafeDictionary<EntityKey, T>((IDictionary<EntityKey, T>)entities);
             }
         }
 

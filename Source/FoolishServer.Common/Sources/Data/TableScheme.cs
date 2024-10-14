@@ -139,25 +139,25 @@ namespace FoolishServer.Data
         /// <summary>
         /// 缓存的临时表名
         /// </summary>
-        private string PrivateTempTableName;
+        private string _privateTempTableName;
         /// <summary>
         /// 缓存全局表名
         /// </summary>
-        private string PrivateGlobalTableName;
+        private string _privateGlobalTableName;
         /// <summary>
         /// 判断表名是否发生变化
         /// </summary>
-        private int TableNameChanged = 0;
+        private int _tableNameChanged = 0;
         /// <summary>
         /// 事务处理锁
         /// </summary>
-        private readonly object SyncRoot = new object();
+        private readonly object _syncRoot = new object();
         /// <summary>
         /// 判断表名是否发生变化，并且重置缓存名称
         /// </summary>
         public bool TableNameChangedAndReset()
         {
-            return Interlocked.CompareExchange(ref TableNameChanged, 0, 1) == 1;
+            return Interlocked.CompareExchange(ref _tableNameChanged, 0, 1) == 1;
         }
         /// <summary>
         /// 用于存数据库的表名
@@ -176,20 +176,20 @@ namespace FoolishServer.Data
             }
             tableName = string.Format(format, tableName, TimeLord.Now);
             //return tableName;
-            if (PrivateTempTableName != tableName)
+            if (_privateTempTableName != tableName)
             {
-                lock (SyncRoot)
+                lock (_syncRoot)
                 {
                     //锁阻塞后再一次判断是否改变，保证操作只做一次
-                    if (PrivateTempTableName != tableName)
+                    if (_privateTempTableName != tableName)
                     {
-                        Interlocked.Exchange(ref TableNameChanged, 1);
-                        PrivateTempTableName = tableName;
-                        PrivateGlobalTableName = StringConverter.ToLowerWithDownLine(tableName);
+                        Interlocked.Exchange(ref _tableNameChanged, 1);
+                        _privateTempTableName = tableName;
+                        _privateGlobalTableName = StringConverter.ToLowerWithDownLine(tableName);
                     }
                 }
             }
-            return PrivateGlobalTableName;
+            return _privateGlobalTableName;
         }
     }
 }

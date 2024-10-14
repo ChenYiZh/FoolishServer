@@ -41,17 +41,17 @@ namespace FoolishServer.Struct
         /// 父实例
         /// </summary>
         [NonSerialized]
-        private Entity parent = null;
+        private Entity _parent = null;
 
         /// <summary>
         /// 父实例
         /// </summary>
-        internal Entity Parent { get { lock (SyncRoot) { return parent; } } }
+        internal Entity Parent { get { lock (SyncRoot) { return _parent; } } }
 
         /// <summary>
         /// 当前实例的存储状态
         /// </summary>
-        private EStorageState state = EStorageState.New;
+        private EStorageState _state = EStorageState.New;
 
         /// <summary>
         /// 当前实例的存储状态
@@ -69,7 +69,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    return parent == null ? state : parent.State;
+                    return _parent == null ? _state : _parent.State;
 
                 }
                 finally
@@ -86,7 +86,7 @@ namespace FoolishServer.Struct
         /// 当前实例在父实例中的属性名称
         /// </summary>
         [NonSerialized]
-        private string propertyNameInParent = null;
+        private string _propertyNameInParent = null;
 
         /// <summary>
         /// 当前实例在父实例中的属性名称
@@ -104,7 +104,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    return propertyNameInParent;
+                    return _propertyNameInParent;
 
                 }
                 finally
@@ -134,8 +134,8 @@ namespace FoolishServer.Struct
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                this.parent = parent;
-                this.propertyNameInParent = propertyName;
+                this._parent = parent;
+                this._propertyNameInParent = propertyName;
             }
             finally
             {
@@ -162,9 +162,9 @@ namespace FoolishServer.Struct
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                parent = null;
-                propertyNameInParent = null;
-                state = EStorageState.Removed;
+                _parent = null;
+                _propertyNameInParent = null;
+                _state = EStorageState.Removed;
             }
             finally
             {
@@ -184,9 +184,9 @@ namespace FoolishServer.Struct
             base.NotifyModified(modifiedType, propertyName);
             lock (SyncRoot)
             {
-                if (parent != null && modifiedType != EModifyType.UnModified)
+                if (_parent != null && modifiedType != EModifyType.UnModified)
                 {
-                    parent.NotifyModified(EModifyType.Modify, propertyNameInParent);
+                    _parent.NotifyModified(EModifyType.Modify, _propertyNameInParent);
                 }
             }
         }

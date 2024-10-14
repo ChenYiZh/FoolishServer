@@ -44,130 +44,130 @@ namespace FoolishServer.Collections
     [ProtoContract, Serializable]
     public sealed class EntityList<T> : PropertyEntity, IThreadSafeList<T>
     {
-        private readonly bool isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
+        private readonly bool _isPropertyEntity = FType<T>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
 
-        private ThreadSafeList<T> List = new ThreadSafeList<T>();
+        private ThreadSafeList<T> _list = new ThreadSafeList<T>();
 
         public T this[int index]
         {
             get
             {
-                return List[index];
+                return _list[index];
             }
             set
             {
-                if (isPropertyEntity)
+                if (_isPropertyEntity)
                 {
                     if (value != null)
                     {
-                        List[index] = value;
+                        _list[index] = value;
                         (value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     }
                     else
                     {
-                        List.RemoveAt(index);
+                        _list.RemoveAt(index);
                     }
                 }
                 else
                 {
-                    List[index] = value;
+                    _list[index] = value;
                 }
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
-        public int Count { get { return List.Count; } }
+        public int Count { get { return _list.Count; } }
 
-        public bool IsReadOnly { get { return List.IsReadOnly; } }
+        public bool IsReadOnly { get { return _list.IsReadOnly; } }
 
         public void Add(T item)
         {
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 if (item != null)
                 {
-                    List.Add(item);
+                    _list.Add(item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
-                List.Add(item);
+                _list.Add(item);
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public void Clear()
         {
-            List.Clear();
+            _list.Clear();
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         public bool Contains(T item)
         {
-            return List.Contains(item);
+            return _list.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            List.CopyTo(array, arrayIndex);
+            _list.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return List.GetEnumerator();
+            return _list.GetEnumerator();
         }
 
         public int IndexOf(T item)
         {
-            return List.IndexOf(item);
+            return _list.IndexOf(item);
         }
 
         public void Insert(int index, T item)
         {
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 if (item != null)
                 {
-                    List.Insert(index, item);
+                    _list.Insert(index, item);
                     (item as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
-                List.Insert(index, item);
+                _list.Insert(index, item);
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public bool Remove(T item)
         {
-            bool result = List.Remove(item);
+            bool result = _list.Remove(item);
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 
         public void RemoveAt(int index)
         {
-            List.RemoveAt(index);
+            _list.RemoveAt(index);
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return List.GetEnumerator();
+            return _list.GetEnumerator();
         }
 
         internal override void SetParent(Entity parent, string propertyName)
         {
             base.SetParent(parent, propertyName);
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 lock (SyncRoot)
                 {
-                    foreach (T child in List)
+                    foreach (T child in _list)
                     {
                         PropertyEntity entity;
                         if ((entity = child as PropertyEntity) != null)
@@ -187,7 +187,7 @@ namespace FoolishServer.Collections
             base.OnModificationCommitted();
             lock (SyncRoot)
             {
-                foreach (T child in List)
+                foreach (T child in _list)
                 {
                     PropertyEntity entity;
                     if ((entity = child as PropertyEntity) != null)
@@ -206,7 +206,7 @@ namespace FoolishServer.Collections
             base.OnPulledFromDb();
             lock (SyncRoot)
             {
-                foreach (T child in List)
+                foreach (T child in _list)
                 {
                     PropertyEntity entity;
                     if ((entity = child as PropertyEntity) != null)

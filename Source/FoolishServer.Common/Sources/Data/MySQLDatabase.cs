@@ -53,7 +53,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 事务队列
         /// </summary>
-        private CachePool<DbCommition> CommitionPool;
+        private CachePool<DbCommition> _commitionPool;
 
         ///// <summary>
         ///// 通讯连接池
@@ -63,17 +63,17 @@ namespace FoolishServer.Data
         /// <summary>
         /// 读写连接
         /// </summary>
-        private MySqlConnection writeConnection, readConnection;
+        private MySqlConnection _writeConnection, _readConnection;
 
         /// <summary>
         /// 是否正在事务处理
         /// </summary>
-        private int isExecuting = 0;
+        private int _isExecuting = 0;
 
         /// <summary>
         /// 准备关闭
         /// </summary>
-        private int isClosed = 0;
+        private int _isClosed = 0;
 
         /// <summary>
         /// 判断连接状态
@@ -90,7 +90,7 @@ namespace FoolishServer.Data
                 //    }
                 //}
                 //return false;
-                return IsConnected(writeConnection) && IsConnected(readConnection);
+                return IsConnected(_writeConnection) && IsConnected(_readConnection);
             }
             protected set { }
         }
@@ -119,19 +119,19 @@ namespace FoolishServer.Data
         /// </summary>
         private MySqlConnection GetWriteConnection()
         {
-            if (!IsConnected(writeConnection))
+            if (!IsConnected(_writeConnection))
             {
-                if (writeConnection != null && writeConnection.State == ConnectionState.Closed)
+                if (_writeConnection != null && _writeConnection.State == ConnectionState.Closed)
                 {
-                    writeConnection.Open();
+                    _writeConnection.Open();
                 }
                 else
                 {
-                    Close(writeConnection);
-                    writeConnection = CreateConnection();
+                    Close(_writeConnection);
+                    _writeConnection = CreateConnection();
                 }
             }
-            return writeConnection;
+            return _writeConnection;
         }
 
         /// <summary>
@@ -139,19 +139,19 @@ namespace FoolishServer.Data
         /// </summary>
         private MySqlConnection GetReadConnection()
         {
-            if (!IsConnected(readConnection))
+            if (!IsConnected(_readConnection))
             {
-                if (readConnection != null && readConnection.State == ConnectionState.Closed)
+                if (_readConnection != null && _readConnection.State == ConnectionState.Closed)
                 {
-                    readConnection.Open();
+                    _readConnection.Open();
                 }
                 else
                 {
-                    Close(readConnection);
-                    readConnection = CreateConnection();
+                    Close(_readConnection);
+                    _readConnection = CreateConnection();
                 }
             }
-            return readConnection;
+            return _readConnection;
         }
 
         /// <summary>
@@ -180,10 +180,10 @@ namespace FoolishServer.Data
         public override void SetSettings(IDatabaseSetting setting)
         {
             base.SetSettings(setting);
-            CommitionPool = new CachePool<DbCommition>(PushingCommitions);
+            _commitionPool = new CachePool<DbCommition>(PushingCommitions);
             //Connections = new ThreadSafeHashSet<MySqlConnection>();
-            writeConnection = CreateConnection();
-            readConnection = CreateConnection();
+            _writeConnection = CreateConnection();
+            _readConnection = CreateConnection();
         }
         int totalCount = 0;
         /// <summary>
@@ -192,19 +192,19 @@ namespace FoolishServer.Data
         private void PushingCommitions(IReadOnlyQueue<DbCommition> set)
         {
             StringBuilder sql = new StringBuilder();
-            Interlocked.Exchange(ref isExecuting, set.Count);
-            if (isExecuting > 0)
+            Interlocked.Exchange(ref _isExecuting, set.Count);
+            if (_isExecuting > 0)
             {
                 sql.Append("BEGIN;");
             }
             int count = 0;
             while (set.Count > 0)
             {
-                if (isClosed > 0)
+                if (_isClosed > 0)
                 {
                     const int cacheCount = 4;
-                    float progress = (1.0f - ((float)set.Count / isExecuting)) * 100.0f / cacheCount;
-                    progress += (isClosed - 1) * 100.0f / cacheCount;
+                    float progress = (1.0f - ((float)set.Count / _isExecuting)) * 100.0f / cacheCount;
+                    progress += (_isClosed - 1) * 100.0f / cacheCount;
                     Console.Write($"\r{FConsole.FormatCustomMessage(Kind.ToString(), $"MySQL[{Setting.ConnectKey}] is saving data... {progress.ToString("F2")}%")}");
                 }
                 DbCommition commition = set.Dequeue();
@@ -241,7 +241,7 @@ namespace FoolishServer.Data
             }
             try
             {
-                if (isExecuting > 0)
+                if (_isExecuting > 0)
                 {
                     sql.Append("COMMIT;");
                 }
@@ -254,10 +254,10 @@ namespace FoolishServer.Data
             {
                 FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
             }
-            Interlocked.Exchange(ref isExecuting, 0);
-            if (isClosed > 0)
+            Interlocked.Exchange(ref _isExecuting, 0);
+            if (_isClosed > 0)
             {
-                Interlocked.Increment(ref isClosed);
+                Interlocked.Increment(ref _isClosed);
             }
             if (totalCount > 1000000)
             {
@@ -270,26 +270,26 @@ namespace FoolishServer.Data
         /// </summary>
         public override void Close()
         {
-            Interlocked.Increment(ref isClosed);
-            while (isExecuting > 0)
+            Interlocked.Increment(ref _isClosed);
+            while (_isExecuting > 0)
             {
                 Thread.Sleep(Settings.LockerTimeout);
             }
-            if (CommitionPool != null)
+            if (_commitionPool != null)
             {
-                CommitionPool.Release();
+                _commitionPool.Release();
             }
             Console.Write($"\r{FConsole.FormatCustomMessage(Kind.ToString(), $"MySQL[{Setting.ConnectKey}] is saving data... 100.00%")}");
             Console.WriteLine();
             Console.WriteLine();
-            CommitionPool = null;
+            _commitionPool = null;
             List<MySqlConnection> connections = null;
             //lock (Connections.SyncRoot)
             //{
             //    connections = new List<MySqlConnection>(Connections);
             //}
-            connections.Add(readConnection);
-            connections.Add(writeConnection);
+            connections.Add(_readConnection);
+            connections.Add(_writeConnection);
             foreach (MySqlConnection connection in connections)
             {
                 Close(connection);
@@ -345,7 +345,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 需要读取的列表信息
         /// </summary>
-        private readonly static string[] ColumnReadInfo
+        private readonly static string[] _columnReadInfo
             = new string[] {"IC.`COLUMN_NAME`", "IC.`COLUMN_DEFAULT`", "IF(IC.`IS_NULLABLE` = 'YES', 1, 0) AS NULLABLE", "IC.`COLUMN_TYPE`",
                 "IF(IC.`COLUMN_NAME` = KCU.`COLUMN_NAME`, 1, 0) AS IS_KEY",//判断是否是主键， >0 是主键
                 "IF(IC.`COLUMN_NAME` = S.`COLUMN_NAME`, 1, 0) AS IS_INDEX" //判断是否是索引
@@ -724,7 +724,7 @@ namespace FoolishServer.Data
         {
             foreach (DbCommition commition in commitions)
             {
-                CommitionPool.Push(commition);
+                _commitionPool.Push(commition);
             }
             return true;
         }

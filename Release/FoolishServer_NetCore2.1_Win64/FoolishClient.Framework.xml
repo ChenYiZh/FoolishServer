@@ -136,7 +136,7 @@
             服务器端口
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.readyFlag">
+        <member name="F:FoolishClient.Net.ClientSocket._readyFlag">
             <summary>
             运行的标识
             </summary>
@@ -161,7 +161,7 @@
             数据处理线程
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.heartbeatBuffer">
+        <member name="F:FoolishClient.Net.ClientSocket._heartbeatBuffer">
             <summary>
             心跳包
             </summary>
@@ -171,7 +171,7 @@
             设置类别名称
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.messageOffset">
+        <member name="F:FoolishClient.Net.ClientSocket._messageOffset">
             <summary>
             消息偏移值
             </summary>
@@ -181,7 +181,7 @@
             消息偏移值
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.compression">
+        <member name="F:FoolishClient.Net.ClientSocket._compression">
             <summary>
             压缩工具
             </summary>
@@ -191,7 +191,7 @@
             压缩工具
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.cryptoProvider">
+        <member name="F:FoolishClient.Net.ClientSocket._cryptoProvider">
             <summary>
             加密工具
             </summary>
@@ -256,6 +256,11 @@
             同步连接
             </summary>
         </member>
+        <member name="M:FoolishClient.Net.ClientSocket.BeginConnectImpl">
+            <summary>
+            创建连接
+            </summary>
+        </member>
         <member name="M:FoolishClient.Net.ClientSocket.Awake">
             <summary>
             初始化执行
@@ -266,7 +271,7 @@
             创建原生套接字
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.ClientSocket.waitingFlag">
+        <member name="F:FoolishClient.Net.ClientSocket._waitingFlag">
             <summary>
             等待的线程锁，防止产生多组线程
             </summary>
@@ -373,6 +378,47 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:FoolishClient.Net.TcpSocket.BeginConnectImpl">
+            <summary>
+            创建连接
+            </summary>
+        </member>
+        <member name="T:FoolishClient.Net.UdpSocket">
+            <summary>
+            Tcp连接池
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.UdpSocket.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="P:FoolishClient.Net.UdpSocket.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="F:FoolishClient.Net.UdpSocket._waitToAccepted">
+            <summary>
+            等待握手
+            </summary>
+        </member>
+        <member name="F:FoolishClient.Net.UdpSocket.ACCEPT_FLAG">
+            <summary>
+            握手标示
+            </summary>
+        </member>
+        <member name="M:FoolishClient.Net.UdpSocket.MakeSocket">
+            <summary>
+            建立原生套接字
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishClient.Net.UdpSocket.BeginConnectImpl">
+            <summary>
+            创建连接
+            </summary>
+        </member>
         <member name="T:FoolishClient.Proxy.IClientActionDispatcher">
             <summary>
             Action工厂
@@ -448,12 +494,22 @@
             默认使用的套接字名称
             </summary>
         </member>
-        <member name="F:FoolishClient.RPC.FNetwork.Sockets">
+        <member name="F:FoolishClient.RPC.FNetwork._sockets">
             <summary>
             客户端套接字列表
             </summary>
         </member>
         <member name="M:FoolishClient.RPC.FNetwork.MakeTcpSocket(System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            创建套接字
+            </summary>
+            <param name="name">标识名称</param>
+            <param name="host"></param>
+            <param name="port"></param>
+            <param name="actionClassFullName">Action协议类的完整名称</param>
+            <param name="heartbeatInterval">心跳间隔</param>
+        </member>
+        <member name="M:FoolishClient.RPC.FNetwork.MakeUdpSocket(System.String,System.String,System.Int32,System.String,System.Int32)">
             <summary>
             创建套接字
             </summary>

@@ -40,17 +40,17 @@ namespace FoolishServer.Config
 {
     internal class Configeration
     {
-        private static bool initialized = false;
+        private static bool _initialized = false;
         /// <summary>
         /// 初始化
         /// </summary>
         public static void Initialize()
         {
-            if (initialized)
+            if (_initialized)
             {
                 return;
             }
-            initialized = true;
+            _initialized = true;
 
             //加载配置
             Settings.LoadFromFile();

@@ -34,5 +34,12 @@ namespace FoolishServer.Net
     /// </summary>
     public class UdpServer : SocketServer
     {
+        /// <summary>
+        /// 创建服务器套接字
+        /// </summary>
+        protected internal override IServerSocket BuildSocket()
+        {
+            return new UdpSocket();
+        }
     }
 }

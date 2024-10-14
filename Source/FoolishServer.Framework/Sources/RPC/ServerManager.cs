@@ -140,10 +140,20 @@ namespace FoolishServer.RPC
         {
             //return new TcpServer();
             IServer host = null;
+            ServerProxy serverProxy = null;
+            if (!string.IsNullOrEmpty(setting.ClassFullname))
+            {
+                serverProxy = ObjectFactory.Create<ServerProxy>(setting.ClassFullname);
+            }
             switch (setting.Type)
             {
-                case ESocketType.Tcp: host = string.IsNullOrEmpty(setting.ClassFullname) ? new TcpServer() : ObjectFactory.Create<TcpServer>(setting.ClassFullname); break;
-                case ESocketType.Udp: host = string.IsNullOrEmpty(setting.ClassFullname) ? new UdpServer() : ObjectFactory.Create<UdpServer>(setting.ClassFullname); break;
+                case ESocketType.Tcp: host = serverProxy != null || string.IsNullOrEmpty(setting.ClassFullname) ? new TcpServer() : ObjectFactory.Create<TcpServer>(setting.ClassFullname); break;
+                case ESocketType.Udp: host = serverProxy != null || string.IsNullOrEmpty(setting.ClassFullname) ? new UdpServer() : ObjectFactory.Create<UdpServer>(setting.ClassFullname); break;
+            }
+            if (host != null && serverProxy != null)
+            {
+                ((SocketServer)host).ServerProxy = serverProxy;
+                serverProxy.Server = host;
             }
             return host;
         }

@@ -39,9 +39,9 @@ namespace FoolishGames.Security
     {
         private const int KEY_LENGTH = 16;
 
-        private byte[] key = new byte[KEY_LENGTH];
+        private byte[] _key = new byte[KEY_LENGTH];
 
-        private byte[] iv = new byte[KEY_LENGTH];
+        private byte[] _iv = new byte[KEY_LENGTH];
 
         public string Key
         {
@@ -52,7 +52,7 @@ namespace FoolishGames.Security
                     throw new ArgumentException("The key of AESCryptoProvider is null.");
                 }
                 byte[] bits = Encoding.UTF8.GetBytes(value);
-                Buffer.BlockCopy(bits, 0, key, 0, bits.Length < KEY_LENGTH ? bits.Length : KEY_LENGTH);
+                Buffer.BlockCopy(bits, 0, _key, 0, bits.Length < KEY_LENGTH ? bits.Length : KEY_LENGTH);
             }
         }
 
@@ -65,7 +65,7 @@ namespace FoolishGames.Security
                     throw new ArgumentException("The iv of AESCryptoProvider is null.");
                 }
                 byte[] bits = Encoding.UTF8.GetBytes(value);
-                Buffer.BlockCopy(bits, 0, iv, 0, bits.Length < KEY_LENGTH ? bits.Length : KEY_LENGTH);
+                Buffer.BlockCopy(bits, 0, _iv, 0, bits.Length < KEY_LENGTH ? bits.Length : KEY_LENGTH);
             }
         }
 
@@ -89,8 +89,8 @@ namespace FoolishGames.Security
         {
             using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
             {
-                aes.Key = key;
-                aes.IV = iv;
+                aes.Key = _key;
+                aes.IV = _iv;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.Zeros;
                 using (MemoryStream stream = new MemoryStream())
@@ -113,8 +113,8 @@ namespace FoolishGames.Security
         {
             using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
             {
-                aes.Key = key;
-                aes.IV = iv;
+                aes.Key = _key;
+                aes.IV = _iv;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.Zeros;
                 using (MemoryStream stream = new MemoryStream())

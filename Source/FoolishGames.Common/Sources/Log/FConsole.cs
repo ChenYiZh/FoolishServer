@@ -62,7 +62,7 @@ namespace FoolishGames.Log
         /// </summary>
         public static IReadOnlyCollection<ILogger> Loggers { get { return loggers; } }
 
-        private static readonly object SyncRoot = new Object();
+        private static readonly object _syncRoot = new Object();
 
         //static FConsole()
         //{
@@ -78,7 +78,7 @@ namespace FoolishGames.Log
         public static bool RegistLogger(ILogger logger)
         {
             bool result = false;
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 result = loggers.Add(logger);
             }
@@ -93,7 +93,7 @@ namespace FoolishGames.Log
         public static bool RemoveLogger(ILogger logger)
         {
             bool result = false;
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 result = loggers.Remove(logger);
             }

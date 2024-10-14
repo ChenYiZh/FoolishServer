@@ -53,11 +53,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Source\FoolishClient.Framework\FoolishClient.Framework.csproj">
-      <Project>{68BD19E1-CA2C-4C69-9342-48E0FCD8C483}</Project>
+      <Project>{68bd19e1-ca2c-4c69-9342-48e0fcd8c483}</Project>
       <Name>FoolishClient.Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Source\FoolishGames.Common\FoolishGames.Common.csproj">
-      <Project>{55C7C58E-CE59-43ED-A816-2CD38B973104}</Project>
+      <Project>{55c7c58e-ce59-43ed-a816-2cd38b973104}</Project>
       <Name>FoolishGames.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\FoolishClient\FoolishClient.csproj">

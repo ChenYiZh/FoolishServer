@@ -38,11 +38,11 @@ namespace FoolishGames.Common
     /// </summary>
     public static class AssemblyService
     {
-        private static ThreadSafeDictionary<string, Assembly> assemblies = new ThreadSafeDictionary<string, Assembly>();
+        private static ThreadSafeDictionary<string, Assembly> _assemblies = new ThreadSafeDictionary<string, Assembly>();
         /// <summary>
         /// 已加载的程序集
         /// </summary>
-        public static IEnumerable<Assembly> Assemblies { get { return assemblies.Values; } }
+        public static IEnumerable<Assembly> Assemblies { get { return _assemblies.Values; } }
         /// <summary>
         /// 读取程序集
         /// </summary>
@@ -53,14 +53,14 @@ namespace FoolishGames.Common
             if (string.IsNullOrEmpty(dllPath)) return null;
             if (!dllPath.EndsWith(".dll")) return null;
             string dllName = Path.GetFileNameWithoutExtension(dllPath);
-            if (assemblies.ContainsKey(dllName))
+            if (_assemblies.ContainsKey(dllName))
             {
-                return assemblies[dllName];
+                return _assemblies[dllName];
             }
             Assembly assembly = Assembly.LoadFile(FPath.GetFullPath(dllPath));
             if (assembly != null)
             {
-                assemblies.Add(dllName, assembly);
+                _assemblies.Add(dllName, assembly);
             }
             return assembly;
         }

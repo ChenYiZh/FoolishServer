@@ -59,7 +59,7 @@ namespace FoolishServer
         public override void OnDatebaseInitialized()
         {
             base.OnDatebaseInitialized();
-            DataContext.RawDatabase.Converter = new EntityJsonConverter();
+            //DataContext.RawDatabase.Converter = new EntityJsonConverter();
             FConsole.Write("RuntimeMain OnDatebaseInitialized.");
         }
 

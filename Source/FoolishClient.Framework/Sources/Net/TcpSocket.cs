@@ -57,5 +57,21 @@ namespace FoolishClient.Net
         {
             return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
+
+        /// <summary>
+        /// 创建连接
+        /// </summary>
+        protected internal override void BeginConnectImpl()
+        {
+            EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+            IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
+            bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
+            if (!success || !opt.IsCompleted || !Socket.Connected)
+            {
+                IsRunning = false;
+                throw new Exception(string.Format("Socket connect failed!"));
+            }
+            //Socket.Connect(host, port);//手机上测下来只有同步才有效
+        }
     }
 }

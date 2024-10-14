@@ -46,151 +46,151 @@ namespace FoolishServer.Collections
     [ProtoContract, Serializable]
     public sealed class EntityDictionary<TKey, TValue> : PropertyEntity, IThreadSafeDictionary<TKey, TValue> where TKey : struct
     {
-        private readonly bool isPropertyEntity = FType<TValue>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
+        private readonly bool _isPropertyEntity = FType<TValue>.Type.IsSubclassOf(FType<PropertyEntity>.Type);
 
-        private ThreadSafeDictionary<TKey, TValue> Dictionary = new ThreadSafeDictionary<TKey, TValue>();
+        private ThreadSafeDictionary<TKey, TValue> _dictionary = new ThreadSafeDictionary<TKey, TValue>();
 
         public TValue this[TKey key]
         {
-            get { return Dictionary[key]; }
+            get { return _dictionary[key]; }
             set
             {
-                if (isPropertyEntity)
+                if (_isPropertyEntity)
                 {
                     if (value != null)
                     {
-                        Dictionary[key] = value;
+                        _dictionary[key] = value;
                         (value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     }
                     else
                     {
-                        Dictionary.Remove(key);
+                        _dictionary.Remove(key);
                     }
                 }
                 else
                 {
-                    Dictionary[key] = value;
+                    _dictionary[key] = value;
                 }
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
-        public ICollection<TKey> Keys { get { return Dictionary.Keys; } }
+        public ICollection<TKey> Keys { get { return _dictionary.Keys; } }
 
-        public ICollection<TValue> Values { get { return Dictionary.Values; } }
+        public ICollection<TValue> Values { get { return _dictionary.Values; } }
 
-        public int Count { get { return Dictionary.Count; } }
+        public int Count { get { return _dictionary.Count; } }
 
-        public bool IsReadOnly { get { return Dictionary.IsReadOnly; } }
+        public bool IsReadOnly { get { return _dictionary.IsReadOnly; } }
 
-        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys { get { return Dictionary.Keys; } }
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys { get { return _dictionary.Keys; } }
 
-        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values { get { return Dictionary.Values; } }
+        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values { get { return _dictionary.Values; } }
 
         public void Add(TKey key, TValue value)
         {
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 if (value != null)
                 {
-                    Dictionary.Add(key, value);
+                    _dictionary.Add(key, value);
                     (value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
-                Dictionary.Add(key, value);
+                _dictionary.Add(key, value);
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 if (item.Value != null)
                 {
-                    Dictionary.Add(item);
+                    _dictionary.Add(item);
                     (item.Value as PropertyEntity)?.SetParent(this, Categories.ENTITY);
                     NotifyModified(EModifyType.Modify, PropertyNameInParent);
                 }
             }
             else
             {
-                Dictionary.Add(item);
+                _dictionary.Add(item);
                 NotifyModified(EModifyType.Modify, PropertyNameInParent);
             }
         }
 
         public void Clear()
         {
-            Dictionary.Clear();
+            _dictionary.Clear();
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return Dictionary.Contains(item);
+            return _dictionary.Contains(item);
         }
 
         public bool ContainsKey(TKey key)
         {
-            return Dictionary.ContainsKey(key);
+            return _dictionary.ContainsKey(key);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            Dictionary.CopyTo(array, arrayIndex);
+            _dictionary.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return Dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            Dictionary.GetObjectData(info, context);
+            _dictionary.GetObjectData(info, context);
         }
 
         public void OnDeserialization(object sender)
         {
-            Dictionary.OnDeserialization(sender);
+            _dictionary.OnDeserialization(sender);
         }
 
         public bool Remove(TKey key)
         {
-            bool result = Dictionary.Remove(key);
+            bool result = _dictionary.Remove(key);
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            bool result = Dictionary.Remove(item);
+            bool result = _dictionary.Remove(item);
             NotifyModified(EModifyType.Modify, PropertyNameInParent);
             return result;
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return Dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return Dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
 
         internal override void SetParent(Entity parent, string propertyName)
         {
             base.SetParent(parent, propertyName);
-            if (isPropertyEntity)
+            if (_isPropertyEntity)
             {
                 lock (SyncRoot)
                 {
-                    foreach (TValue child in Dictionary.Values)
+                    foreach (TValue child in _dictionary.Values)
                     {
                         PropertyEntity entity;
                         if ((entity = child as PropertyEntity) != null)
@@ -210,7 +210,7 @@ namespace FoolishServer.Collections
             base.OnModificationCommitted();
             lock (SyncRoot)
             {
-                foreach (TValue child in Dictionary.Values)
+                foreach (TValue child in _dictionary.Values)
                 {
                     PropertyEntity entity;
                     if ((entity = child as PropertyEntity) != null)
@@ -229,7 +229,7 @@ namespace FoolishServer.Collections
             base.OnPulledFromDb();
             lock (SyncRoot)
             {
-                foreach (TValue child in Dictionary.Values)
+                foreach (TValue child in _dictionary.Values)
                 {
                     PropertyEntity entity;
                     if ((entity = child as PropertyEntity) != null)

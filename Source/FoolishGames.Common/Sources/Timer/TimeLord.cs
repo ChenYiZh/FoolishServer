@@ -43,7 +43,7 @@ namespace FoolishGames.Timer
         /// <summary>
         /// 锁
         /// </summary>
-        private static readonly object syncRoot = new object();
+        private static readonly object _syncRoot = new object();
 
         /// <summary>
         /// 设置时间控件
@@ -51,7 +51,7 @@ namespace FoolishGames.Timer
         /// <param name="watch"></param>
         public static void SetPacketWatch(IPacketWatch watch)
         {
-            lock (syncRoot)
+            lock (_syncRoot)
             {
                 PacketWatch = watch;
             }

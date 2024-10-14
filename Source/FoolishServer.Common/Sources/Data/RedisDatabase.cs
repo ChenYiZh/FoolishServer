@@ -64,19 +64,19 @@ namespace FoolishServer.Data
         /// <summary>
         /// 心跳检测
         /// </summary>
-        private Timer HeartbeatTime = null;
+        private Timer _heartbeatTime = null;
         /// <summary>
         /// Redis的连接服务器
         /// </summary>
-        private IServer RedisServer { get; set; }
+        private IServer _redisServer { get; set; }
         /// <summary>
         /// 连接中的数据库
         /// </summary>
-        private StackExchange.Redis.IDatabase Database { get; set; }
+        private StackExchange.Redis.IDatabase _database { get; set; }
         /// <summary>
         /// 判断是否正在事务处理
         /// </summary>
-        private int isExecuting = 0;
+        private int _isExecuting = 0;
         /// <summary>
         /// 什么类型的数据库
         /// </summary>
@@ -86,7 +86,7 @@ namespace FoolishServer.Data
         /// </summary>
         public RedisDatabase(IRedisSetting setting)
         {
-            isExecuting = 0;
+            _isExecuting = 0;
             Setting = setting;
             Kind = EDatabase.Redis;
         }
@@ -96,21 +96,21 @@ namespace FoolishServer.Data
         public void Close()
         {
             FConsole.WriteWithCategory(Kind.ToString(), "Redis closing...");
-            if (HeartbeatTime != null)
+            if (_heartbeatTime != null)
             {
                 try
                 {
-                    HeartbeatTime.Dispose();
+                    _heartbeatTime.Dispose();
                 }
                 catch (Exception e)
                 {
                     FConsole.WriteExceptionWithCategory(Kind.ToString(), e);
                 }
-                HeartbeatTime = null;
+                _heartbeatTime = null;
             }
             //如果有正在执行的事务，等待处理完
             bool executing = false;
-            while (isExecuting > 0)
+            while (_isExecuting > 0)
             {
                 executing = true;
                 Console.Write("\r" + FConsole.FormatCustomMessage(Kind.ToString(), "Redis is saving data..."));
@@ -123,12 +123,12 @@ namespace FoolishServer.Data
             }
             if (Redis != null)
             {
-                if (RedisServer != null)
+                if (_redisServer != null)
                 {
                     try
                     {
                         //阻塞当前线程，强制Redis落地
-                        RedisServer.Save(SaveType.ForegroundSave);
+                        _redisServer.Save(SaveType.ForegroundSave);
                     }
                     catch (Exception e)
                     {
@@ -145,7 +145,7 @@ namespace FoolishServer.Data
                 }
                 Redis = null;
                 Redis = null;
-                Database = null;
+                _database = null;
             }
         }
         /// <summary>
@@ -156,9 +156,9 @@ namespace FoolishServer.Data
         {
             FConsole.WriteInfoWithCategory(Kind.ToString(), "Redis connecting...");
             Reconnect();
-            if (Connected && HeartbeatTime == null)
+            if (Connected && _heartbeatTime == null)
             {
-                HeartbeatTime = new Timer(Ping, this, 60000, 60000);
+                _heartbeatTime = new Timer(Ping, this, 60000, 60000);
             }
             return Connected;
         }
@@ -218,8 +218,8 @@ namespace FoolishServer.Data
             }
             if (Connected)
             {
-                RedisServer = Redis.GetServer(Setting.Host, Setting.Port);
-                Database = Redis.GetDatabase(Setting.DbIndex);
+                _redisServer = Redis.GetServer(Setting.Host, Setting.Port);
+                _database = Redis.GetDatabase(Setting.DbIndex);
                 FConsole.WriteInfoFormatWithCategory(Kind.ToString(), "Redis[{0}] connected.", Setting.DbIndex);
             }
         }
@@ -231,7 +231,7 @@ namespace FoolishServer.Data
         {
             try
             {
-                RedisServer.Ping();
+                _redisServer.Ping();
             }
             catch (Exception e)
             {
@@ -245,11 +245,11 @@ namespace FoolishServer.Data
         /// </summary>
         public bool CommitModifiedEntitys(IEnumerable<DbCommition> commitions)
         {
-            Interlocked.Increment(ref isExecuting);
+            Interlocked.Increment(ref _isExecuting);
             CheckRedis();
             try
             {
-                IBatch batch = Database.CreateBatch();
+                IBatch batch = _database.CreateBatch();
                 foreach (DbCommition commition in commitions)
                 {
                     //FConsole.Write(commition.Key.ToString() + ": " + commition.ModifyType);
@@ -274,7 +274,7 @@ namespace FoolishServer.Data
             }
             finally
             {
-                Interlocked.Decrement(ref isExecuting);
+                Interlocked.Decrement(ref _isExecuting);
             }
         }
 
@@ -284,7 +284,7 @@ namespace FoolishServer.Data
         public IEnumerable<T> LoadAll<T>() where T : MajorEntity, new()
         {
             CheckRedis();
-            Task<HashEntry[]> task = Database.HashGetAllAsync(EntityKey.MakeTableName(FType<T>.Type));
+            Task<HashEntry[]> task = _database.HashGetAllAsync(EntityKey.MakeTableName(FType<T>.Type));
             task.Wait();
             HashEntry[] entries = task.Result;
             T[] entities = new T[entries.Length];
@@ -301,7 +301,7 @@ namespace FoolishServer.Data
         public T Find<T>(EntityKey key) where T : MajorEntity, new()
         {
             CheckRedis();
-            Task<RedisValue> task = Database.HashGetAsync(key.TableName, key.KeyName);
+            Task<RedisValue> task = _database.HashGetAsync(key.TableName, key.KeyName);
             task.Wait();
             if (task.Result.HasValue)
             {

@@ -85,7 +85,7 @@ namespace FoolishGames.Action
         /// <summary>
         /// 类名
         /// </summary>
-        private string typeName = null;
+        private string _typeName = null;
 
         /// <summary>
         /// 类名
@@ -94,11 +94,11 @@ namespace FoolishGames.Action
         {
             get
             {
-                if (typeName == null)
+                if (_typeName == null)
                 {
-                    typeName = GetType().Name;
+                    _typeName = GetType().Name;
                 }
-                return typeName;
+                return _typeName;
             }
         }
 

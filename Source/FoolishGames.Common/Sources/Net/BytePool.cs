@@ -67,7 +67,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 锁
         /// </summary>
-        private readonly object SyncRoot = new object();
+        private readonly object _syncRoot = new object();
         /// <summary>
         /// 字节池
         /// </summary>
@@ -112,7 +112,7 @@ namespace FoolishGames.Net
         /// <param name="length"></param>
         public void GetByteBlock(out byte[] buffer, out int offset, out int length)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (Offsets.Count == 0)
                 {
@@ -129,7 +129,7 @@ namespace FoolishGames.Net
         /// <param name="offset"></param>
         public void Release(int offset)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 Offsets.Push(offset);
             }

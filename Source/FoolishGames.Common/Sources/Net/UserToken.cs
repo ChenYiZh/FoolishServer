@@ -52,14 +52,14 @@ namespace FoolishGames.Net
         /// 收发数据的标识
         /// <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
         /// </summary>
-        private int isSendingOrReceivingFlag = 0;
+        private int _isSendingOrReceivingFlag = 0;
 
         /// <summary>
         /// 是否是待处理状态
         /// </summary>
         internal bool IsWaitingSendOrReceive
         {
-            get { return Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 0, 0) == 0; }
+            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 0, 0) == 0; }
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace FoolishGames.Net
         /// </summary>
         internal bool IsSending
         {
-            get { return Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 1, 1) == 1; }
+            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 1, 1) == 1; }
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace FoolishGames.Net
         /// </summary>
         internal bool IsReceiving
         {
-            get { return Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 2, 2) == 2; }
+            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 2, 2) == 2; }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace FoolishGames.Net
         /// </summary>
         internal bool Sendable()
         {
-            return Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 1, 0) == 0 || IsSending;
+            return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 1, 0) == 0 || IsSending;
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace FoolishGames.Net
         /// </summary>
         internal bool Receivable()
         {
-            return Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 2, 0) == 0 || IsReceiving;
+            return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 2, 0) == 0 || IsReceiving;
         }
 
         /// <summary>
@@ -101,11 +101,11 @@ namespace FoolishGames.Net
         {
             if (fromState == 0)
             {
-                Interlocked.Exchange(ref isSendingOrReceivingFlag, 0);
+                Interlocked.Exchange(ref _isSendingOrReceivingFlag, 0);
             }
             else
             {
-                Interlocked.CompareExchange(ref isSendingOrReceivingFlag, 0, fromState);
+                Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 0, fromState);
             }
         }
         #endregion

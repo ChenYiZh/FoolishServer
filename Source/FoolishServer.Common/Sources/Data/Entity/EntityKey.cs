@@ -41,17 +41,17 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 数据类型
         /// </summary>
-        private Type type;
+        private Type _type;
 
         /// <summary>
         /// 数据类型
         /// </summary>
         internal Type Type
         {
-            get { return type; }
+            get { return _type; }
             set
             {
-                type = null;
+                _type = null;
                 RefreshKeyName();
                 CheckIsSingleKey();
             }
@@ -60,12 +60,12 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 表名
         /// </summary>
-        private string tableName;
+        private string _tableName;
 
         /// <summary>
         /// 表名
         /// </summary>
-        public string TableName { get { return tableName; } }
+        public string TableName { get { return _tableName; } }
 
         /// <summary>
         /// 主键
@@ -80,17 +80,17 @@ namespace FoolishServer.Data.Entity
         /// <summary>
         /// 完整Key名称，用于判断
         /// </summary>
-        private string keyName;
+        private string _keyName;
 
         /// <summary>
         /// 完整Key名称，用于判断
         /// </summary>
-        public string KeyName { get { return keyName; } }
+        public string KeyName { get { return _keyName; } }
 
         /// <summary>
         /// 全名
         /// </summary>
-        private string fullName;
+        private string _fullName;
 
         /// <summary>
         /// 通过主键生成对象
@@ -99,11 +99,11 @@ namespace FoolishServer.Data.Entity
         public EntityKey(params object[] keys)
         {
             IsSingleKey = false;
-            type = null;
+            _type = null;
             this.keys = keys;
-            keyName = null;
-            tableName = null;
-            fullName = null;
+            _keyName = null;
+            _tableName = null;
+            _fullName = null;
             MakeKeyName();
         }
 
@@ -114,11 +114,11 @@ namespace FoolishServer.Data.Entity
         internal EntityKey(Type type, params object[] keys)
         {
             IsSingleKey = false;
-            this.type = type;
+            this._type = type;
             this.keys = keys;
-            keyName = null;
-            tableName = null;
-            fullName = null;
+            _keyName = null;
+            _tableName = null;
+            _fullName = null;
             MakeKeyName();
             CheckIsSingleKey();
         }
@@ -134,9 +134,9 @@ namespace FoolishServer.Data.Entity
         private void CheckIsSingleKey()
         {
             IsSingleKey = false;
-            if (type != null)
+            if (_type != null)
             {
-                TableScheme tableScheme = DataContext.GetTableScheme(type) as TableScheme;
+                TableScheme tableScheme = DataContext.GetTableScheme(_type) as TableScheme;
                 IsSingleKey = tableScheme != null && tableScheme.KeyFields.Count == 1;
             }
         }
@@ -154,9 +154,9 @@ namespace FoolishServer.Data.Entity
         /// </summary>
         private void MakeKeyName()
         {
-            tableName = MakeTableName(type);
-            keyName = MakeKeyName(keys);
-            fullName = MakeFullName(type, keys);
+            _tableName = MakeTableName(_type);
+            _keyName = MakeKeyName(keys);
+            _fullName = MakeFullName(_type, keys);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace FoolishServer.Data.Entity
             }
             if (IsSingleKey && other.Value.IsSingleKey)
             {
-                return type == other.Value.type && keys[0].Equals(other.Value.keys[0]);
+                return _type == other.Value._type && keys[0].Equals(other.Value.keys[0]);
             }
             return ToString() == obj.ToString();
         }
@@ -243,7 +243,7 @@ namespace FoolishServer.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            return fullName;
+            return _fullName;
         }
 
         /// <summary>

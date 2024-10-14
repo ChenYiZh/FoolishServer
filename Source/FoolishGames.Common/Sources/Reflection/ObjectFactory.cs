@@ -41,7 +41,7 @@ namespace FoolishGames.Reflection
         /// <summary>
         /// 缓存池
         /// </summary>
-        private static IDictionary<string, Type> types = new ThreadSafeDictionary<string, Type>();
+        private static IDictionary<string, Type> _types = new ThreadSafeDictionary<string, Type>();
 
         /// <summary>
         /// 自动通过程序集搜索创建
@@ -51,12 +51,12 @@ namespace FoolishGames.Reflection
             try
             {
                 Type type;
-                if (!types.TryGetValue(typeName, out type))
+                if (!_types.TryGetValue(typeName, out type))
                 {
                     type = Type.GetType(typeName);
                     if (type != null)
                     {
-                        types[typeName] = type;
+                        _types[typeName] = type;
                     }
                     else
                     {
@@ -65,7 +65,7 @@ namespace FoolishGames.Reflection
                             type = assembly.GetType(typeName);
                             if (type != null)
                             {
-                                types[typeName] = type;
+                                _types[typeName] = type;
                                 break;
                             }
                         }
@@ -77,7 +77,7 @@ namespace FoolishGames.Reflection
                                 type = assembly.GetType(typeName);
                                 if (type != null)
                                 {
-                                    types[typeName] = type;
+                                    _types[typeName] = type;
                                     break;
                                 }
                             }
@@ -101,12 +101,12 @@ namespace FoolishGames.Reflection
             try
             {
                 Type type;
-                if (!types.TryGetValue(typeName, out type))
+                if (!_types.TryGetValue(typeName, out type))
                 {
                     type = Type.GetType(typeName);
                     if (type != null)
                     {
-                        types[typeName] = type;
+                        _types[typeName] = type;
                     }
                 }
                 return Activator.CreateInstance(type, args) as T;
@@ -131,12 +131,12 @@ namespace FoolishGames.Reflection
             try
             {
                 Type type;
-                if (!types.TryGetValue(typeName, out type))
+                if (!_types.TryGetValue(typeName, out type))
                 {
                     type = assembly.GetType(typeName);
                     if (type != null)
                     {
-                        types[typeName] = type;
+                        _types[typeName] = type;
                     }
                 }
                 return Activator.CreateInstance(type, args) as T;

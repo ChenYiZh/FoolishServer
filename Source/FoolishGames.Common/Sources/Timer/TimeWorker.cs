@@ -45,13 +45,13 @@ namespace FoolishGames.Timer
         /// <summary>
         /// 时间计划
         /// </summary>
-        private ThreadSafeDictionary<string, TimeSchedule> schedules;
+        private ThreadSafeDictionary<string, TimeSchedule> _schedules;
         /// <summary>
         /// 初始化
         /// </summary>
         public TimeWorker()
         {
-            schedules = new ThreadSafeDictionary<string, TimeSchedule>();
+            _schedules = new ThreadSafeDictionary<string, TimeSchedule>();
         }
         /// <summary>
         /// 计时器间隔
@@ -82,7 +82,7 @@ namespace FoolishGames.Timer
         private void Update(object state)
         {
             List<string> removeCache = new List<string>();
-            foreach (KeyValuePair<string, TimeSchedule> schedule in schedules)
+            foreach (KeyValuePair<string, TimeSchedule> schedule in _schedules)
             {
                 schedule.Value.Execute();
                 if (schedule.Value.IsExpired)
@@ -92,7 +92,7 @@ namespace FoolishGames.Timer
             };
             foreach (string key in removeCache)
             {
-                schedules.Remove(key);
+                _schedules.Remove(key);
             }
         }
         /// <summary>
@@ -105,14 +105,14 @@ namespace FoolishGames.Timer
                 FConsole.WriteError("TimeSchedule is Null! ");
                 return;
             }
-            if (schedules.ContainsKey(schedule.Name))
+            if (_schedules.ContainsKey(schedule.Name))
             {
                 FConsole.WriteError("There is a same name of schedule.: " + schedule.Name);
                 return;
             }
-            lock (schedules)
+            lock (_schedules)
             {
-                schedules.Add(schedule.Name, schedule);
+                _schedules.Add(schedule.Name, schedule);
             }
         }
         /// <summary>
@@ -125,7 +125,7 @@ namespace FoolishGames.Timer
                 return;
             }
             string key = null;
-            foreach (KeyValuePair<string, TimeSchedule> plan in schedules)
+            foreach (KeyValuePair<string, TimeSchedule> plan in _schedules)
             {
                 if (plan.Value == schedule)
                 {
@@ -133,14 +133,14 @@ namespace FoolishGames.Timer
                 }
             }
             // WARN: 这里会出现集合修改的问题
-            lock (schedules)
+            lock (_schedules)
             {
-                if (key == null && schedules.ContainsKey(schedule.Name))
+                if (key == null && _schedules.ContainsKey(schedule.Name))
                 {
-                    schedules.Remove(schedule.Name);
+                    _schedules.Remove(schedule.Name);
                     return;
                 }
-                schedules.Remove(key);
+                _schedules.Remove(key);
             }
         }
         /// <summary>
@@ -148,7 +148,7 @@ namespace FoolishGames.Timer
         /// </summary>
         public void Stop()
         {
-            schedules.Clear();
+            _schedules.Clear();
             if (Timer != null)
             {
                 Timer.Dispose();

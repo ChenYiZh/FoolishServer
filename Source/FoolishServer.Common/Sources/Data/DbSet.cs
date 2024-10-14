@@ -58,59 +58,59 @@ namespace FoolishServer.Data
         /// <summary>
         /// 缓存中的数据，热数据
         /// </summary>
-        private ThreadSafeDictionary<EntityKey, T> rawEntities = new ThreadSafeDictionary<EntityKey, T>();
+        private ThreadSafeDictionary<EntityKey, T> _rawEntities = new ThreadSafeDictionary<EntityKey, T>();
 
         /// <summary>
         /// 缓存中的数据，热数据
         /// </summary>
-        public IReadOnlyDictionary<EntityKey, T> RawEntities { get { return rawEntities; } }
+        public IReadOnlyDictionary<EntityKey, T> RawEntities { get { return _rawEntities; } }
 
         /// <summary>
         /// 现在真在使用的修改缓存池id
         /// </summary>
-        private int modifiedEntitiesPoolIndex = 0;
+        private int _modifiedEntitiesPoolIndex = 0;
 
         /// <summary>
         /// 修改池的锁
         /// </summary>
-        private readonly object modifiedEntitiesPoolLocker = new object();
+        private readonly object _modifiedEntitiesPoolLocker = new object();
 
         /// <summary>
         /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
         /// 防止多线程阻塞，所以使用集合池
         /// </summary>
-        private IReadOnlyDictionary<EntityKey, T>[] modifiedEntitiesPool = null;
+        private IReadOnlyDictionary<EntityKey, T>[] _modifiedEntitiesPool = null;
 
         /// <summary>
         /// 现在真在使用的修改缓存池id
         /// </summary>
-        public int ModifiedEntitiesPoolIndex { get { return modifiedEntitiesPoolIndex; } }
+        public int ModifiedEntitiesPoolIndex { get { return _modifiedEntitiesPoolIndex; } }
 
         /// <summary>
         /// 已经改动过的实例，这些数据应该会出现在热数据中，主要用于推送。
         /// 防止多线程阻塞，所以使用集合池
         /// </summary>
-        public IReadOnlyList<IReadOnlyDictionary<EntityKey, T>> ModifiedEntitiesPool { get { return modifiedEntitiesPool; } }
+        public IReadOnlyList<IReadOnlyDictionary<EntityKey, T>> ModifiedEntitiesPool { get { return _modifiedEntitiesPool; } }
 
         /// <summary>
         /// 冷数据
         /// </summary>
-        private ThreadSafeDictionary<EntityKey, T> coldEntities = new ThreadSafeDictionary<EntityKey, T>();
+        private ThreadSafeDictionary<EntityKey, T> _coldEntities = new ThreadSafeDictionary<EntityKey, T>();
 
         /// <summary>
         /// 冷数据
         /// </summary>
-        public IReadOnlyDictionary<EntityKey, T> ColdEntities { get { return coldEntities; } }
+        public IReadOnlyDictionary<EntityKey, T> ColdEntities { get { return _coldEntities; } }
 
         /// <summary>
         /// 原子锁
         /// </summary>
-        private int releaseCountdown = 0;
+        private int _releaseCountdown = 0;
 
         /// <summary>
         /// 卸载冷数据倒计时
         /// </summary>
-        public int ReleaseCountdown { get { return releaseCountdown; } set { Interlocked.Exchange(ref releaseCountdown, value); } }
+        public int ReleaseCountdown { get { return _releaseCountdown; } set { Interlocked.Exchange(ref _releaseCountdown, value); } }
 
         /// <summary>
         /// 推送倒计时
@@ -130,14 +130,14 @@ namespace FoolishServer.Data
         /// <summary>
         /// 提交判断标示
         /// </summary>
-        private int commitFlag = 0;
+        private int _commitFlag = 0;
 
         public DbSet()
         {
-            modifiedEntitiesPool = new IReadOnlyDictionary<EntityKey, T>[3];
-            for (int i = 0; i < modifiedEntitiesPool.Length; i++)
+            _modifiedEntitiesPool = new IReadOnlyDictionary<EntityKey, T>[3];
+            for (int i = 0; i < _modifiedEntitiesPool.Length; i++)
             {
-                modifiedEntitiesPool[i] = new Dictionary<EntityKey, T>();
+                _modifiedEntitiesPool[i] = new Dictionary<EntityKey, T>();
             }
             TableScheme = DataContext.GetTableScheme<T>();
             //CommitThread = new Thread(OnCommitModifiedData);
@@ -200,9 +200,9 @@ namespace FoolishServer.Data
             }
 
             //更新
-            lock (modifiedEntitiesPoolLocker)
+            lock (_modifiedEntitiesPoolLocker)
             {
-                ((Dictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = entity;
+                ((Dictionary<EntityKey, T>)_modifiedEntitiesPool[_modifiedEntitiesPoolIndex])[key] = entity;
             }
 
             Modify(entity);
@@ -219,11 +219,11 @@ namespace FoolishServer.Data
             T result;
             if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromRawDb))
             {
-                if (!rawEntities.TryGetValue(key, out result)) { return result; }
+                if (!_rawEntities.TryGetValue(key, out result)) { return result; }
             }
             if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromDb))
             {
-                if (ReleaseCountdown > 0 && coldEntities.TryGetValue(key, out result)) { return result; }
+                if (ReleaseCountdown > 0 && _coldEntities.TryGetValue(key, out result)) { return result; }
                 if (!DataContext.Databases.ContainsKey(TableScheme.ConnectKey)) { return null; }
                 return DataContext.Databases[TableScheme.ConnectKey].Find<T>(key);
             }
@@ -237,21 +237,21 @@ namespace FoolishServer.Data
         private void Remove(EntityKey key)
         {
             T entity;
-            if (rawEntities.TryGetValue(key, out entity))
+            if (_rawEntities.TryGetValue(key, out entity))
             {
                 entity.SetState(EStorageState.Removed);
             }
-            rawEntities.Remove(key);
-            if (coldEntities.TryGetValue(key, out entity))
+            _rawEntities.Remove(key);
+            if (_coldEntities.TryGetValue(key, out entity))
             {
                 entity.SetState(EStorageState.Removed);
             }
-            coldEntities.Remove(key);
+            _coldEntities.Remove(key);
 
             //提交更改
-            lock (modifiedEntitiesPoolLocker)
+            lock (_modifiedEntitiesPoolLocker)
             {
-                ((Dictionary<EntityKey, T>)modifiedEntitiesPool[modifiedEntitiesPoolIndex])[key] = null;
+                ((Dictionary<EntityKey, T>)_modifiedEntitiesPool[_modifiedEntitiesPoolIndex])[key] = null;
             }
             //通知
             OnDataModified?.Invoke(key, null);
@@ -265,9 +265,9 @@ namespace FoolishServer.Data
             //只有配置进入缓存才会缓存
             if (TableScheme.InCache)
             {
-                rawEntities[entity.GetEntityKey()] = entity;
+                _rawEntities[entity.GetEntityKey()] = entity;
             }
-            coldEntities.Remove(entity.GetEntityKey());
+            _coldEntities.Remove(entity.GetEntityKey());
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace FoolishServer.Data
             Thread.Sleep(100);
             if (ReleaseCountdown <= 0)
             {
-                coldEntities.Clear();
+                _coldEntities.Clear();
                 FConsole.Write(GetType().Name + " ReleaseColdEntities.");
             }
         }
@@ -302,32 +302,32 @@ namespace FoolishServer.Data
             //    if (commitFlag > 0)
             //    {
             //        Interlocked.Exchange(ref commitFlag, 0);
-            if (commitFlag > 0)
+            if (_commitFlag > 0)
             {
                 return;
             }
-            Interlocked.Exchange(ref commitFlag, 1);
+            Interlocked.Exchange(ref _commitFlag, 1);
             try
             {
-                int pushIndex = modifiedEntitiesPoolIndex - 1;
+                int pushIndex = _modifiedEntitiesPoolIndex - 1;
                 if (pushIndex < 0)
                 {
-                    pushIndex = modifiedEntitiesPool.Length - 1;
+                    pushIndex = _modifiedEntitiesPool.Length - 1;
                 }
-                int nextIndex = modifiedEntitiesPoolIndex + 1;
-                if (nextIndex >= modifiedEntitiesPool.Length)
+                int nextIndex = _modifiedEntitiesPoolIndex + 1;
+                if (nextIndex >= _modifiedEntitiesPool.Length)
                 {
                     nextIndex = 0;
                 }
-                Interlocked.Exchange(ref modifiedEntitiesPoolIndex, nextIndex);
-                Dictionary<EntityKey, T> entities = (Dictionary<EntityKey, T>)modifiedEntitiesPool[pushIndex];
+                Interlocked.Exchange(ref _modifiedEntitiesPoolIndex, nextIndex);
+                Dictionary<EntityKey, T> entities = (Dictionary<EntityKey, T>)_modifiedEntitiesPool[pushIndex];
                 ForceCommitModifiedData(entities);
             }
             catch (Exception e)
             {
                 FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
             }
-            Interlocked.Exchange(ref commitFlag, 0);
+            Interlocked.Exchange(ref _commitFlag, 0);
             //    }
             //    Thread.Sleep(10);
             //}
@@ -338,9 +338,9 @@ namespace FoolishServer.Data
         /// </summary>
         public void ForceCommitAllModifiedData()
         {
-            lock (modifiedEntitiesPoolLocker)
+            lock (_modifiedEntitiesPoolLocker)
             {
-                foreach (Dictionary<EntityKey, T> entities in modifiedEntitiesPool)
+                foreach (Dictionary<EntityKey, T> entities in _modifiedEntitiesPool)
                 {
                     ForceCommitModifiedData(entities);
                 }
@@ -374,18 +374,18 @@ namespace FoolishServer.Data
                     if (DataContext.RawDatabase != null)
                     {
                         IEnumerable<T> iterator = DataContext.RawDatabase.LoadAll<T>();
-                        rawEntities.Clear();
+                        _rawEntities.Clear();
                         foreach (T entity in iterator)
                         {
                             entity.OnPulledFromDb();
-                            rawEntities[entity.GetEntityKey()] = entity;
+                            _rawEntities[entity.GetEntityKey()] = entity;
                         }
                     }
                 }
             }
             else
             {
-                rawEntities.Clear();
+                _rawEntities.Clear();
             }
         }
 
@@ -394,9 +394,9 @@ namespace FoolishServer.Data
         /// </summary>
         public void PushAllRawData()
         {
-            lock (rawEntities.SyncRoot)
+            lock (_rawEntities.SyncRoot)
             {
-                CommitModifiedEntitys(rawEntities);
+                CommitModifiedEntitys(_rawEntities);
             }
         }
 
@@ -455,7 +455,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 执行读取全部数据的函数锁
         /// </summary>
-        private readonly object loadingAllFlag = new object();
+        private readonly object _loadingAllFlag = new object();
         /// <summary>
         /// 读取全部数据，只要有一个查询其他全部等待，只为了合批只做一次查询
         /// </summary>
@@ -466,14 +466,14 @@ namespace FoolishServer.Data
             if (TableScheme.StorageType.HasFlag(EStorageType.ReadFromDb))
             {
                 // LoadAll;
-                lock (loadingAllFlag)
+                lock (_loadingAllFlag)
                 {
                     //还未卸载直接加载
-                    if (releaseCountdown <= 0 || ColdEntities.Count == 0)
+                    if (_releaseCountdown <= 0 || ColdEntities.Count == 0)
                     {
                         //数据库加载
-                        coldEntities.Clear();
-                        if (!DataContext.Databases.ContainsKey(TableScheme.ConnectKey)) { return coldEntities; }
+                        _coldEntities.Clear();
+                        if (!DataContext.Databases.ContainsKey(TableScheme.ConnectKey)) { return _coldEntities; }
                         IEnumerable<T> data = DataContext.Databases[TableScheme.ConnectKey].LoadAll<T>();
                         foreach (T entity in data)
                         {
@@ -485,12 +485,12 @@ namespace FoolishServer.Data
                             }
                             else
                             {
-                                coldEntities[key] = entity;
+                                _coldEntities[key] = entity;
                             }
                         }
                     }
 
-                    result = new Dictionary<EntityKey, T>(coldEntities);
+                    result = new Dictionary<EntityKey, T>(_coldEntities);
                     ReleaseCountdown = Settings.DataReleasePeriod;
                 }
             }
@@ -498,9 +498,9 @@ namespace FoolishServer.Data
             {
                 result = new Dictionary<EntityKey, T>();
             }
-            lock (rawEntities.SyncRoot)
+            lock (_rawEntities.SyncRoot)
             {
-                foreach (KeyValuePair<EntityKey, T> kv in rawEntities)
+                foreach (KeyValuePair<EntityKey, T> kv in _rawEntities)
                 {
                     result[kv.Key] = kv.Value;
                 }
@@ -526,17 +526,17 @@ namespace FoolishServer.Data
             List<T> entities = null;
             try
             {
-                Monitor.TryEnter(rawEntities.SyncRoot, Settings.LockerTimeout, ref lockToken);
+                Monitor.TryEnter(_rawEntities.SyncRoot, Settings.LockerTimeout, ref lockToken);
                 if (lockToken)
                 {
-                    entities = new List<T>(rawEntities.Values);
+                    entities = new List<T>(_rawEntities.Values);
                 }
             }
             finally
             {
                 if (lockToken)
                 {
-                    Monitor.Exit(rawEntities.SyncRoot);
+                    Monitor.Exit(_rawEntities.SyncRoot);
                 }
             }
             if (lockToken && entities != null)
@@ -545,11 +545,11 @@ namespace FoolishServer.Data
                 {
                     if (entity.IsExpired)
                     {
-                        rawEntities.Remove(entity.GetEntityKey());
+                        _rawEntities.Remove(entity.GetEntityKey());
                     }
                     if (ReleaseCountdown > 0)
                     {
-                        coldEntities.Add(entity.GetEntityKey(), entity);
+                        _coldEntities.Add(entity.GetEntityKey(), entity);
                     }
                 }
             }

@@ -90,7 +90,7 @@
             刚创建时处理，所有参数都还没有赋值
             </summary>
         </member>
-        <member name="F:FoolishGames.Action.GameAction.typeName">
+        <member name="F:FoolishGames.Action.GameAction._typeName">
             <summary>
             类名
             </summary>
@@ -498,12 +498,12 @@
             内容长度
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.readIndex">
+        <member name="F:FoolishGames.IO.MessageReader._readIndex">
             <summary>
             读取的数据指针
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.context">
+        <member name="F:FoolishGames.IO.MessageReader._context">
             <summary>
             通信包内容
             </summary>
@@ -513,7 +513,7 @@
             内容信息
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.packetLength">
+        <member name="F:FoolishGames.IO.MessageReader._packetLength">
             <summary>
             包体长度
             </summary>
@@ -680,7 +680,7 @@
             内容信息
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageWriter.stream">
+        <member name="F:FoolishGames.IO.MessageWriter._stream">
             <summary>
             缓存池
             </summary>
@@ -1136,7 +1136,7 @@
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs.setbuffer</para>
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.BytePool.SyncRoot">
+        <member name="F:FoolishGames.Net.BytePool._syncRoot">
             <summary>
             锁
             </summary>
@@ -1440,17 +1440,17 @@
             数据管理对象
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.SocketSender.SendableSyncRoot">
+        <member name="F:FoolishGames.Net.SocketSender._sendableSyncRoot">
             <summary>
             发送队列的锁
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessages">
+        <member name="F:FoolishGames.Net.SocketSender._waitToSendMessages">
             <summary>
             待发送的消息列表
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.SocketSender.messageNumber">
+        <member name="F:FoolishGames.Net.SocketSender._messageNumber">
             <summary>
             消息Id，需要加原子锁
             </summary>
@@ -1584,7 +1584,7 @@
             嵌套的Socket
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.UserToken.isSendingOrReceivingFlag">
+        <member name="F:FoolishGames.Net.UserToken._isSendingOrReceivingFlag">
             <summary>
             收发数据的标识
             <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
@@ -1804,7 +1804,7 @@
             当前使用的计时控件
             </summary>
         </member>
-        <member name="F:FoolishGames.Timer.TimeLord.syncRoot">
+        <member name="F:FoolishGames.Timer.TimeLord._syncRoot">
             <summary>
             锁
             </summary>
@@ -2021,7 +2021,7 @@
             计时器
             </summary>
         </member>
-        <member name="F:FoolishGames.Timer.TimeWorker.schedules">
+        <member name="F:FoolishGames.Timer.TimeWorker._schedules">
             <summary>
             时间计划
             </summary>
@@ -2104,17 +2104,17 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.Execution">
+        <member name="F:FoolishGames.Common.CachePool`1._execution">
             <summary>
             队列操作
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.Pools">
+        <member name="F:FoolishGames.Common.CachePool`1._pools">
             <summary>
             缓存池
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.CurrentPoolIndex">
+        <member name="F:FoolishGames.Common.CachePool`1._currentPoolIndex">
             <summary>
             当前压入的缓存池索引
             </summary>
@@ -2139,7 +2139,7 @@
             循环中锁的最长等待时间
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.isReleased">
+        <member name="F:FoolishGames.Common.CachePool`1._isReleased">
             <summary>
             工作状态标识
             </summary>
@@ -2324,7 +2324,7 @@
             反射创建对象
             </summary>
         </member>
-        <member name="F:FoolishGames.Reflection.ObjectFactory.types">
+        <member name="F:FoolishGames.Reflection.ObjectFactory._types">
             <summary>
             缓存池
             </summary>

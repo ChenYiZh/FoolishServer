@@ -105,6 +105,11 @@ namespace FoolishServer.Net
         public IHostSetting Setting { get; private set; }
 
         /// <summary>
+        /// 代理服务器对象
+        /// </summary>
+        internal ServerProxy ServerProxy { get; set; } = null;
+
+        /// <summary>
         /// 启动结构
         /// </summary>
         public bool Start(IHostSetting setting)
@@ -127,7 +132,7 @@ namespace FoolishServer.Net
                 {
                     ServerSocket.Close();
                 }
-                ServerSocket = new ServerSocket();
+                ServerSocket = BuildSocket();
                 ServerSocket.OnConnected += OnSocketConnected;
                 ServerSocket.OnDisconnected += OnSocketDisconnected;
                 ServerSocket.OnPong += OnSocketReceiveHeartbeat;
@@ -144,12 +149,9 @@ namespace FoolishServer.Net
         }
 
         /// <summary>
-        /// 在服务器启动时执行
+        /// 创建服务器套接字
         /// </summary>
-        protected virtual void OnStart()
-        {
-
-        }
+        internal protected abstract IServerSocket BuildSocket();
 
         /// <summary>
         /// 消息处理
@@ -176,13 +178,6 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Process message error.", e);
             }
-        }
-
-        /// <summary>
-        /// 开始接收数据，第一部处理
-        /// </summary>
-        protected virtual void OnReceiveMessage(ISession session, IMessageReader message)
-        {
         }
 
         /// <summary>
@@ -231,15 +226,6 @@ namespace FoolishServer.Net
             }
         }
 
-        /// <summary>
-        /// 在客户端连接时执行
-        /// </summary>
-        protected virtual void OnSessionConnected(ISession session)
-        {
-            //在客户端连接时执行
-            //FConsole.WriteFormat("Hello {0}!", session.SessionId);
-        }
-
         private void OnSocketDisconnected(IServerSocket socket, IRemoteSocket remoteSocket)
         {
             try
@@ -264,15 +250,6 @@ namespace FoolishServer.Net
             }
         }
 
-        /// <summary>
-        /// 在客户端断开时执行
-        /// </summary>
-        protected virtual void OnSessionDisonnected(ISession session)
-        {
-            //在客户端断开时执行
-            //FConsole.WriteFormat("Bye {0}!", session.SessionId);
-        }
-
         private void OnSocketReceiveHeartbeat(IServerSocket socket, IMessageEventArgs<IRemoteSocket> args)
         {
             try
@@ -288,31 +265,6 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
             }
-        }
-
-        /// <summary>
-        /// 收到客户端的心跳包时执行
-        /// </summary>
-        protected virtual void OnSessionHeartbeat(ISession session)
-        {
-            //收到客户端的心跳包时执行
-            //FConsole.WriteFormat("Beat {0}!", session.SessionId);
-        }
-
-        /// <summary>
-        /// 在客户端心跳包过期时执行
-        /// </summary>
-        protected virtual void OnSessionHeartbeatExpired(ISession session)
-        {
-            //在客户端心跳包过期时执行
-        }
-
-        /// <summary>
-        /// 在关闭前处理
-        /// </summary>
-        protected virtual void OnClose()
-        {
-            //在关闭前处理
         }
 
         /// <summary>
@@ -343,6 +295,88 @@ namespace FoolishServer.Net
                 {
                     FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 在服务器启动时执行
+        /// </summary>
+        protected virtual void OnStart()
+        {
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnStart();
+            }
+        }
+
+        /// <summary>
+        /// 开始接收数据，第一部处理
+        /// </summary>
+        protected virtual void OnReceiveMessage(ISession session, IMessageReader message)
+        {
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnReceiveMessage(session, message);
+            }
+        }
+
+        /// <summary>
+        /// 在客户端连接时执行
+        /// </summary>
+        protected virtual void OnSessionConnected(ISession session)
+        {
+            //在客户端连接时执行
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnSessionConnected(session);
+            }
+        }
+
+        /// <summary>
+        /// 在客户端断开时执行
+        /// </summary>
+        protected virtual void OnSessionDisonnected(ISession session)
+        {
+            //在客户端断开时执行
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnSessionDisonnected(session);
+            }
+        }
+
+        /// <summary>
+        /// 收到客户端的心跳包时执行
+        /// </summary>
+        protected virtual void OnSessionHeartbeat(ISession session)
+        {
+            //收到客户端的心跳包时执行
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnSessionHeartbeat(session);
+            }
+        }
+
+        /// <summary>
+        /// 在客户端心跳包过期时执行
+        /// </summary>
+        protected virtual void OnSessionHeartbeatExpired(ISession session)
+        {
+            //在客户端心跳包过期时执行
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnSessionHeartbeatExpired(session);
+            }
+        }
+
+        /// <summary>
+        /// 在关闭前处理
+        /// </summary>
+        protected virtual void OnClose()
+        {
+            //在关闭前处理
+            if (ServerProxy != null)
+            {
+                ServerProxy.OnClose();
             }
         }
     }

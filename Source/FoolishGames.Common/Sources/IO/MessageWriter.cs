@@ -91,20 +91,20 @@ namespace FoolishGames.IO
         /// </summary>
         public byte[] GetContext()
         {
-            return stream.GetBuffer();
+            return _stream.GetBuffer();
         }
 
         /// <summary>
         /// 缓存池
         /// </summary>
-        private MemoryStream stream = new MemoryStream();
+        private MemoryStream _stream = new MemoryStream();
 
         /// <summary>
         /// 析构函数
         /// </summary>
         ~MessageWriter()
         {
-            stream.Dispose();
+            _stream.Dispose();
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace FoolishGames.IO
         /// </summary>
         public void WriteByte(byte value)
         {
-            stream.WriteByte(value);
+            _stream.WriteByte(value);
             ContextLength += 1;
         }
 
@@ -265,7 +265,7 @@ namespace FoolishGames.IO
         private void WriteBytes(byte[] bytes)
         {
             ContextLength += bytes.Length;
-            stream.Write(bytes, 0, bytes.Length);
+            _stream.Write(bytes, 0, bytes.Length);
         }
     }
 }

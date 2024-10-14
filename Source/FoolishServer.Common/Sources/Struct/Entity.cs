@@ -97,7 +97,7 @@ namespace FoolishServer.Struct
         /// 上次修改的时间
         /// </summary>
         [NonSerialized]
-        private DateTime modifiedTime = TimeLord.Now;
+        private DateTime _modifiedTime = TimeLord.Now;
 
         /// <summary>
         /// 上次修改的时间
@@ -138,7 +138,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    modifiedTime = value;
+                    _modifiedTime = value;
                 }
                 finally
                 {
@@ -154,7 +154,7 @@ namespace FoolishServer.Struct
         /// 操作类型
         /// </summary>
         [NonSerialized]
-        private EModifyType modifiedType = EModifyType.Add;
+        private EModifyType _modifiedType = EModifyType.Add;
 
         /// <summary>
         /// 操作类型
@@ -173,7 +173,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    return modifiedType;
+                    return _modifiedType;
                 }
                 finally
                 {
@@ -195,7 +195,7 @@ namespace FoolishServer.Struct
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    modifiedType = value;
+                    _modifiedType = value;
                 }
                 finally
                 {
@@ -258,7 +258,7 @@ namespace FoolishServer.Struct
                 NotifyModifiedType(modifiedType);
                 if (State == EStorageState.Stored)
                 {
-                    modifiedTime = TimeLord.Now;
+                    _modifiedTime = TimeLord.Now;
                 }
             }
         }
@@ -268,14 +268,14 @@ namespace FoolishServer.Struct
         /// </summary>
         private void NotifyModifiedType(EModifyType modifiedType)
         {
-            switch (this.modifiedType)
+            switch (this._modifiedType)
             {
-                case EModifyType.UnModified: this.modifiedType = modifiedType; break;
+                case EModifyType.UnModified: this._modifiedType = modifiedType; break;
                 case EModifyType.Modify:
                     {
                         if (modifiedType == EModifyType.Remove || modifiedType == EModifyType.Add)
                         {
-                            this.modifiedType = modifiedType;
+                            this._modifiedType = modifiedType;
                         }
                     }
                     break;
@@ -283,7 +283,7 @@ namespace FoolishServer.Struct
                     {
                         if (modifiedType == EModifyType.Remove)
                         {
-                            this.modifiedType = EModifyType.UnModified;
+                            this._modifiedType = EModifyType.UnModified;
                         }
                     }
                     break;
@@ -334,7 +334,7 @@ namespace FoolishServer.Struct
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                modifiedType = EModifyType.UnModified;
+                _modifiedType = EModifyType.UnModified;
             }
             finally
             {
@@ -351,7 +351,7 @@ namespace FoolishServer.Struct
         /// <returns></returns>
         protected virtual DateTime GetModifiedTime()
         {
-            return modifiedTime;
+            return _modifiedTime;
         }
     }
 }

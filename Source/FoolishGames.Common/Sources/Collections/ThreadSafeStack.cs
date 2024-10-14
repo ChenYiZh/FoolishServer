@@ -34,49 +34,49 @@ namespace FoolishGames.Collections
     public class ThreadSafeStack<T> : IThreadSafeStack<T>
     {
         #region ConcurrentStack
-        private ConcurrentStack<T> stack = null;
+        private ConcurrentStack<T> _stack = null;
 
         public object SyncRoot { get { return this; } }
 
         public ThreadSafeStack()
         {
-            stack = new ConcurrentStack<T>();
+            _stack = new ConcurrentStack<T>();
         }
 
-        public int Count { get { return stack.Count; } }
+        public int Count { get { return _stack.Count; } }
 
         public T Peek()
         {
             T value;
-            stack.TryPeek(out value);
+            _stack.TryPeek(out value);
             return value;
         }
 
         public T Pop()
         {
             T value;
-            stack.TryPop(out value);
+            _stack.TryPop(out value);
             return value;
         }
 
         public void Push(T item)
         {
-            stack.Push(item);
+            _stack.Push(item);
         }
 
         public void Clear()
         {
-            stack.Clear();
+            _stack.Clear();
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return stack.GetEnumerator();
+            return _stack.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return stack.GetEnumerator();
+            return _stack.GetEnumerator();
         }
         #endregion
 

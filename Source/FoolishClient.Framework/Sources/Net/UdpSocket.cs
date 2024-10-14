@@ -47,7 +47,17 @@ namespace FoolishClient.Net
         /// <summary>
         /// 类型
         /// </summary>
-        public override ESocketType Type { get { return ESocketType.Tcp; } }
+        public override ESocketType Type { get { return ESocketType.Udp; } }
+
+        /// <summary>
+        /// 等待握手
+        /// </summary>
+        private bool _waitToAccepted = false;
+
+        /// <summary>
+        /// 握手标示
+        /// </summary>
+        private const string ACCEPT_FLAG = "Author ChenYiZh";
 
         /// <summary>
         /// 建立原生套接字
@@ -55,7 +65,55 @@ namespace FoolishClient.Net
         /// <returns></returns>
         protected override Socket MakeSocket()
         {
-            return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
+            return new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         }
+
+        /// <summary>
+        /// 创建连接
+        /// </summary>
+        protected internal override void BeginConnectImpl()
+        {
+            if (_waitToAccepted)
+            {
+                return;
+            }
+            _waitToAccepted = true;
+
+            //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+            IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
+            EventArgs.RemoteEndPoint = Address;
+            bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
+            if (!success || !opt.IsCompleted || !Socket.Connected)
+            {
+                IsRunning = false;
+                throw new Exception(string.Format("Socket connect failed!"));
+            }
+            EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+            byte[] helloWords = Encoding.UTF8.GetBytes(ACCEPT_FLAG);
+            //Buffer.BlockCopy(helloWords, 0, EventArgs.Buffer, 0, helloWords.Length);
+            //EventArgs.SetBuffer(0, helloWords.Length);
+            Sender.Post(helloWords);
+            //Socket.SendToAsync(EventArgs);
+            //while (Socket.SendToAsync(EventArgs)) { }
+        }
+
+        /// <summary>
+        /// 当消息处理完执行
+        /// </summary>
+        //protected internal override void MessageSolved(object sender, SocketAsyncEventArgs e)
+        //{
+        //    if (_waitToAccepted)
+        //    {
+        //        _waitToAccepted = false;
+        //        EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+        //        byte[] helloWords = Encoding.UTF8.GetBytes("Author ChenYiZh");
+        //        EventArgs.SetBuffer(helloWords, 0, helloWords.Length);
+        //        Socket.SendAsync(EventArgs);
+        //    }
+        //    else
+        //    {
+        //        base.MessageSolved(sender, e);
+        //    }
+        //}
     }
 }

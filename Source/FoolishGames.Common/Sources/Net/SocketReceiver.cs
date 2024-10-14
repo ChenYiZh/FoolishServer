@@ -90,10 +90,11 @@ namespace FoolishGames.Net
         /// <returns>是否维持等待状态</returns>
         public bool BeginReceive(bool force = false)
         {
-            if (Socket == null || Socket.Socket == null || !Socket.Connected)
+            if ((Socket.Type == ESocketType.Udp && Socket == null)
+                || (Socket.Type != ESocketType.Udp && (Socket == null || Socket.Socket == null || !Socket.Connected)))
             {
-                FConsole.WriteWarnFormatWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display {0}.", 
-                    Socket != null && Socket.Socket != null ? (Socket.Socket.Connected ? "connected" : "disconnected") : "socket is null");
+                FConsole.WriteWarnFormatWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display {0}.",
+                                      Socket != null && Socket.Socket != null ? (Socket.Socket.Connected ? "connected" : "disconnected") : "socket is null");
                 Socket?.Close();
                 return false;
             }
@@ -101,7 +102,7 @@ namespace FoolishGames.Net
             if (UserToken.IsReceiving) { return false; }
             if (UserToken.Receivable())
             {
-                if (!force && Socket.Socket.Available == 0)
+                if (Socket.Type == ESocketType.Udp || (!force && Socket.Socket.Available == 0))
                 {
                     UserToken.ResetSendOrReceiveState(2);
                     return true;
@@ -120,7 +121,7 @@ namespace FoolishGames.Net
                             bool willRaiseEvent = true;
                             lock (Socket.EventArgs)
                             {
-                                willRaiseEvent = Socket.Socket.ReceiveAsync(Socket.EventArgs);
+                                willRaiseEvent = Socket.Type == ESocketType.Udp ? Socket.Socket.ReceiveFromAsync(Socket.EventArgs) : Socket.Socket.ReceiveAsync(Socket.EventArgs);
                             }
                             if (!willRaiseEvent)
                             {

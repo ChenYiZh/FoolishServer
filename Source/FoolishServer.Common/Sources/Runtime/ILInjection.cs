@@ -126,7 +126,7 @@ namespace FoolishServer.Runtime
 
             try
             {
-                MethodTypes = new GlobalMethodTypes(definition.MainModule, syncRootField, notifyMethod);
+                _methodTypes = new GlobalMethodTypes(definition.MainModule, syncRootField, notifyMethod);
             }
             catch (Exception e)
             {
@@ -316,7 +316,7 @@ namespace FoolishServer.Runtime
         /// <summary>
         /// 全局引用
         /// </summary>
-        private static GlobalMethodTypes MethodTypes;
+        private static GlobalMethodTypes _methodTypes;
 
         /// <summary>
         /// 注入Set函数
@@ -338,12 +338,12 @@ namespace FoolishServer.Runtime
             //          bool V_2,
             //          object V_3)
             setMethod.Body.InitLocals = true;
-            VariableDefinition V_0 = new VariableDefinition(MethodTypes.BoolType);
-            VariableDefinition V_1 = new VariableDefinition(MethodTypes.ObjectType);
-            VariableDefinition V_2 = new VariableDefinition(MethodTypes.ObjectType);
-            VariableDefinition V_3 = new VariableDefinition(MethodTypes.BoolType);
-            VariableDefinition V_4 = new VariableDefinition(MethodTypes.BoolType);
-            VariableDefinition V_5 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_0 = new VariableDefinition(_methodTypes.BoolType);
+            VariableDefinition V_1 = new VariableDefinition(_methodTypes.ObjectType);
+            VariableDefinition V_2 = new VariableDefinition(_methodTypes.ObjectType);
+            VariableDefinition V_3 = new VariableDefinition(_methodTypes.BoolType);
+            VariableDefinition V_4 = new VariableDefinition(_methodTypes.BoolType);
+            VariableDefinition V_5 = new VariableDefinition(_methodTypes.BoolType);
             setMethod.Body.Variables.Add(V_0);
             setMethod.Body.Variables.Add(V_1);
             setMethod.Body.Variables.Add(V_2);
@@ -358,7 +358,7 @@ namespace FoolishServer.Runtime
             Instruction IL_0003 = worker.Create(OpCodes.Ldnull);
             Instruction IL_0004 = worker.Create(OpCodes.Stloc_1);
             Instruction IL_0005 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0006 = worker.Create(OpCodes.Ldfld, MethodTypes.SyncRootField);
+            Instruction IL_0006 = worker.Create(OpCodes.Ldfld, _methodTypes.SyncRootField);
             Instruction IL_000b = worker.Create(OpCodes.Stloc_2);
             Instruction IL_000c = worker.Create(OpCodes.Ldc_I4_0);
             Instruction IL_000d = worker.Create(OpCodes.Stloc_3);
@@ -366,9 +366,9 @@ namespace FoolishServer.Runtime
 
             Instruction IL_000e_0 = worker.Create(OpCodes.Nop);
             Instruction IL_000e = worker.Create(OpCodes.Ldloc_2);
-            Instruction IL_000e_1 = worker.Create(OpCodes.Ldc_I4, MethodTypes.MillisecondsTimeout);
+            Instruction IL_000e_1 = worker.Create(OpCodes.Ldc_I4, _methodTypes.MillisecondsTimeout);
             Instruction IL_000f = worker.Create(OpCodes.Ldloca_S, V_3);
-            Instruction IL_0011 = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
+            Instruction IL_0011 = worker.Create(OpCodes.Call, _methodTypes.MonitorEnter);
 
             //Instruction IL_0016 = worker.Create(OpCodes.Nop);
             Instruction IL_0017 = worker.Create(OpCodes.Nop);
@@ -377,7 +377,7 @@ namespace FoolishServer.Runtime
             Instruction IL_001e = worker.Create(OpCodes.Box, paramType);
             Instruction IL_0023 = worker.Create(OpCodes.Ldarg_1);
             Instruction IL_0024 = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_0029 = worker.Create(OpCodes.Call, MethodTypes.EqualsMethod);
+            Instruction IL_0029 = worker.Create(OpCodes.Call, _methodTypes.EqualsMethod);
 
             Instruction IL_002e = worker.Create(OpCodes.Stloc_0);
             Instruction IL_002f = worker.Create(OpCodes.Ldloc_0);
@@ -412,7 +412,7 @@ namespace FoolishServer.Runtime
 
             Instruction IL_0052 = worker.Create(OpCodes.Brfalse_S, IL_005b);
             Instruction IL_0054 = worker.Create(OpCodes.Ldloc_2);
-            Instruction IL_0055 = worker.Create(OpCodes.Call, MethodTypes.MonitorExit);
+            Instruction IL_0055 = worker.Create(OpCodes.Call, _methodTypes.MonitorExit);
             Instruction IL_005a = worker.Create(OpCodes.Nop);
 
             //IL_005a
@@ -432,7 +432,7 @@ namespace FoolishServer.Runtime
             Instruction IL_006d = worker.Create(OpCodes.Ldloc_1);
             Instruction IL_006e = worker.Create(OpCodes.Ldarg_1);
             Instruction IL_006f = worker.Create(OpCodes.Box, paramType);
-            Instruction IL_0074 = worker.Create(OpCodes.Call, MethodTypes.NotifyMethod);
+            Instruction IL_0074 = worker.Create(OpCodes.Call, _methodTypes.NotifyMethod);
 
             Instruction IL_0079 = worker.Create(OpCodes.Nop);
             Instruction IL_007a = worker.Create(OpCodes.Nop);
@@ -537,10 +537,10 @@ namespace FoolishServer.Runtime
             //          bool V_1,
             //          retType V_2)
             getMethod.Body.InitLocals = true;
-            VariableDefinition V_0 = new VariableDefinition(MethodTypes.ObjectType);
-            VariableDefinition V_1 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_0 = new VariableDefinition(_methodTypes.ObjectType);
+            VariableDefinition V_1 = new VariableDefinition(_methodTypes.BoolType);
             VariableDefinition V_2 = new VariableDefinition(getMethod.ReturnType);
-            VariableDefinition V_3 = new VariableDefinition(MethodTypes.BoolType);
+            VariableDefinition V_3 = new VariableDefinition(_methodTypes.BoolType);
             getMethod.Body.Variables.Add(V_0);
             getMethod.Body.Variables.Add(V_1);
             getMethod.Body.Variables.Add(V_2);
@@ -549,7 +549,7 @@ namespace FoolishServer.Runtime
             //生成 IL代码
             Instruction IL_0000 = worker.Create(OpCodes.Nop);
             Instruction IL_0001 = worker.Create(OpCodes.Ldarg_0);
-            Instruction IL_0002 = worker.Create(OpCodes.Ldfld, MethodTypes.SyncRootField);
+            Instruction IL_0002 = worker.Create(OpCodes.Ldfld, _methodTypes.SyncRootField);
             Instruction IL_0007 = worker.Create(OpCodes.Stloc_0);
             Instruction IL_0008 = worker.Create(OpCodes.Ldc_I4_0);
             Instruction IL_0009 = worker.Create(OpCodes.Stloc_1);
@@ -559,12 +559,12 @@ namespace FoolishServer.Runtime
             Instruction IL_000a_0 = worker.Create(OpCodes.Nop);
             Instruction IL_000a = worker.Create(OpCodes.Ldloc_0);
 
-            Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4, MethodTypes.MillisecondsTimeout);
+            Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4, _methodTypes.MillisecondsTimeout);
 
             //Instruction IL_000a_1 = worker.Create(OpCodes.Ldc_I4_4, 0x3e8);
 
             Instruction IL_000b = worker.Create(OpCodes.Ldloca_S, V_1);
-            Instruction IL_000d = worker.Create(OpCodes.Call, MethodTypes.MonitorEnter);
+            Instruction IL_000d = worker.Create(OpCodes.Call, _methodTypes.MonitorEnter);
 
             //Instruction IL_0012 = worker.Create(OpCodes.Nop);
             Instruction IL_0013 = worker.Create(OpCodes.Nop);
@@ -585,7 +585,7 @@ namespace FoolishServer.Runtime
             Instruction IL_001e = worker.Create(OpCodes.Brfalse_S, IL_0027);
 
             Instruction IL_0020 = worker.Create(OpCodes.Ldloc_0);
-            Instruction IL_0021 = worker.Create(OpCodes.Call, MethodTypes.MonitorExit);
+            Instruction IL_0021 = worker.Create(OpCodes.Call, _methodTypes.MonitorExit);
             Instruction IL_0026 = worker.Create(OpCodes.Nop);
 
             Instruction IL_0029 = worker.Create(OpCodes.Ret);

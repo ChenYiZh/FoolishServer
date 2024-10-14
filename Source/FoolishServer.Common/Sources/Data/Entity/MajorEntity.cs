@@ -65,7 +65,7 @@ namespace FoolishServer.Data.Entity
         /// 当前实例的存储状态
         /// </summary>
         [JsonIgnore]
-        private EStorageState state = EStorageState.New;
+        private EStorageState _state = EStorageState.New;
         /// <summary>
         /// 当前实例的存储状态
         /// </summary>
@@ -83,7 +83,7 @@ namespace FoolishServer.Data.Entity
                 try
                 {
                     Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                    return state;
+                    return _state;
                 }
                 finally
                 {
@@ -109,7 +109,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                this.state = state;
+                this._state = state;
             }
             finally
             {
@@ -129,12 +129,12 @@ namespace FoolishServer.Data.Entity
         /// EntityKey被修改前的数据
         /// </summary>
         [JsonIgnore]
-        private EntityKey oldEntityKey;
+        private EntityKey _oldEntityKey;
         /// <summary>
         /// Redis主键名称
         /// </summary>
         [JsonIgnore]
-        private EntityKey entityKey;
+        private EntityKey _entityKey;
         /// <summary>
         /// 判断数据是否长时间没有修改
         /// </summary>
@@ -154,7 +154,7 @@ namespace FoolishServer.Data.Entity
             {
                 keys[i] = keyFields[i].DefaultValue;
             }
-            oldEntityKey = entityKey = new EntityKey(type, keys);
+            _oldEntityKey = _entityKey = new EntityKey(type, keys);
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace FoolishServer.Data.Entity
                 FConsole.WriteErrorFormatWithCategory(tableScheme.Type.Name, "Failed to generate entity id... check this class");
                 return;
             }
-            entityKey.keys[index] = value;
-            entityKey.RefreshKeyName();
+            _entityKey.keys[index] = value;
+            _entityKey.RefreshKeyName();
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                return entityKey;
+                return _entityKey;
             }
             finally
             {
@@ -260,7 +260,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                return oldEntityKey;
+                return _oldEntityKey;
             }
             finally
             {
@@ -284,7 +284,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                return !string.IsNullOrEmpty(oldEntityKey) && oldEntityKey != entityKey;
+                return !string.IsNullOrEmpty(_oldEntityKey) && _oldEntityKey != _entityKey;
             }
             finally
             {
@@ -317,7 +317,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                oldEntityKey = entityKey;
+                _oldEntityKey = _entityKey;
             }
             finally
             {
@@ -343,7 +343,7 @@ namespace FoolishServer.Data.Entity
             try
             {
                 Monitor.TryEnter(syncRoot, Settings.LockerTimeout, ref lockTaken);
-                state = EStorageState.Stored;
+                _state = EStorageState.Stored;
             }
             finally
             {

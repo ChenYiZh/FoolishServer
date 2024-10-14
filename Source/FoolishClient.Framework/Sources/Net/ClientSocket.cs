@@ -76,12 +76,12 @@ namespace FoolishClient.Net
         /// <summary>
         /// 运行的标识
         /// </summary>
-        private int readyFlag = 0;
+        private int _readyFlag = 0;
 
         /// <summary>
         /// 数据是否已经初始化了
         /// </summary>
-        public virtual bool IsReady { get { return readyFlag == 1; } }
+        public virtual bool IsReady { get { return _readyFlag == 1; } }
 
         /// <summary>
         /// 心跳间隔
@@ -102,7 +102,7 @@ namespace FoolishClient.Net
         /// <summary>
         /// 心跳包
         /// </summary>
-        private byte[] heartbeatBuffer;
+        private byte[] _heartbeatBuffer;
 
         ///// <summary>
         ///// 线程循环等待时间
@@ -122,32 +122,32 @@ namespace FoolishClient.Net
         /// <summary>
         /// 消息偏移值
         /// </summary>
-        private int messageOffset = 2;
+        private int _messageOffset = 2;
 
         /// <summary>
         /// 消息偏移值
         /// </summary>
-        public override int MessageOffset { get { return messageOffset; } }
+        public override int MessageOffset { get { return _messageOffset; } }
 
         /// <summary>
         /// 压缩工具
         /// </summary>
-        private ICompression compression = null;
+        private ICompression _compression = null;
 
         /// <summary>
         /// 压缩工具
         /// </summary>
-        public override ICompression Compression { get { return compression; } }
+        public override ICompression Compression { get { return _compression; } }
 
         /// <summary>
         /// 加密工具
         /// </summary>
-        private ICryptoProvider cryptoProvider = null;
+        private ICryptoProvider _cryptoProvider = null;
 
         /// <summary>
         /// 加密工具
         /// </summary>
-        public override ICryptoProvider CryptoProvider { get { return cryptoProvider; } }
+        public override ICryptoProvider CryptoProvider { get { return _cryptoProvider; } }
 
         /// <summary>
         /// 发送的管理类
@@ -201,7 +201,7 @@ namespace FoolishClient.Net
             ActionProvider = new ClientActionDispatcher(actionClassFullName);
             HeartbeatInterval = heartbeatInterval;
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is ready...");
-            Interlocked.Exchange(ref readyFlag, 1);
+            Interlocked.Exchange(ref _readyFlag, 1);
         }
 
         /// <summary>
@@ -245,15 +245,7 @@ namespace FoolishClient.Net
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is starting...");
             try
             {
-                EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
-                IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
-                bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
-                if (!success || !opt.IsCompleted || !Socket.Connected)
-                {
-                    IsRunning = false;
-                    throw new Exception(string.Format("Socket connect failed!"));
-                }
-                //Socket.Connect(host, port);//手机上测下来只有同步才有效
+                BeginConnectImpl();
             }
             catch (Exception e)
             {
@@ -304,6 +296,11 @@ namespace FoolishClient.Net
         }
 
         /// <summary>
+        /// 创建连接
+        /// </summary>
+        internal protected abstract void BeginConnectImpl();
+
+        /// <summary>
         /// 初始化执行
         /// </summary>
         protected virtual void Awake()
@@ -333,13 +330,13 @@ namespace FoolishClient.Net
         /// <summary>
         /// 等待的线程锁，防止产生多组线程
         /// </summary>
-        private int waitingFlag = 0;
+        private int _waitingFlag = 0;
 
         /// <summary>
         /// 当消息处理完执行
         /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
         /// </summary>
-        private void MessageSolved(object sender, SocketAsyncEventArgs e)
+        internal protected virtual void MessageSolved(object sender, SocketAsyncEventArgs e)
         {
             if (EventArgs == null)
             {
@@ -353,9 +350,11 @@ namespace FoolishClient.Net
                 switch (e.LastOperation)
                 {
                     case SocketAsyncOperation.Receive:
+                    case SocketAsyncOperation.ReceiveFrom:
                         bWaiting = !Receiver.ProcessReceive();
                         break;
                     case SocketAsyncOperation.Send:
+                    case SocketAsyncOperation.SendTo:
                         bWaiting = !Sender.ProcessSend();
                         break;
                     default:
@@ -366,13 +365,13 @@ namespace FoolishClient.Net
             {
                 FConsole.WriteExceptionWithCategory(Categories.SOCKET, ex);
             }
-            if (bWaiting && Interlocked.CompareExchange(ref waitingFlag, 1, 0) == 0)
+            if (bWaiting && Interlocked.CompareExchange(ref _waitingFlag, 1, 0) == 0)
             {
                 while (Receiver != null && Sender != null && Receiver.BeginReceive() && Sender.BeginSend())
                 {
                     Thread.Sleep(10);
                 }
-                Interlocked.Exchange(ref waitingFlag, 0);
+                Interlocked.Exchange(ref _waitingFlag, 0);
             }
         }
 
@@ -397,9 +396,9 @@ namespace FoolishClient.Net
                     throw new SocketException((int)SocketError.NotConnected);
                 }
                 // 心跳包
-                if (heartbeatBuffer != null)
+                if (_heartbeatBuffer != null)
                 {
-                    Sender.SendBytesImmediately(heartbeatBuffer);
+                    Sender.SendBytesImmediately(_heartbeatBuffer);
                 }
             }
             catch (Exception e)
@@ -413,7 +412,7 @@ namespace FoolishClient.Net
         /// </summary>
         public virtual void RebuildHeartbeatPackage()
         {
-            heartbeatBuffer = BuildHeartbeatBuffer();
+            _heartbeatBuffer = BuildHeartbeatBuffer();
         }
 
         /// <summary>
@@ -525,21 +524,21 @@ namespace FoolishClient.Net
         /// </summary>
         public void SetMessageOffset(int offset)
         {
-            messageOffset = offset;
+            _messageOffset = offset;
         }
         /// <summary>
         /// 设置压缩方案
         /// </summary>
         public void SetCompression(ICompression compression)
         {
-            this.compression = compression;
+            this._compression = compression;
         }
         /// <summary>
         /// 设置解密方案
         /// </summary>
         public void SetCryptoProvide(ICryptoProvider cryptoProvider)
         {
-            this.cryptoProvider = cryptoProvider;
+            this._cryptoProvider = cryptoProvider;
         }
         /// <summary>
         /// 数据发送<c>异步</c>

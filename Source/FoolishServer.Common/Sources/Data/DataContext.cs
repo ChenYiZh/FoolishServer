@@ -58,22 +58,22 @@ namespace FoolishServer.Data
         /// <summary>
         /// 表结构
         /// </summary>
-        private static Dictionary<Type, ITableScheme> tableSchemes = new Dictionary<Type, ITableScheme>();
+        private static Dictionary<Type, ITableScheme> _tableSchemes = new Dictionary<Type, ITableScheme>();
 
         /// <summary>
         /// 表结构映射
         /// </summary>
-        internal static IReadOnlyDictionary<Type, ITableScheme> TableSchemes { get { return tableSchemes; } }
+        internal static IReadOnlyDictionary<Type, ITableScheme> TableSchemes { get { return _tableSchemes; } }
 
         /// <summary>
         /// 缓存中的数据
         /// </summary>
-        private static Dictionary<Type, IDbSet> entityPool = new Dictionary<Type, IDbSet>();
+        private static Dictionary<Type, IDbSet> _entityPool = new Dictionary<Type, IDbSet>();
 
         /// <summary>
         /// 缓存中的数据
         /// </summary>
-        internal static IReadOnlyDictionary<Type, IDbSet> EntityPool { get { return entityPool; } }
+        internal static IReadOnlyDictionary<Type, IDbSet> EntityPool { get { return _entityPool; } }
 
         /// <summary>
         /// 计时器间隔设为100ms
@@ -83,7 +83,7 @@ namespace FoolishServer.Data
         /// <summary>
         /// 计时器
         /// </summary>
-        private static Timer Timer;
+        private static Timer _timer;
 
         /// <summary>
         /// 读取数据
@@ -105,9 +105,9 @@ namespace FoolishServer.Data
         /// </summary>
         public static ITableScheme GetTableScheme(Type type)
         {
-            if (tableSchemes.ContainsKey(type))
+            if (_tableSchemes.ContainsKey(type))
             {
-                return tableSchemes[type];
+                return _tableSchemes[type];
             }
             return null;
         }
@@ -145,6 +145,10 @@ namespace FoolishServer.Data
             {
                 RawDatabase = new RedisDatabase(Settings.RedisSetting);
             }
+            else
+            {
+                FConsole.WriteWarnFormat("No raw database exists.");
+            }
 
             //建立数据库连接
             if (Databases == null)
@@ -173,7 +177,7 @@ namespace FoolishServer.Data
         public static void CheckTableSchemes()
         {
             FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Check whether tables in the dbs have been changed...");
-            foreach (ITableScheme tableScheme in tableSchemes.Values)
+            foreach (ITableScheme tableScheme in _tableSchemes.Values)
             {
                 ISQLDatabase database;
                 if (Databases.TryGetValue(tableScheme.ConnectKey, out database))
@@ -182,7 +186,7 @@ namespace FoolishServer.Data
                 }
                 else
                 {
-                    FConsole.WriteErrorFormat("No database of '{0}' exists.", tableScheme.ConnectKey);
+                    FConsole.WriteWarnFormat("No database of '{0}' exists.", tableScheme.ConnectKey);
                 }
             }
         }
@@ -208,29 +212,29 @@ namespace FoolishServer.Data
 
             //加载所有热数据
             FConsole.WriteInfoFormatWithCategory(Categories.ENTITY, "Start loading hot data...");
-            Parallel.ForEach(entityPool.Values, (IDbSet dbSet) =>
+            Parallel.ForEach(_entityPool.Values, (IDbSet dbSet) =>
             {
                 dbSet.PullAllRawData();
             });
 
             //开启计时器
-            Timer = new Timer(Tick, null, TIMER_INTERVAL, TIMER_INTERVAL);
+            _timer = new Timer(Tick, null, TIMER_INTERVAL, TIMER_INTERVAL);
         }
 
         /// <summary>
         /// 反射用的
         /// </summary>
-        private static Type DbSetType = typeof(DbSet<>);
+        private static Type _dbSetType = typeof(DbSet<>);
         /// <summary>
         /// 初始化数据容器
         /// </summary>
         /// <param name="type"></param>
         private static void InitializeDataContainer(Type type)
         {
-            tableSchemes.Add(type, new TableScheme(type));
-            Type dbSetType = DbSetType.MakeGenericType(type);
+            _tableSchemes.Add(type, new TableScheme(type));
+            Type dbSetType = _dbSetType.MakeGenericType(type);
             IDbSet dbSet = (IDbSet)Activator.CreateInstance(dbSetType);
-            entityPool.Add(type, dbSet);
+            _entityPool.Add(type, dbSet);
         }
 
         /// <summary>
@@ -291,17 +295,17 @@ namespace FoolishServer.Data
         internal static void Shutdown()
         {
             //关闭计时器
-            if (Timer != null)
+            if (_timer != null)
             {
                 try
                 {
-                    Timer.Dispose();
+                    _timer.Dispose();
                 }
                 catch (Exception e)
                 {
                     FConsole.WriteExceptionWithCategory(Categories.ENTITY, e);
                 }
-                Timer = null;
+                _timer = null;
             }
             //推送数据
             Parallel.ForEach(EntityPool.Values, (IDbSet dbSet) =>
