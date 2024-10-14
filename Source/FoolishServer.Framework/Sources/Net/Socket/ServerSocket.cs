@@ -281,19 +281,20 @@ namespace FoolishServer.Net
         /// <summary>
         /// 开始接受连接
         /// </summary>
-        private void PostAccept()
+        internal protected void PostAccept()
         {
-            while (IsRunning)
+            //while (IsRunning)
+            //{
+            try
             {
-                try
-                {
-                    OnPostAccept();
-                }
-                catch (Exception e)
-                {
-                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Post accept listen error:", e);
-                }
+                if (!IsRunning) return;
+                OnPostAccept();
             }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Post accept listen error:", e);
+            }
+            //}
         }
 
         /// <summary>
@@ -358,10 +359,10 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
             }
-            finally
-            {
-                //PostAccept();
-            }
+            //finally
+            //{
+            //    PostAccept();
+            //}
         }
 
         /// <summary>

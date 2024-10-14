@@ -23,11 +23,6 @@ namespace FoolishServer.Net
         private const string ACCEPT_FLAG = "Author ChenYiZh";
 
         /// <summary>
-        /// 是否正在获取新的客户端
-        /// </summary>
-        private bool _accepting = false;
-
-        /// <summary>
         /// 创建套接字
         /// </summary>
         protected internal override void BuildSocket()
@@ -44,11 +39,6 @@ namespace FoolishServer.Net
         /// </summary>
         protected internal override void OnPostAccept()
         {
-            if (_accepting)
-            {
-                return;
-            }
-            _accepting = true;
             //对象池里拿结构
             SocketAsyncEventArgs acceptEventArgs = acceptEventArgsPool.Pop() ?? CreateAcceptEventArgs();
             acceptEventArgs.SetBuffer(new byte[BUFFER_SIZE], 0, BUFFER_SIZE);
@@ -95,7 +85,7 @@ namespace FoolishServer.Net
             }
             finally
             {
-                _accepting = false;
+                PostAccept();
             }
         }
     }
