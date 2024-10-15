@@ -156,7 +156,7 @@
             心跳包线程
             </summary>
         </member>
-        <member name="P:FoolishClient.Net.ClientSocket.SendOrReceiveThread">
+        <member name="P:FoolishClient.Net.ClientSocket.LoopingThread">
             <summary>
             数据处理线程
             </summary>
@@ -274,12 +274,6 @@
         <member name="F:FoolishClient.Net.ClientSocket._waitingFlag">
             <summary>
             等待的线程锁，防止产生多组线程
-            </summary>
-        </member>
-        <member name="M:FoolishClient.Net.ClientSocket.MessageSolved(System.Object,System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            当消息处理完执行
-            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
         <member name="M:FoolishClient.Net.ClientSocket.CheckSendOrReceive(System.Object)">
@@ -543,6 +537,44 @@
         <member name="M:FoolishClient.RPC.FNetwork.Shutdown">
             <summary>
             关闭所有套接字连接
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.ClientReceiver">
+            <summary>
+            消息接收处理类
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ClientReceiver.EventArgs">
+            <summary>
+            增强类
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.ClientReceiver.UserToken">
+            <summary>
+            数据管理对象
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ClientReceiver.#ctor(FoolishGames.Net.ISocket)">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ClientReceiver.Close(System.Net.Sockets.SocketAsyncEventArgs,FoolishGames.Net.EOpCode)">
+            <summary>
+            关闭操作
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.TcpClientReceiver">
+            <summary>
+            消息接收处理类
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+            </summary>
+        </member>
+        <member name="T:FoolishGames.Net.UdpClientReceiver">
+            <summary>
+            消息接收处理类
+            <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
     </members>

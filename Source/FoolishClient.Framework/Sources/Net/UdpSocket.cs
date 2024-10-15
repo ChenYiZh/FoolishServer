@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -41,13 +42,15 @@ namespace FoolishClient.Net
         /// </summary>
         public UdpSocket() : base()
         {
-
         }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public override ESocketType Type { get { return ESocketType.Udp; } }
+        public override ESocketType Type
+        {
+            get { return ESocketType.Udp; }
+        }
 
         /// <summary>
         /// 等待握手
@@ -77,6 +80,7 @@ namespace FoolishClient.Net
             {
                 return;
             }
+
             _waitToAccepted = true;
 
             //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
@@ -88,11 +92,12 @@ namespace FoolishClient.Net
                 IsRunning = false;
                 throw new Exception(string.Format("Socket connect failed!"));
             }
-            EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
+
+            //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
             byte[] helloWords = Encoding.UTF8.GetBytes(ACCEPT_FLAG);
             //Buffer.BlockCopy(helloWords, 0, EventArgs.Buffer, 0, helloWords.Length);
             //EventArgs.SetBuffer(0, helloWords.Length);
-            Sender.Post(helloWords);
+            Sender.Push(this, helloWords, true);
             //Socket.SendToAsync(EventArgs);
             //while (Socket.SendToAsync(EventArgs)) { }
         }

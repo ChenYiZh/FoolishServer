@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using FoolishGames.Common;
 using FoolishGames.IO;
 using FoolishGames.Log;
@@ -38,172 +39,134 @@ namespace FoolishGames.Net
     /// 消息接收处理类
     /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
     /// </summary>
-    public sealed class SocketReceiver<TSocket> : IReceiver where TSocket : ISocket
+    public abstract class SocketReceiver<TSocket> : IReceiver where TSocket : ISocket
     {
+        /// <summary>
+        /// 核心Socket
+        /// </summary>
+        public ISocket Socket { get; private set; }
+
+        public SocketReceiver(ISocket socket)
+        {
+            Socket = socket;
+        }
+
         /// <summary>
         /// 收发消息处理
         /// </summary>
         public delegate void MessageReceiveEventHandler(IMessageEventArgs<TSocket> e);
-        /// <summary>
-        /// 封装的套接字
-        /// </summary>
-        public TSocket Socket { get; private set; }
-        /// <summary>
-        /// 增强类
-        /// </summary>
-        public SocketAsyncEventArgs EventArgs { get { return Socket.EventArgs; } }
-        /// <summary>
-        /// 数据管理对象
-        /// </summary>
-        internal UserToken UserToken { get; private set; }
+
         /// <summary>
         /// 接收到数据包事件
         /// </summary>
         public MessageReceiveEventHandler OnMessageReceived;
-        private void MessageReceived(MessageReceiverEventArgs<TSocket> args) { OnMessageReceived?.Invoke(args); }
+
+        private void MessageReceived(MessageReceiverEventArgs<TSocket> args)
+        {
+            OnMessageReceived?.Invoke(args);
+        }
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
         public MessageReceiveEventHandler OnPing;
-        private void Ping(MessageReceiverEventArgs<TSocket> args) { OnPing?.Invoke(args); }
+
+        private void Ping(MessageReceiverEventArgs<TSocket> args)
+        {
+            OnPing?.Invoke(args);
+        }
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
         public MessageReceiveEventHandler OnPong;
-        private void Pong(MessageReceiverEventArgs<TSocket> args) { OnPong?.Invoke(args); }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        public SocketReceiver(TSocket socket)
-        {
-            Socket = socket;
-            if (socket.EventArgs == null) { throw new NullReferenceException("Fail to create socket receiver, because the SocketAsyncEventArgs is null."); }
-            UserToken usertoken = socket.EventArgs.UserToken as UserToken;
-            if (usertoken == null) { throw new NullReferenceException("Fail to create socket receiver, because the UserToken of SocketAsyncEventArgs is null."); }
-            UserToken = usertoken;
-        }
-        /// <summary>
-        /// 等待消息接收
-        /// </summary>
-        /// <returns>是否维持等待状态</returns>
-        public bool BeginReceive(bool force = false)
-        {
-            if ((Socket.Type == ESocketType.Udp && Socket == null)
-                || (Socket.Type != ESocketType.Udp && (Socket == null || Socket.Socket == null || !Socket.Connected)))
-            {
-                FConsole.WriteWarnFormatWithCategory(Categories.SOCKET, "System.Net.Socket is abnormal, and display {0}.",
-                                      Socket != null && Socket.Socket != null ? (Socket.Socket.Connected ? "connected" : "disconnected") : "socket is null");
-                Socket?.Close();
-                return false;
-            }
-            if (EventArgs == null) { return false; }
-            if (UserToken.IsReceiving) { return false; }
-            if (UserToken.Receivable())
-            {
-                if (Socket.Type == ESocketType.Udp || (!force && Socket.Socket.Available == 0))
-                {
-                    UserToken.ResetSendOrReceiveState(2);
-                    return true;
-                }
-                ThreadPool.UnsafeQueueUserWorkItem((state) =>
-                {
-                    try
-                    {
 
-                        //线程中需要重新加锁加判断
-                        //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
-                        if (/*UserToken.IsReceiving && */UserToken.Receivable()
-                        && (force || Socket.Socket.Available > 0)
-                        && Socket.EventArgs != null)
-                        {
-                            bool willRaiseEvent = true;
-                            lock (Socket.EventArgs)
-                            {
-                                willRaiseEvent = Socket.Type == ESocketType.Udp ? Socket.Socket.ReceiveFromAsync(Socket.EventArgs) : Socket.Socket.ReceiveAsync(Socket.EventArgs);
-                            }
-                            if (!willRaiseEvent)
-                            {
-                                ProcessReceive();
-                            }
-                        }
-                    }
-                    catch /*(Exception e)*/
-                    {
-                        Socket.Close();
-                    }
-                }, null);
-                return false;
-            }
-            return false;
+        private void Pong(MessageReceiverEventArgs<TSocket> args)
+        {
+            OnPong?.Invoke(args);
         }
+
+        // /// <summary>
+        // /// 等待消息接收
+        // /// </summary>
+        // /// <returns>是否维持等待状态</returns>
+        // public abstract bool BeginReceive(bool force = false);
 
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        public bool ProcessReceive()
+        public void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
         {
-            if (EventArgs == null || Socket.Socket == null) { return false; }
-            if (EventArgs.BytesTransferred == 0)
+            if (ioEventArgs == null || ioEventArgs.UserToken == null)
             {
-                Socket.Close(EOpCode.Empty);
-                return false;
-            }
-            if (EventArgs.SocketError != SocketError.Success)
-            {
-                FConsole.WriteErrorFormatWithCategory(Categories.SOCKET,
-                    "Process Receive IP {0} SocketError:{1}, bytes len:{2}",
-                    (UserToken != null ? Socket.Address?.ToString() : ""),
-                    EventArgs.SocketError.ToString(),
-                    EventArgs.BytesTransferred);
-                Socket.Close();
-                return false;
+                Socket.OperationCompleted();
+                return;
             }
 
-            //Process Receive
-            if (EventArgs.BytesTransferred > 0)
+            UserToken userToken = (UserToken) ioEventArgs.UserToken;
+            if (ioEventArgs.BytesTransferred == 0)
+            {
+                Socket.OperationCompleted();
+                Close(ioEventArgs, EOpCode.Empty);
+                return;
+            }
+
+            if (ioEventArgs.SocketError != SocketError.Success)
+            {
+                Socket.OperationCompleted();
+                FConsole.WriteErrorFormatWithCategory(Categories.SOCKET,
+                    "Process Receive IP {0} SocketError:{1}, bytes len:{2}",
+                    (userToken != null ? userToken.Socket.Address?.ToString() : ""),
+                    ioEventArgs.SocketError.ToString(),
+                    ioEventArgs.BytesTransferred);
+                Close(ioEventArgs, EOpCode.Close);
+                return;
+            }
+
+            //处理消息
+            if (ioEventArgs.BytesTransferred > 0)
             {
                 //先缓存数据
-                byte[] buffer = new byte[EventArgs.BytesTransferred];
-                lock (EventArgs)
+                byte[] buffer = new byte[ioEventArgs.BytesTransferred];
+                lock (ioEventArgs)
                 {
-                    Buffer.BlockCopy(EventArgs.Buffer, EventArgs.Offset, buffer, 0, buffer.Length);
+                    Buffer.BlockCopy(ioEventArgs.Buffer, ioEventArgs.Offset, buffer, 0, buffer.Length);
                 }
+
                 //byte[] argsBuffer = EventArgs.Buffer;
                 //int argsOffset = EventArgs.Offset;
                 //int argsLength = EventArgs.BytesTransferred;
                 byte[] argsBuffer = buffer;
-                int argsOffset = 0;
                 int argsLength = buffer.Length;
 
                 //从当前位置数据开始解析
-                int offset = argsOffset;
+                int offset = 0;
 
                 //消息处理的队列
                 List<IMessageReader> messages = new List<IMessageReader>();
                 try
                 {
                     //继续接收上次未接收完毕的数据
-                    if (UserToken.ReceivedBuffer != null)
+                    if (userToken.ReceivedBuffer != null)
                     {
                         //上次连报头都没接收完
-                        if (UserToken.ReceivedStartIndex < 0)
+                        if (userToken.ReceivedStartIndex < 0)
                         {
-                            byte[] data = new byte[argsLength + UserToken.ReceivedBuffer.Length];
-                            Buffer.BlockCopy(UserToken.ReceivedBuffer, 0, data, 0, UserToken.ReceivedBuffer.Length);
-                            Buffer.BlockCopy(argsBuffer, argsOffset, data, UserToken.ReceivedBuffer.Length, argsLength);
-                            UserToken.ReceivedBuffer = null;
+                            byte[] data = new byte[argsLength + userToken.ReceivedBuffer.Length];
+                            Buffer.BlockCopy(userToken.ReceivedBuffer, 0, data, 0, userToken.ReceivedBuffer.Length);
+                            Buffer.BlockCopy(argsBuffer, 0, data, userToken.ReceivedBuffer.Length, argsLength);
+                            userToken.ReceivedBuffer = null;
 
                             argsBuffer = data;
-                            offset = argsOffset = 0;
+                            offset = 0;
                             argsLength = data.Length;
                         }
                         //数据仍然接收不完
-                        else if (UserToken.ReceivedStartIndex + argsLength < UserToken.ReceivedBuffer.Length)
+                        else if (userToken.ReceivedStartIndex + argsLength < userToken.ReceivedBuffer.Length)
                         {
-                            Buffer.BlockCopy(argsBuffer, argsOffset, UserToken.ReceivedBuffer, UserToken.ReceivedStartIndex, argsLength);
-                            UserToken.ReceivedStartIndex += argsLength;
+                            Buffer.BlockCopy(argsBuffer, 0, userToken.ReceivedBuffer,
+                                userToken.ReceivedStartIndex, argsLength);
+                            userToken.ReceivedStartIndex += argsLength;
                             offset += argsLength;
 
                             //buffer = null;
@@ -211,54 +174,47 @@ namespace FoolishGames.Net
                         //这轮数据可以接受完
                         else
                         {
-                            int deltaLength = UserToken.ReceivedBuffer.Length - UserToken.ReceivedStartIndex;
-                            Buffer.BlockCopy(argsBuffer, argsOffset, UserToken.ReceivedBuffer, UserToken.ReceivedStartIndex, deltaLength);
-                            IMessageReader bigMessage = PackageFactory.Unpack(UserToken.ReceivedBuffer, Socket.MessageOffset, Socket.Compression, Socket.CryptoProvider);
-                            UserToken.ReceivedBuffer = null;
+                            int deltaLength = userToken.ReceivedBuffer.Length - userToken.ReceivedStartIndex;
+                            Buffer.BlockCopy(argsBuffer, 0, userToken.ReceivedBuffer,
+                                userToken.ReceivedStartIndex, deltaLength);
+                            IMessageReader bigMessage = PackageFactory.Unpack(userToken.ReceivedBuffer,
+                                userToken.Socket.MessageOffset, userToken.Socket.Compression,
+                                userToken.Socket.CryptoProvider);
+                            userToken.ReceivedBuffer = null;
                             messages.Add(bigMessage);
                             offset += deltaLength;
-                            //if (offset >= argsLength)
-                            //{
-                            //    buffer = null;
-                            //}
-                            //else
-                            //{
-                            //    buffer = new byte[argsLength];
-                            //    Buffer.BlockCopy(argsBuffer, argsOffset, buffer, 0, argsLength);
-                            //}
                         }
                     }
-                    //else
-                    //{
-                    //    buffer = new byte[argsLength];
-                    //    Buffer.BlockCopy(argsBuffer, argsOffset, buffer, 0, argsLength);
-                    //}
 
                     //针对接收到的数据进行完整解析
-                    while (offset - argsOffset < argsLength)
+                    while (offset < argsLength)
                     {
-                        int totalLength = PackageFactory.GetTotalLength(argsBuffer, offset + Socket.MessageOffset);
+                        int totalLength =
+                            PackageFactory.GetTotalLength(argsBuffer, offset + userToken.Socket.MessageOffset);
                         //包头解析不全
                         if (totalLength < 0)
                         {
-                            UserToken.ReceivedStartIndex = -1;
-                            //UserToken.ReceivedBuffer = new byte[buffer.Length - offset];
-                            UserToken.ReceivedBuffer = new byte[argsLength + argsOffset - offset];
-                            Buffer.BlockCopy(argsBuffer, offset, UserToken.ReceivedBuffer, 0, UserToken.ReceivedBuffer.Length);
+                            userToken.ReceivedStartIndex = -1;
+                            //userToken.ReceivedBuffer = new byte[buffer.Length - offset];
+                            userToken.ReceivedBuffer = new byte[argsLength - offset];
+                            Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0,
+                                userToken.ReceivedBuffer.Length);
                             break;
                         }
 
                         //包体解析不全
                         if (totalLength > argsLength)
                         {
-                            UserToken.ReceivedStartIndex = argsLength + argsOffset - offset;
-                            UserToken.ReceivedBuffer = new byte[totalLength - offset];
-                            Buffer.BlockCopy(argsBuffer, offset, UserToken.ReceivedBuffer, 0, totalLength - offset);
+                            userToken.ReceivedStartIndex = argsLength - offset;
+                            userToken.ReceivedBuffer = new byte[totalLength - offset];
+                            Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0, totalLength - offset);
+                            //Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0, argsLength);
                             break;
                         }
 
-                        offset += Socket.MessageOffset;
-                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, Socket.Compression, Socket.CryptoProvider);
+                        offset += userToken.Socket.MessageOffset;
+                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, userToken.Socket.Compression,
+                            userToken.Socket.CryptoProvider);
                         messages.Add(message);
                         offset = totalLength;
                     }
@@ -278,70 +234,80 @@ namespace FoolishGames.Net
                             FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, message.Error);
                             continue;
                         }
+
                         switch (message.OpCode)
                         {
-                            case (sbyte)EOpCode.Close:
-                                {
-                                    // TODO: 检查关闭协议是否有效
-                                    //Close(ioEventArgs, EOpCode.Empty);
-                                    Socket.Close(EOpCode.Empty);
-                                }
+                            case (sbyte) EOpCode.Close:
+                            {
+                                // TODO: 检查关闭协议是否有效
+                                //Close(ioEventArgs, EOpCode.Empty);
+                                Close(ioEventArgs, EOpCode.Empty);
+                            }
                                 break;
-                            case (sbyte)EOpCode.Ping:
-                                {
-                                    Ping(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
-                                }
+                            case (sbyte) EOpCode.Ping:
+                            {
+                                Ping(new MessageReceiverEventArgs<TSocket>
+                                    {Socket = (TSocket) userToken.Socket, Message = message});
+                            }
                                 break;
-                            case (sbyte)EOpCode.Pong:
-                                {
-                                    Pong(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
-                                }
+                            case (sbyte) EOpCode.Pong:
+                            {
+                                Pong(new MessageReceiverEventArgs<TSocket>
+                                    {Socket = (TSocket) userToken.Socket, Message = message});
+                            }
                                 break;
                             default:
-                                {
-                                    MessageReceived(new MessageReceiverEventArgs<TSocket> { Socket = Socket, Message = message });
-                                }
+                            {
+                                MessageReceived(new MessageReceiverEventArgs<TSocket>
+                                    {Socket = (TSocket) userToken.Socket, Message = message});
+                            }
                                 break;
                         }
                     }
                     catch (Exception e)
                     {
-                        FConsole.WriteExceptionWithCategory(Categories.SOCKET, "An exception occurred when resolve the message.", e);
+                        FConsole.WriteExceptionWithCategory(Categories.SOCKET,
+                            "An exception occurred when resolve the message.", e);
                     }
                 }
             }
-            else if (UserToken.ReceivedBuffer != null)
+            else if (userToken.ReceivedBuffer != null)
             {
                 //数据错乱
-                UserToken.ReceivedBuffer = null;
-                return false;
+                userToken.ReceivedBuffer = null;
+                //return;
             }
 
-            if (Socket.Socket == null || Socket.Socket.Available == 0)
+            if (userToken.ReceivedBuffer != null)
             {
-                UserToken.ResetSendOrReceiveState(2);
-                return false;
+                PostReceive(ioEventArgs);
             }
-            //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.receiveasync?view=netstandard-2.0
-            bool willRaiseEvent = true;
-            if (Socket != null)
+            else
             {
-                lock (Socket.EventArgs)
-                {
-                    willRaiseEvent = Socket.Socket.ReceiveAsync(Socket.EventArgs);
-                }
-                if (!willRaiseEvent)
-                {
-                    ProcessReceive();
-                }
+                Socket.NextStep(ioEventArgs);
             }
-            //延迟关闭
-            if (Socket == null || !Socket.IsRunning)
-            {
-                //ResetSocketAsyncEventArgs(ioEventArgs);
-                Socket?.Close();
-            }
-            return true;
         }
+
+        /// <summary>
+        /// 统一从缓存池读取数据
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        /// <param name="to"></param>
+        /// <param name="offset"></param>
+        private void CopySocketBuffer(SocketAsyncEventArgs ioEventArgs, byte[] dis, int offset)
+        {
+            Buffer.BlockCopy(ioEventArgs.Buffer, 0, dis, offset, ioEventArgs.BytesTransferred);
+        }
+
+        /// <summary>
+        /// 投递接收数据请求
+        /// </summary>
+        /// <param name="ioEventArgs"></param>
+        public abstract void PostReceive(SocketAsyncEventArgs ioEventArgs);
+
+        /// <summary>
+        /// 关闭操作
+        /// </summary>
+        protected abstract void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode);
     }
 }

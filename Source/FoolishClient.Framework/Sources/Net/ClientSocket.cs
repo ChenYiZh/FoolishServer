@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using FoolishClient.Action;
 using FoolishClient.Delegate;
 using FoolishClient.Log;
@@ -56,7 +57,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 地址
         /// </summary>
-        public override IPEndPoint Address { get { return address; } }
+        public override IPEndPoint Address
+        {
+            get { return address; }
+        }
 
         /// <summary>
         /// 标识名称
@@ -81,7 +85,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 数据是否已经初始化了
         /// </summary>
-        public virtual bool IsReady { get { return _readyFlag == 1; } }
+        public virtual bool IsReady
+        {
+            get { return _readyFlag == 1; }
+        }
 
         /// <summary>
         /// 心跳间隔
@@ -97,7 +104,7 @@ namespace FoolishClient.Net
         /// 数据处理线程
         /// </summary>
         //internal protected virtual Timer SendOrReceiveTimer { get; set; } = null;
-        internal protected virtual Thread SendOrReceiveThread { get; set; } = null;
+        internal protected virtual Thread LoopingThread { get; set; } = null;
 
         /// <summary>
         /// 心跳包
@@ -127,7 +134,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 消息偏移值
         /// </summary>
-        public override int MessageOffset { get { return _messageOffset; } }
+        public override int MessageOffset
+        {
+            get { return _messageOffset; }
+        }
 
         /// <summary>
         /// 压缩工具
@@ -137,7 +147,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 压缩工具
         /// </summary>
-        public override ICompression Compression { get { return _compression; } }
+        public override ICompression Compression
+        {
+            get { return _compression; }
+        }
 
         /// <summary>
         /// 加密工具
@@ -147,7 +160,10 @@ namespace FoolishClient.Net
         /// <summary>
         /// 加密工具
         /// </summary>
-        public override ICryptoProvider CryptoProvider { get { return _cryptoProvider; } }
+        public override ICryptoProvider CryptoProvider
+        {
+            get { return _cryptoProvider; }
+        }
 
         /// <summary>
         /// 发送的管理类
@@ -162,7 +178,11 @@ namespace FoolishClient.Net
         /// <summary>
         /// 消息Id
         /// </summary>
-        public long MessageNumber { get { return Sender.MessageNumber; } set { Sender.MessageNumber = value; } }
+        public long MessageNumber
+        {
+            get { return UserToken.MessageNumber; }
+            set { UserToken.MessageNumber = value; }
+        }
 
         /// <summary>
         /// Action生成类
@@ -240,6 +260,7 @@ namespace FoolishClient.Net
                 FConsole.WriteErrorFormatWithCategory(Categories.SOCKET, "Socket is not ready!");
                 return false;
             }
+
             IsRunning = true;
             Awake();
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is starting...");
@@ -253,6 +274,7 @@ namespace FoolishClient.Net
                 Close();
                 return false;
             }
+
             if (HeartbeatTimer == null)
             {
                 //心跳包线程
@@ -265,22 +287,20 @@ namespace FoolishClient.Net
             //    SendOrReceiveTimer = new Timer(CheckSendOrReceive, null, 15, 15);
             //}
 
-            if (SendOrReceiveThread == null)
+            if (LoopingThread == null)
             {
-                SendOrReceiveThread = new Thread(() =>
-                {
-                    Thread.Sleep(50);
-                    while (IsRunning)
-                    {
-                        CheckSendOrReceive(null);
-                        Thread.Sleep(1);
-                    }
-                });
-                try
-                {
-                    SendOrReceiveThread.Start();
-                }
-                catch { return false; }
+                LoopingThread = new Thread(Looping);
+                LoopingThread.Start();
+                //Receiver.PostReceive(EventArgs);
+                // SendOrReceiveThread = new Thread(CheckSendOrReceive);
+                // try
+                // {
+                //     SendOrReceiveThread.Start();
+                // }
+                // catch
+                // {
+                //     return false;
+                // }
             }
 
             ////开始监听数据
@@ -288,7 +308,8 @@ namespace FoolishClient.Net
             //ThreadProcessReceive.Start();
 
             //BeginReceive();
-            Sender?.BeginSend();
+
+            //Sender.PostSend(EventArgs);
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
@@ -310,15 +331,111 @@ namespace FoolishClient.Net
                 Socket = MakeSocket();
                 //socket.ReceiveTimeout = 50;//此方法只能在同步模式下使用
                 EventArgs = MakeEventArgs(Socket);
+                EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnCompleted);
             }
+
             if (Sender == null)
             {
                 Sender = new SocketSender(this);
             }
+
             if (Receiver == null)
             {
-                Receiver = new SocketReceiver<IClientSocket>(this);
+                Receiver = null;
+                switch (Type)
+                {
+                    case ESocketType.Tcp:
+                        Receiver = new TcpClientReceiver(this);
+                        break;
+                    case ESocketType.Udp:
+                        Receiver = new UdpClientReceiver(this);
+                        break;
+                }
+
                 Receiver.OnMessageReceived = OnMessageReceived;
+            }
+        }
+
+        private void OnCompleted(object sender, SocketAsyncEventArgs eventArgs)
+        {
+            try
+            {
+                switch (EventArgs.LastOperation)
+                {
+                    case SocketAsyncOperation.Receive:
+                    case SocketAsyncOperation.ReceiveFrom:
+                        Receiver.ProcessReceive(eventArgs);
+                        break;
+                    case SocketAsyncOperation.Send:
+                    case SocketAsyncOperation.SendTo:
+                        Sender.ProcessSend(eventArgs);
+                        break;
+                    default:
+                        throw new ArgumentException(
+                            "The last operation completed on the socket was not a receive or send");
+                }
+            }
+            catch (Exception e)
+            {
+                FConsole.WriteExceptionWithCategory(Category, e);
+            }
+        }
+
+        private void Looping(object state)
+        {
+            while (IsRunning)
+            {
+                if (Operating())
+                {
+                    continue;
+                }
+                
+                if (Socket.Poll(0, SelectMode.SelectRead))
+                {
+                    if (TryReceive(true))
+                    {
+                        Receiver.PostReceive(EventArgs);
+                    }
+                    continue;
+                }
+
+                if (Socket.Poll(0, SelectMode.SelectWrite))
+                {
+                    if (TrySend(true))
+                    {
+                        Sender.PostSend(EventArgs);
+                    }
+                    continue;
+                }
+            }
+        }
+
+        public override void NextStep(SocketAsyncEventArgs eventArgs)
+        {
+            OperationCompleted();
+            return;
+            InLooping();
+            while (true)
+            {
+                if (Socket.Poll(-1, SelectMode.SelectRead))
+                {
+                    if (TryReceive(true))
+                    {
+                        Receiver.PostReceive(eventArgs);
+                    }
+
+                    return;
+                }
+
+                if (Socket.Poll(-1, SelectMode.SelectWrite))
+                {
+                    if (TrySend(true))
+                    {
+                        Sender.PostSend(eventArgs);
+                    }
+
+                    return;
+                }
             }
         }
 
@@ -332,55 +449,83 @@ namespace FoolishClient.Net
         /// </summary>
         private int _waitingFlag = 0;
 
-        /// <summary>
-        /// 当消息处理完执行
-        /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-        /// </summary>
-        internal protected virtual void MessageSolved(object sender, SocketAsyncEventArgs e)
-        {
-            if (EventArgs == null)
-            {
-                return;
-            }
-            // 等待操作处理
-            bool bWaiting = false;
-            try
-            {
-                // determine which type of operation just completed and call the associated handler
-                switch (e.LastOperation)
-                {
-                    case SocketAsyncOperation.Receive:
-                    case SocketAsyncOperation.ReceiveFrom:
-                        bWaiting = !Receiver.ProcessReceive();
-                        break;
-                    case SocketAsyncOperation.Send:
-                    case SocketAsyncOperation.SendTo:
-                        bWaiting = !Sender.ProcessSend();
-                        break;
-                    default:
-                        throw new ArgumentException("The last operation completed on the socket was not a receive or send");
-                }
-            }
-            catch (Exception ex)
-            {
-                FConsole.WriteExceptionWithCategory(Categories.SOCKET, ex);
-            }
-            if (bWaiting && Interlocked.CompareExchange(ref _waitingFlag, 1, 0) == 0)
-            {
-                while (Receiver != null && Sender != null && Receiver.BeginReceive() && Sender.BeginSend())
-                {
-                    Thread.Sleep(10);
-                }
-                Interlocked.Exchange(ref _waitingFlag, 0);
-            }
-        }
+        // /// <summary>
+        // /// 当消息处理完执行
+        // /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+        // /// </summary>
+        // internal protected virtual void MessageSolved(object sender, SocketAsyncEventArgs e)
+        // {
+        //     if (EventArgs == null)
+        //     {
+        //         return;
+        //     }
+        //
+        //     // 等待操作处理
+        //     //bool bWaiting = false;
+        //     try
+        //     {
+        //         // determine which type of operation just completed and call the associated handler
+        //         switch (e.LastOperation)
+        //         {
+        //             case SocketAsyncOperation.Receive:
+        //             case SocketAsyncOperation.ReceiveFrom:
+        //                 Receiver.ProcessReceive(e);
+        //                 break;
+        //             case SocketAsyncOperation.Send:
+        //             case SocketAsyncOperation.SendTo:
+        //
+        //                 Sender.ProcessSend();
+        //                 break;
+        //             default:
+        //                 throw new ArgumentException(
+        //                     "The last operation completed on the socket was not a receive or send");
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         FConsole.WriteExceptionWithCategory(Categories.SOCKET, ex);
+        //     }
+        //
+        //     // if (bWaiting && Interlocked.CompareExchange(ref _waitingFlag, 1, 0) == 0)
+        //     // {
+        //     //     while (Receiver != null && Sender != null && Receiver.BeginReceive() && Sender.BeginSend())
+        //     //     {
+        //     //         Thread.Sleep(10);
+        //     //     }
+        //     //
+        //     //     Interlocked.Exchange(ref _waitingFlag, 0);
+        //     // }
+        // }
 
         /// <summary>
         /// 定时处理消息
         /// </summary>
         internal void CheckSendOrReceive(object state)
         {
-            if (Receiver != null && !Receiver.BeginReceive()) { Sender?.BeginSend(); }
+            Thread.Sleep(50);
+            while (IsRunning)
+            {
+                try
+                {
+                    if (Socket.Poll(5, SelectMode.SelectRead))
+                    {
+                        Receiver.PostReceive(EventArgs);
+                    }
+                    else
+                    {
+                        Sender.PostSend(EventArgs);
+                    }
+                }
+                catch
+                {
+                }
+
+                Thread.Sleep(1);
+            }
+            // if (Receiver != null && !Receiver.BeginReceive())
+            // {
+            //     Sender?.BeginSend();
+            // }
         }
 
         /// <summary>
@@ -395,10 +540,11 @@ namespace FoolishClient.Net
                 {
                     throw new SocketException((int)SocketError.NotConnected);
                 }
+
                 // 心跳包
                 if (_heartbeatBuffer != null)
                 {
-                    Sender.SendBytesImmediately(_heartbeatBuffer);
+                    Sender.Push(this, _heartbeatBuffer, true);
                 }
             }
             catch (Exception e)
@@ -436,6 +582,7 @@ namespace FoolishClient.Net
             {
                 return;
             }
+
             //FConsole.Write(new System.Diagnostics.StackTrace(true).ToString());
             IsRunning = false;
             lock (this)
@@ -448,11 +595,14 @@ namespace FoolishClient.Net
                     //立即发送一条客户端关闭消息
                     try
                     {
-                        Sender.Post(closeMessage);
+                        Sender.Push(this, closeMessage, true);
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
             }
+
             base.Close(opCode);
             lock (this)
             {
@@ -466,6 +616,7 @@ namespace FoolishClient.Net
                     {
                         FConsole.WriteExceptionWithCategory(Category, "HeartbeatTime dispose error.", e);
                     }
+
                     HeartbeatTimer = null;
                 }
                 //if (ThreadProcessReceive != null)
@@ -494,17 +645,18 @@ namespace FoolishClient.Net
                 //    SendOrReceiveTimer = null;
                 //}
 
-                if (SendOrReceiveThread != null)
+                if (LoopingThread != null)
                 {
                     try
                     {
-                        SendOrReceiveThread.Abort();
+                        LoopingThread.Abort();
                     }
                     catch (Exception e)
                     {
                         FConsole.WriteExceptionWithCategory(Category, "SendOrReceiveThread abort error.", e);
                     }
-                    SendOrReceiveThread = null;
+
+                    LoopingThread = null;
                 }
 
                 //管理类回收
@@ -512,13 +664,16 @@ namespace FoolishClient.Net
                 {
                     EventArgs.Dispose();
                 }
+
                 EventArgs = null;
 
                 Sender = null;
                 Receiver = null;
             }
+
             FConsole.WriteInfoFormatWithCategory(Category, "Socket Closed.");
         }
+
         /// <summary>
         /// 设置消息的偏移值
         /// </summary>
@@ -526,6 +681,7 @@ namespace FoolishClient.Net
         {
             _messageOffset = offset;
         }
+
         /// <summary>
         /// 设置压缩方案
         /// </summary>
@@ -533,6 +689,7 @@ namespace FoolishClient.Net
         {
             this._compression = compression;
         }
+
         /// <summary>
         /// 设置解密方案
         /// </summary>
@@ -540,6 +697,7 @@ namespace FoolishClient.Net
         {
             this._cryptoProvider = cryptoProvider;
         }
+
         /// <summary>
         /// 数据发送<c>异步</c>
         /// </summary>
@@ -548,33 +706,40 @@ namespace FoolishClient.Net
         public void Send(IMessageWriter message)
         {
             AutoConnect();
-            Sender?.Send(message);
+            byte[] data = PackageFactory.Pack(message, MessageOffset, Compression, CryptoProvider);
+            Sender.Push(this, data, false);
         }
+
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
         /// </summary>
         /// <param name="message">发送的消息</param>
-        [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
+        [Obsolete(
+            "Only used in important message. This method will confuse the message queue. You can use 'Send' instead.",
+            false)]
         public void SendImmediately(IMessageWriter message)
         {
             AutoConnect();
-            Sender?.SendImmediately(message);
+            byte[] data = PackageFactory.Pack(message, MessageOffset, Compression, CryptoProvider);
+            Sender.Push(this, data, true);
         }
+
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析
         /// </summary>
         internal protected void SendBytes(byte[] data)
         {
             AutoConnect();
-            Sender?.SendBytes(data);
+            Sender.Push(this, data, false);
         }
+
         /// <summary>
         /// 内部函数，直接传bytes，会影响数据解析，以及解析顺序
         /// </summary>
         internal protected void SendBytesImmediately(byte[] data)
         {
             AutoConnect();
-            Sender?.SendBytesImmediately(data);
+            Sender.Push(this, data, true);
         }
 
         /// <summary>
@@ -610,6 +775,7 @@ namespace FoolishClient.Net
                 FConsole.WriteErrorFormatWithCategory(Category, "{0} receive empty message.", Category);
                 return;
             }
+
             try
             {
                 ClientAction action = ActionProvider.Provide(message.ActionId);

@@ -23,55 +23,68 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
+using FoolishGames.Common;
+using FoolishGames.IO;
+using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
-using FoolishGames.Net;
+using System.Threading;
+using FoolishClient.Net;
 
-namespace FoolishClient.Net
+namespace FoolishGames.Net
 {
     /// <summary>
-    /// Tcp连接池
+    /// 消息接收处理类
+    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
     /// </summary>
-    public class TcpSocket : ClientSocket
+    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
     {
+        /// <summary>
+        /// 增强类
+        /// </summary>
+        public SocketAsyncEventArgs EventArgs
+        {
+            get { return Socket.EventArgs; }
+        }
+
+        /// <summary>
+        /// 数据管理对象
+        /// </summary>
+        internal UserToken UserToken { get; private set; }
+
         /// <summary>
         /// 初始化
         /// </summary>
-        public TcpSocket() : base()
+        public ClientReceiver(ISocket socket) : base(socket)
         {
-
-        }
-
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public override ESocketType Type { get { return ESocketType.Tcp; } }
-
-        /// <summary>
-        /// 建立原生套接字
-        /// </summary>
-        /// <returns></returns>
-        protected override Socket MakeSocket()
-        {
-            return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        }
-
-        /// <summary>
-        /// 创建连接
-        /// </summary>
-        protected internal override void BeginConnectImpl()
-        {
-            //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
-            IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
-            bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
-            if (!success || !opt.IsCompleted || !Socket.Connected)
+            if (socket.EventArgs == null)
             {
-                IsRunning = false;
-                throw new Exception(string.Format("Socket connect failed!"));
+                throw new NullReferenceException(
+                    "Fail to create socket receiver, because the SocketAsyncEventArgs is null.");
             }
-            //Socket.Connect(host, port);//手机上测下来只有同步才有效
+
+            UserToken usertoken = socket.UserToken;
+            if (usertoken == null)
+            {
+                throw new NullReferenceException(
+                    "Fail to create socket receiver, because the UserToken of SocketAsyncEventArgs is null.");
+            }
+
+            UserToken = usertoken;
+        }
+
+        /// <summary>
+        /// 关闭操作
+        /// </summary>
+        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
+        {
+            if (ioEventArgs != null && ioEventArgs.UserToken != null)
+            {
+                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
+            }
         }
     }
 }

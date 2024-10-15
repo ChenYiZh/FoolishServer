@@ -23,19 +23,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using FoolishGames.Collections;
+using FoolishGames.Proxy;
 
 namespace FoolishGames.Net
 {
     /// <summary>
     /// 寄宿在原生Socket的管理类
     /// </summary>
-    internal sealed class UserToken : IUserToken
+    public sealed class UserToken : IUserToken
     {
         /// <summary>
         /// 嵌套的Socket
@@ -48,66 +51,30 @@ namespace FoolishGames.Net
         //public SocketAsyncResult AsyncResult { get; internal set; }
 
         #region socket state
-        /// <summary>
-        /// 收发数据的标识
-        /// <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
-        /// </summary>
-        private int _isSendingOrReceivingFlag = 0;
 
-        /// <summary>
-        /// 是否是待处理状态
-        /// </summary>
-        internal bool IsWaitingSendOrReceive
-        {
-            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 0, 0) == 0; }
-        }
+        // /// <summary>
+        // /// 收发数据的标识
+        // /// <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
+        // /// </summary>
+        // private int _isSendingOrReceivingFlag = 0;
+        //
+        // /// <summary>
+        // /// 是否可以进行发送操作
+        // /// </summary>
+        // internal bool CheckAndSending()
+        // {
+        //     return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 2, 0) != 1;
+        // }
+        //
+        //
+        // /// <summary>
+        // /// 是否可以进行接收操作
+        // /// </summary>
+        // internal bool CheckAndReceiving()
+        // {
+        //     return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 1, 0) != 2;
+        // }
 
-        /// <summary>
-        /// 是否正在发送数据
-        /// </summary>
-        internal bool IsSending
-        {
-            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 1, 1) == 1; }
-        }
-
-        /// <summary>
-        /// 是否正在接收数据
-        /// </summary>
-        internal bool IsReceiving
-        {
-            get { return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 2, 2) == 2; }
-        }
-
-        /// <summary>
-        /// 判断是否可以发送，如果可以则切换至发送状态
-        /// </summary>
-        internal bool Sendable()
-        {
-            return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 1, 0) == 0 || IsSending;
-        }
-
-        /// <summary>
-        /// 判断是否可以接收，如果可以则切换至接收状态
-        /// </summary>
-        internal bool Receivable()
-        {
-            return Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 2, 0) == 0 || IsReceiving;
-        }
-
-        /// <summary>
-        /// 重置收发标识
-        /// </summary>
-        internal void ResetSendOrReceiveState(int fromState)
-        {
-            if (fromState == 0)
-            {
-                Interlocked.Exchange(ref _isSendingOrReceivingFlag, 0);
-            }
-            else
-            {
-                Interlocked.CompareExchange(ref _isSendingOrReceivingFlag, 0, fromState);
-            }
-        }
         #endregion
 
         /// <summary>
@@ -158,6 +125,14 @@ namespace FoolishGames.Net
         //    ReceiverStream = null;
         //}
 
+        // /// <summary>
+        // /// 重置发送状态
+        // /// </summary>
+        // public void ResetSendAndReceiveState()
+        // {
+        //     Interlocked.Exchange(ref _isSendingOrReceivingFlag, 0);
+        // }
+
         /// <summary>
         /// 重置数据
         /// </summary>
@@ -179,5 +154,66 @@ namespace FoolishGames.Net
             OriginalOffset = offset;
             OriginalLength = length;
         }
+
+        #region Send数据
+
+        /// <summary>
+        /// 消息Id，需要加原子锁
+        /// </summary>
+        private long _messageNumber = DateTime.Now.Ticks;
+
+        /// <summary>
+        /// 消息Id
+        /// <para>get 返回时会自动 +1</para>
+        /// </summary>
+        public long MessageNumber
+        {
+            get { return Interlocked.Increment(ref _messageNumber); }
+            set { Interlocked.Exchange(ref _messageNumber, value); }
+        }
+
+        /// <summary>
+        /// 待发送的消息列表
+        /// </summary>
+        private ThreadSafeLinkedList<byte[]> _waitToSendMessages = new ThreadSafeLinkedList<byte[]>();
+
+        /// <summary>
+        /// 缓存需要发送的数据
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="immediate"></param>
+        public void Push(byte[] msg, bool immediate)
+        {
+            if (immediate)
+            {
+                _waitToSendMessages.AddFirst(msg);
+            }
+            else
+            {
+                _waitToSendMessages.AddLast(msg);
+            }
+        }
+
+        /// <summary>
+        /// 判断是否有数据并且返回第一个值
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public bool TryDequeueMsg(out byte[] msg)
+        {
+            lock (_waitToSendMessages.SyncRoot)
+            {
+                if (_waitToSendMessages.Count > 0)
+                {
+                    msg = _waitToSendMessages.GetAndRemoveFirst();
+                    return true;
+                }
+
+                msg = null;
+                return false;
+            }
+        }
+
+        #endregion
     }
 }

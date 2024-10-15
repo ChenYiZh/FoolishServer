@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using FoolishGames.Collections;
 using FoolishGames.Common;
 using FoolishGames.IO;
@@ -44,50 +45,77 @@ namespace FoolishServer.Net
     /// 连接消息代理
     /// </summary>
     public delegate void ConnectionEventHandler(IServerSocket socket, IRemoteSocket remoteSocket);
+
     /// <summary>
     /// 收发消息处理
     /// </summary>
     public delegate void MessageEventHandler(IServerSocket socket, IMessageEventArgs<IRemoteSocket> e);
+
     /// <summary>
     /// 服务器套接字管理
     /// </summary>
-    public abstract class ServerSocket : FSocket, IServerSocket, IMsgSocket, IServerMessageProcessor
+    public abstract class ServerSocket : FSocket, IServerSocket, IMsgSocket //, IServerMessageProcessor
     {
         /// <summary>
         /// 连接事件
         /// </summary>
         public event ConnectionEventHandler OnConnected;
-        private void AfterConnected(IRemoteSocket remoteSocket) { OnConnected?.Invoke(this, remoteSocket); }
+
+        private void AfterConnected(IRemoteSocket remoteSocket)
+        {
+            OnConnected?.Invoke(this, remoteSocket);
+        }
 
         /// <summary>
         /// 握手事件
         /// </summary>
         public event ConnectionEventHandler OnHandshaked;
-        private void Handshaked(IRemoteSocket remoteSocket) { OnHandshaked?.Invoke(this, remoteSocket); }
+
+        private void Handshaked(IRemoteSocket remoteSocket)
+        {
+            OnHandshaked?.Invoke(this, remoteSocket);
+        }
 
         /// <summary>
         /// 断开连接事件
         /// </summary>
         public event ConnectionEventHandler OnDisconnected;
-        private void Disconnected(IRemoteSocket remoteSocket) { OnDisconnected?.Invoke(this, remoteSocket); }
+
+        private void Disconnected(IRemoteSocket remoteSocket)
+        {
+            OnDisconnected?.Invoke(this, remoteSocket);
+        }
 
         /// <summary>
         /// 接收到数据包事件
         /// </summary>
         public event MessageEventHandler OnMessageReceived;
-        void IServerMessageProcessor.MessageReceived(IMessageEventArgs<IRemoteSocket> args) { OnMessageReceived?.Invoke(this, args); }
+
+        private void MessageReceived(IMessageEventArgs<IRemoteSocket> args)
+        {
+            OnMessageReceived?.Invoke(this, args);
+        }
 
         /// <summary>
         /// 心跳探索事件
         /// </summary>
         public event MessageEventHandler OnPing;
-        void IServerMessageProcessor.Ping(IMessageEventArgs<IRemoteSocket> args) { OnPing?.Invoke(this, args); }
+
+        private void Ping(IMessageEventArgs<IRemoteSocket> args)
+        {
+            ((RemoteSocket)args.Socket).RefreshTime = TimeLord.Now;
+            OnPing?.Invoke(this, args);
+        }
 
         /// <summary>
         /// 心跳回应事件
         /// </summary>
         public event MessageEventHandler OnPong;
-        void IServerMessageProcessor.Pong(IMessageEventArgs<IRemoteSocket> args) { OnPong?.Invoke(this, args); }
+
+        private void Pong(IMessageEventArgs<IRemoteSocket> args)
+        {
+            OnPong?.Invoke(this, args);
+        }
 
         /// <summary>
         /// 内部关键原生Socket
@@ -97,7 +125,10 @@ namespace FoolishServer.Net
         /// <summary>
         /// 内部关键原生Socket
         /// </summary>
-        public override Socket Socket { get { return socket; } }
+        public override Socket Socket
+        {
+            get { return socket; }
+        }
 
         /// <summary>
         /// 封装的地址
@@ -107,17 +138,26 @@ namespace FoolishServer.Net
         /// <summary>
         /// 封装的地址
         /// </summary>
-        public override IPEndPoint Address { get { return _address; } }
+        public override IPEndPoint Address
+        {
+            get { return _address; }
+        }
 
         /// <summary>
         /// 绑定的端口
         /// </summary>
-        public int Port { get { return Setting.Port; } }
+        public int Port
+        {
+            get { return Setting.Port; }
+        }
 
         /// <summary>
         /// 对应Host的名称
         /// </summary>
-        public string ServerName { get { return Setting.Name; } }
+        public string ServerName
+        {
+            get { return Setting.Name; }
+        }
 
         /// <summary>
         /// 配置信息
@@ -132,12 +172,18 @@ namespace FoolishServer.Net
         /// <summary>
         /// 消息偏移值
         /// </summary>
-        public override int MessageOffset { get { return _messageOffset; } }
+        public override int MessageOffset
+        {
+            get { return _messageOffset; }
+        }
 
         /// <summary>
         /// 消息偏移值
         /// </summary>
-        public void SetMessageOffset(int offset) { _messageOffset = offset; }
+        public void SetMessageOffset(int offset)
+        {
+            _messageOffset = offset;
+        }
 
         /// <summary>
         /// 消息偏移值
@@ -147,12 +193,18 @@ namespace FoolishServer.Net
         /// <summary>
         /// 压缩工具
         /// </summary>
-        public override ICompression Compression { get { return _compression; } }
+        public override ICompression Compression
+        {
+            get { return _compression; }
+        }
 
         /// <summary>
         /// 压缩工具
         /// </summary>
-        public void SetCompression(ICompression compression) { this._compression = compression; }
+        public void SetCompression(ICompression compression)
+        {
+            this._compression = compression;
+        }
 
         /// <summary>
         /// 消息偏移值
@@ -162,17 +214,26 @@ namespace FoolishServer.Net
         /// <summary>
         /// 加密工具
         /// </summary>
-        public override ICryptoProvider CryptoProvider { get { return _cryptoProvider; } }
+        public override ICryptoProvider CryptoProvider
+        {
+            get { return _cryptoProvider; }
+        }
 
         /// <summary>
         /// 加密工具
         /// </summary>
-        public void SetCryptoProvide(ICryptoProvider cryptoProvider) { this._cryptoProvider = cryptoProvider; }
+        public void SetCryptoProvide(ICryptoProvider cryptoProvider)
+        {
+            this._cryptoProvider = cryptoProvider;
+        }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public override ESocketType Type { get { return Setting.Type; } }
+        public override ESocketType Type
+        {
+            get { return Setting.Type; }
+        }
 
         /// <summary>
         /// 状态类
@@ -202,7 +263,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 等待消息处理的缓存列表，主要用于单线程处理
         /// </summary>
-        private ThreadSafeHashSet<RemoteSocket> _sockets = new ThreadSafeHashSet<RemoteSocket>();
+        internal protected ThreadSafeHashSet<RemoteSocket> sockets = new ThreadSafeHashSet<RemoteSocket>();
 
         /// <summary>
         /// 生成的所有套接字管理对象都缓存在这里
@@ -218,14 +279,23 @@ namespace FoolishServer.Net
         /// 待处理的Socket的等待线程
         /// </summary>
         //private Timer WaitingSocketTimer;
-        private Thread _waitingSocketThread;
+        private Thread _loopingThread;
+
+        /// <summary>
+        /// 接收管理类
+        /// </summary>
+        internal SocketReceiver<IRemoteSocket> Receiver { get; private set; }
+
+        /// <summary>
+        /// 发送的管理类
+        /// </summary>
+        internal SocketSender Sender { get; private set; }
 
         /// <summary>
         /// 初始化
         /// </summary>
         public ServerSocket() : base(null)
         {
-
         }
 
         /// <summary>
@@ -234,7 +304,11 @@ namespace FoolishServer.Net
         /// <param name="setting"></param>
         public void Start(IHostSetting setting)
         {
-            if (IsRunning) { return; }
+            if (IsRunning)
+            {
+                return;
+            }
+
             //默认参数赋值
             IsRunning = true;
             Setting = setting;
@@ -249,11 +323,13 @@ namespace FoolishServer.Net
             {
                 acceptEventArgsPool.Push(CreateAcceptEventArgs());
             }
+
             _ioEventArgsPool = new ThreadSafeStack<SocketAsyncEventArgs>();
             for (int i = 0; i < setting.MaxIOCapacity; i++)
             {
                 _ioEventArgsPool.Push(MakeIOEventArgs());
             }
+
             //并发锁初始化
             _maxConnectionsEnforcer = new Semaphore(setting.MaxConnections, setting.MaxConnections);
             //生成套接字
@@ -261,14 +337,31 @@ namespace FoolishServer.Net
 
             BuildSocket();
 
+            Receiver = null;
+            switch (Type)
+            {
+                case ESocketType.Tcp:
+                    Receiver = new TcpServerReceiver(this);
+                    break;
+                case ESocketType.Udp:
+                    Receiver = new UdpServerReceiver(this);
+                    break;
+            }
+
+            Sender = new SocketSender(this);
+
+            Receiver.OnMessageReceived = MessageReceived;
+            Receiver.OnPing = Ping;
+            Receiver.OnPong = Pong;
+
             //服务器状态输出周期
             _summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
             //待接收消息的套接字管理线程
             //int waitingInterval = 10;
             //WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
-            //_waitingSocketThread = new Thread(() => { while (IsRunning) { ProcessWaiting(null); Thread.Sleep(1); } });
-            //_waitingSocketThread.Start();
+            _loopingThread = new Thread(Looping);
+            _loopingThread.Start();
             //启动监听
             PostAccept();
         }
@@ -334,9 +427,10 @@ namespace FoolishServer.Net
                         //ArrangeSocketBuffer(ioEventArgs);
                         socket = new RemoteSocket(this, ioEventArgs);
                         socket.AccessTime = TimeLord.Now;
-                        _sockets.Add(socket);
+                        sockets.Add(socket);
                         //userToken.Socket = socket;
                     }
+
                     acceptEventArgs.AcceptSocket = null;
 
                     //release connect when socket has be closed.
@@ -351,7 +445,8 @@ namespace FoolishServer.Net
                     {
                         FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "OnConnected error:", e);
                     }
-                    socket.BeginReceive();
+
+                    //Receiver.PostReceive(ioEventArgs);
                     //PostReceive(ioEventArgs);
                 }
             }
@@ -359,10 +454,10 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
             }
-            //finally
-            //{
-            //    PostAccept();
-            //}
+            finally
+            {
+                PostAccept();
+            }
         }
 
         /// <summary>
@@ -380,17 +475,17 @@ namespace FoolishServer.Net
         internal protected void ReleaseAccept(SocketAsyncEventArgs acceptEventArgs, bool isRelease = true)
         {
             acceptEventArgsPool.Push(acceptEventArgs);
-            //if (isRelease)
-            //{
-            try
+            if (isRelease)
             {
-                _maxConnectionsEnforcer.Release();
+                try
+                {
+                    _maxConnectionsEnforcer.Release();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Release accept error.", e);
+                }
             }
-            catch (Exception e)
-            {
-                FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Release accept error.", e);
-            }
-            //}
         }
 
         /// <summary>
@@ -400,22 +495,71 @@ namespace FoolishServer.Net
         {
             try
             {
-                IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
-                if (userToken == null) { return; }//TODO:不知道为什么会有空的情况
+                IUserToken userToken = UserToken;
+                // if (userToken == null)
+                // {
+                //     return;
+                // } 
+
                 RemoteSocket socket = (RemoteSocket)userToken.Socket;
                 socket.AccessTime = TimeLord.Now;
-                if (socket.MessageSolved(sender, ioEventArgs))
+                switch (ioEventArgs.LastOperation)
                 {
-                    _sockets.Add(socket);
+                    case SocketAsyncOperation.Receive:
+                    case SocketAsyncOperation.ReceiveFrom:
+                        Receiver.ProcessReceive(ioEventArgs);
+                        break;
+                    case SocketAsyncOperation.Send:
+                    case SocketAsyncOperation.SendTo:
+                        Sender.PostSend(ioEventArgs);
+                        break;
+                    default:
+                        throw new ArgumentException(
+                            "The last operation completed on the socket was not a receive or send");
                 }
+                // if (socket.MessageSolved(sender, ioEventArgs))
+                // {
+                //     _sockets.Add(socket);
+                // }
             }
             catch (ObjectDisposedException)
             {
+                OperationCompleted();
                 ReleaseIOEventArgs(ioEventArgs);
             }
             catch (Exception e)
             {
+                OperationCompleted();
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), $"IOCompleted unkown error:", e);
+            }
+        }
+
+        internal protected abstract void Looping(object state);
+
+        public override void NextStep(SocketAsyncEventArgs eventArgs)
+        {
+            OperationCompleted();
+            return;
+            while (true)
+            {
+                if (Socket.Poll(-1, SelectMode.SelectRead))
+                {
+                    if (TryReceive(true))
+                    {
+                        Receiver.PostReceive(eventArgs);
+                    }
+
+                    break;
+                }
+                else if (Socket.Poll(-1, SelectMode.SelectWrite))
+                {
+                    if (TrySend(true))
+                    {
+                        Sender.PostSend(eventArgs);
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -425,10 +569,11 @@ namespace FoolishServer.Net
         private void ProcessWaiting(object state)
         {
             List<RemoteSocket> sockets;
-            lock (_sockets.SyncRoot)
+            lock (this.sockets.SyncRoot)
             {
-                sockets = new List<RemoteSocket>(_sockets);
+                sockets = new List<RemoteSocket>(this.sockets);
             }
+
             foreach (RemoteSocket socket in sockets)
             {
                 if ((TimeLord.Now - socket.RefreshTime).TotalMilliseconds > 2 * Constants.HeartBeatsInterval)
@@ -437,10 +582,11 @@ namespace FoolishServer.Net
                     socket.Close();
                     continue;
                 }
+
                 ////不做这个处理会认为连接失败
                 //if ((TimeLord.Now - socket.AccessTime).TotalSeconds > 1)
                 //{
-                socket.CheckSendOrReceive();
+                //socket.CheckSendOrReceive();
                 //}
             }
         }
@@ -451,13 +597,14 @@ namespace FoolishServer.Net
         private void ReleaseIOEventArgs(SocketAsyncEventArgs ioEventArgs)
         {
             if (ioEventArgs == null) return;
-            IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
+            IUserToken userToken = ioEventArgs.UserToken as IUserToken;
             if (userToken != null)
             {
-                _sockets.Remove((RemoteSocket)userToken.Socket);
+                sockets.Remove((RemoteSocket)userToken.Socket);
                 userToken.Reset();
                 //userToken.Socket = null;
             }
+
             ioEventArgs.AcceptSocket = null;
             _ioEventArgsPool.Push(ioEventArgs);
         }
@@ -495,6 +642,7 @@ namespace FoolishServer.Net
             catch (Exception)
             {
             }
+
             eventArgs.AcceptSocket = null;
         }
 
@@ -513,10 +661,11 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteException(e);
             }
-            _sockets.Remove((RemoteSocket)socket);
+
+            sockets.Remove((RemoteSocket)socket);
             if (socket.EventArgs != null)
             {
-                IUserToken token = (IUserToken)socket.EventArgs.UserToken;
+                IUserToken token = socket.UserToken;
                 if (opCode != EOpCode.Empty)
                 {
                     try
@@ -528,6 +677,7 @@ namespace FoolishServer.Net
                         FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "Closing error:", e);
                     }
                 }
+
                 if (socket.EventArgs.AcceptSocket != null)
                 {
                     try
@@ -540,16 +690,20 @@ namespace FoolishServer.Net
                     }
                 }
             }
+
             try
             {
                 _maxConnectionsEnforcer.Release();
             }
             catch (Exception e)
             {
-                string errorMessage = string.Format("Closed error, connect status: TotalCount={0}, CurrentCount={1}, CloseCount={2}, RejectedCount={3}",
-                    _summary.TotalConnectCount, _summary.CurrentConnectCount, _summary.CloseConnectCount, _summary.RejectedConnectCount);
+                string errorMessage = string.Format(
+                    "Closed error, connect status: TotalCount={0}, CurrentCount={1}, CloseCount={2}, RejectedCount={3}",
+                    _summary.TotalConnectCount, _summary.CurrentConnectCount, _summary.CloseConnectCount,
+                    _summary.RejectedConnectCount);
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), errorMessage, e);
             }
+
             try
             {
                 Disconnected(socket);
@@ -558,6 +712,7 @@ namespace FoolishServer.Net
             {
                 FConsole.WriteExceptionWithCategory(Setting.GetCategory(), "OnDisconnected error:", e);
             }
+
             if (socket.EventArgs != null)
             {
                 ResetSocketAsyncEventArgs(socket.EventArgs);
@@ -574,10 +729,13 @@ namespace FoolishServer.Net
             try
             {
                 FConsole.WriteFormatWithCategory(Setting.GetCategory(),
-              "Socket connect status: Total Count = {0}, Current Count = {1}, Closed Count = {2}, Rejected Count = {3}",
-              _summary.TotalConnectCount, _summary.CurrentConnectCount, _summary.CloseConnectCount, _summary.RejectedConnectCount);
+                    "Socket connect status: Total Count = {0}, Current Count = {1}, Closed Count = {2}, Rejected Count = {3}",
+                    _summary.TotalConnectCount, _summary.CurrentConnectCount, _summary.CloseConnectCount,
+                    _summary.RejectedConnectCount);
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -617,35 +775,40 @@ namespace FoolishServer.Net
             IsRunning = false;
             DisposeEventArgs();
             List<RemoteSocket> sockets = new List<RemoteSocket>();
-            foreach (RemoteSocket socket in _sockets)
+            foreach (RemoteSocket socket in this.sockets)
             {
                 sockets.Add(socket);
             }
+
             foreach (RemoteSocket socket in sockets)
             {
                 try
                 {
                     socket.Close();
                 }
-                catch { }
+                catch
+                {
+                }
             }
-            _sockets.Clear();
+
+            this.sockets.Clear();
             //if (WaitingSocketTimer != null)
             //{
             //    WaitingSocketTimer.Dispose();
             //    WaitingSocketTimer = null;
             //}
-            if (_waitingSocketThread != null)
+            if (_loopingThread != null)
             {
                 try
                 {
-                    _waitingSocketThread.Abort();
+                    _loopingThread.Abort();
                 }
                 catch (Exception e)
                 {
                     FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
                 }
-                _waitingSocketThread = null;
+
+                _loopingThread = null;
             }
 
             if (_summaryTask != null)
@@ -654,7 +817,10 @@ namespace FoolishServer.Net
                 {
                     _summaryTask.Dispose();
                 }
-                catch { }
+                catch
+                {
+                }
+
                 _summaryTask = null;
             }
 
@@ -680,12 +846,15 @@ namespace FoolishServer.Net
                 {
                     FConsole.WriteExceptionWithCategory(Setting.GetCategory(), e);
                 }
+
                 socket = null;
             }
+
             foreach (SocketAsyncEventArgs eventArgs in _allEventArgsPool)
             {
                 eventArgs.Dispose();
             }
+
             _allEventArgsPool.Clear();
             acceptEventArgsPool.Clear();
             _ioEventArgsPool.Clear();

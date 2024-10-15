@@ -23,55 +23,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
+using FoolishGames.Common;
+using FoolishGames.IO;
+using FoolishGames.Log;
+using FoolishServer.Net;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
-using FoolishGames.Net;
+using System.Threading;
 
-namespace FoolishClient.Net
+namespace FoolishGames.Net
 {
     /// <summary>
-    /// Tcp连接池
+    /// 消息接收处理类
+    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
     /// </summary>
-    public class TcpSocket : ClientSocket
+    public abstract class ServerReceiver : SocketReceiver<IRemoteSocket>
     {
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        public TcpSocket() : base()
+        internal ServerReceiver(ISocket serverSocket):base(serverSocket)
         {
-
         }
 
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public override ESocketType Type { get { return ESocketType.Tcp; } }
-
-        /// <summary>
-        /// 建立原生套接字
-        /// </summary>
-        /// <returns></returns>
-        protected override Socket MakeSocket()
+        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
         {
-            return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        }
-
-        /// <summary>
-        /// 创建连接
-        /// </summary>
-        protected internal override void BeginConnectImpl()
-        {
-            //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
-            IAsyncResult opt = Socket.BeginConnect(Address, null, EventArgs);
-            bool success = opt.AsyncWaitHandle.WaitOne(1000, true);
-            if (!success || !opt.IsCompleted || !Socket.Connected)
+            if (ioEventArgs != null && ioEventArgs.UserToken != null)
             {
-                IsRunning = false;
-                throw new Exception(string.Format("Socket connect failed!"));
+                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
             }
-            //Socket.Connect(host, port);//手机上测下来只有同步才有效
         }
     }
 }

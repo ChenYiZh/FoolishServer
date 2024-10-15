@@ -48,6 +48,7 @@ namespace FoolishServer.Net
                 //ProcessAccept(acceptEventArgs);
             }
         }
+
         /// <summary>
         /// 收到连接时需要做的事情
         /// </summary>
@@ -59,12 +60,15 @@ namespace FoolishServer.Net
                 {
                     throw new NullReferenceException("RemoteEndPoint is none or bytes transferred is 0.");
                 }
+
                 byte[] buffer = new byte[acceptEventArgs.BytesTransferred];
                 Buffer.BlockCopy(acceptEventArgs.Buffer, 0, buffer, 0, buffer.Length);
                 if (Encoding.UTF8.GetString(buffer) != ACCEPT_FLAG)
                 {
                     throw new AccessViolationException("The accept message is wrong.");
                 }
+
+                acceptEventArgs.AcceptSocket = sender as Socket;
                 ProcessAccept(acceptEventArgs);
             }
             catch (Exception e)
@@ -79,13 +83,41 @@ namespace FoolishServer.Net
                     catch
                     {
                     }
+
                     acceptEventArgs.AcceptSocket = null;
                 }
+
                 ReleaseAccept(acceptEventArgs);
             }
             finally
             {
                 PostAccept();
+            }
+        }
+
+        protected internal override void Looping(object state)
+        {
+            while (IsRunning)
+            {
+                if (Socket.Poll(0, SelectMode.SelectRead))
+                {
+                    if (TryReceive(true))
+                    {
+                        Receiver.PostReceive(EventArgs);
+                    }
+
+                    continue;
+                }
+
+                if (Socket.Poll(0, SelectMode.SelectWrite))
+                {
+                    if (TrySend(true))
+                    {
+                        Sender.PostSend(EventArgs);
+                    }
+
+                    continue;
+                }
             }
         }
     }

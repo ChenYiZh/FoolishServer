@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using FoolishGames.IO;
 using FoolishGames.Proxy;
 using FoolishGames.Security;
@@ -66,6 +67,11 @@ namespace FoolishGames.Net
         SocketAsyncEventArgs EventArgs { get; }
 
         /// <summary>
+        /// 自定义管理类
+        /// </summary>
+        UserToken UserToken { get; }
+
+        /// <summary>
         /// 获取类型
         /// </summary>
         ESocketType Type { get; }
@@ -94,5 +100,41 @@ namespace FoolishGames.Net
         /// 关闭函数
         /// </summary>
         void Close(EOpCode opCode = EOpCode.Close);
+
+        /// <summary>
+        /// 尝试开始发送
+        /// </summary>
+        bool TrySend(bool onlyWait = false);
+
+        /// <summary>
+        /// 尝试开始接收
+        /// </summary>
+        /// <returns></returns>
+        bool TryReceive(bool onlyWait = false);
+        
+        /// <summary>
+        /// 是否正处于操作阶段
+        /// </summary>
+        bool Operating();
+
+        /// <summary>
+        /// 操作完成时执行
+        /// </summary>
+        void OperationCompleted();
+
+        /// <summary>
+        /// 执行下步操作
+        /// </summary>
+        void NextStep(SocketAsyncEventArgs eventArgs);
+
+        /// <summary>
+        /// 正在NextStep的循环中
+        /// </summary>
+        void InLooping();
+
+        /// <summary>
+        /// 已经离开NextStep的循环中
+        /// </summary>
+        void OutLooping();
     }
 }

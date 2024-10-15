@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoolishServer.Net
 {
@@ -60,13 +61,49 @@ namespace FoolishServer.Net
                     catch
                     {
                     }
+
                     acceptEventArgs.AcceptSocket = null;
                 }
+
                 ReleaseAccept(acceptEventArgs);
             }
             finally
             {
                 PostAccept();
+            }
+        }
+
+        protected internal override void Looping(object state)
+        {
+            while (IsRunning)
+            {
+                if (Operating())
+                {
+                    continue;
+                }
+
+                foreach (RemoteSocket socket in sockets)
+                {
+                    if (socket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectRead))
+                    {
+                        if (TryReceive(true))
+                        {
+                            Receiver.PostReceive(socket.EventArgs);
+                        }
+
+                        break;
+                    }
+
+                    if (socket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectWrite))
+                    {
+                        if (TrySend(true))
+                        {
+                            Sender.PostSend(socket.EventArgs);
+                        }
+
+                        break;
+                    }
+                }
             }
         }
     }

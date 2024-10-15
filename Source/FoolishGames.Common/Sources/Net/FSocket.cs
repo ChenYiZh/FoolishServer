@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -54,6 +55,77 @@ namespace FoolishGames.Net
         public virtual bool IsRunning { get; protected set; } = false;
 
         /// <summary>
+        /// 0：等待，1：发送，2：接收，3：在循环中
+        /// </summary>
+        private int _operation = 0;
+
+        /// <summary>
+        /// 尝试开始发送
+        /// </summary>
+        public virtual bool TrySend(bool onlyWait = false)
+        {
+            if (onlyWait)
+            {
+                return Interlocked.CompareExchange(ref _operation, 1, 0) == 0;
+            }
+
+            //return Interlocked.CompareExchange(ref _operation, 2, 3) != 2;
+            return Interlocked.CompareExchange(ref _operation, 1, 0) != 2;
+        }
+
+        /// <summary>
+        /// 尝试接收
+        /// </summary>
+        public virtual bool TryReceive(bool onlyWait = false)
+        {
+            if (onlyWait)
+            {
+                return Interlocked.CompareExchange(ref _operation, 2, 0) == 0;
+            }
+
+            //return Interlocked.CompareExchange(ref _operation, 2, 3) != 1;
+            return Interlocked.CompareExchange(ref _operation, 2, 0) != 1;
+        }
+
+        /// <summary>
+        /// 是否正处于操作
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool Operating()
+        {
+            return Interlocked.CompareExchange(ref _operation, 0, 0) != 0;
+        }
+
+        /// <summary>
+        /// 进入循环
+        /// </summary>
+        public virtual void InLooping()
+        {
+            Interlocked.Exchange(ref _operation, 3);
+        }
+
+        /// <summary>
+        /// 移出循环
+        /// </summary>
+        public virtual void OutLooping()
+        {
+            Interlocked.CompareExchange(ref _operation, 0, 3);
+        }
+
+        /// <summary>
+        /// 操作完成时执行
+        /// </summary>
+        public virtual void OperationCompleted()
+        {
+            Interlocked.Exchange(ref _operation, 0);
+        }
+
+        /// <summary>
+        /// 执行下步操作
+        /// </summary>
+        public abstract void NextStep(SocketAsyncEventArgs eventArgs);
+
+        /// <summary>
         /// 是否已经开始运行
         /// </summary>
         public virtual bool Connected
@@ -61,8 +133,8 @@ namespace FoolishGames.Net
             get
             {
                 return EventArgs != null
-                    && Socket != null
-                    && Socket.Connected;
+                       && Socket != null
+                       && Socket.Connected;
             }
         }
 
@@ -81,6 +153,14 @@ namespace FoolishGames.Net
         /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
         /// </summary>
         public virtual SocketAsyncEventArgs EventArgs { get; protected set; }
+
+        /// <summary>
+        /// 自定义数据结构
+        /// </summary>
+        public virtual UserToken UserToken
+        {
+            get { return (UserToken) EventArgs.UserToken; }
+        }
 
         /// <summary>
         /// 类型
@@ -118,6 +198,7 @@ namespace FoolishGames.Net
                 //throw new NullReferenceException("SocketAsyncEventArgs is null! Create socket failed.");
                 return;
             }
+
             EventArgs = eventArgs;
             Socket = EventArgs.AcceptSocket;
             UserToken userToken = eventArgs.UserToken as UserToken;
@@ -126,6 +207,8 @@ namespace FoolishGames.Net
                 userToken = new UserToken(eventArgs);
                 eventArgs.UserToken = userToken;
             }
+
+            //UserToken = userToken;
             userToken.Socket = this;
         }
 
@@ -139,7 +222,7 @@ namespace FoolishGames.Net
                 IsRunning = false;
                 if (EventArgs != null)
                 {
-                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
+                    //((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
                     if (Socket != null)
                     {
                         try
@@ -158,8 +241,9 @@ namespace FoolishGames.Net
                             Socket = null;
                         }
                     }
+
                     UserToken userToken;
-                    if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
+                    if ((userToken = UserToken) != null && userToken.Socket == this)
                     {
                         userToken.Socket = null;
                     }
@@ -173,7 +257,7 @@ namespace FoolishGames.Net
             {
                 try
                 {
-                    ((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
+                    //((UserToken)EventArgs.UserToken).ResetSendOrReceiveState(0);
                 }
                 catch (Exception e)
                 {
@@ -181,7 +265,7 @@ namespace FoolishGames.Net
                 }
 
                 UserToken userToken;
-                if ((userToken = EventArgs.UserToken as UserToken) != null && userToken.Socket == this)
+                if ((userToken = UserToken) != null && userToken.Socket == this)
                 {
                     userToken.Socket = null;
                 }
@@ -207,6 +291,7 @@ namespace FoolishGames.Net
                 {
                     FConsole.WriteExceptionWithCategory(Categories.SOCKET, "EventArgs dispose error.", e);
                 }
+
                 EventArgs = null;
             }
         }
@@ -214,12 +299,14 @@ namespace FoolishGames.Net
         /// <summary>
         /// 创建Socket的超类
         /// </summary>
-        public static SocketAsyncEventArgs MakeEventArgs(Socket socket, byte[] buffer = null, int offset = 0, int bufferSize = 8192)
+        public static SocketAsyncEventArgs MakeEventArgs(Socket socket, byte[] buffer = null, int offset = 0,
+            int bufferSize = 8192)
         {
             if (buffer == null)
             {
                 buffer = new byte[offset + bufferSize];
             }
+
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             // 设置缓冲区大小
             args.SetBuffer(buffer, offset % buffer.Length, bufferSize);

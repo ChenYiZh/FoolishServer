@@ -48,7 +48,7 @@ namespace Example
             FConsole.RegistLogger(new Logger());
 
             //IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
-            IClientSocket socket = FNetwork.MakeUdpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+            IClientSocket socket = FNetwork.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
             //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
