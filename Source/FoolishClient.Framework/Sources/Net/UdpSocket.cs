@@ -93,32 +93,9 @@ namespace FoolishClient.Net
                 throw new Exception(string.Format("Socket connect failed!"));
             }
 
-            //EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
             byte[] helloWords = Encoding.UTF8.GetBytes(ACCEPT_FLAG);
-            //Buffer.BlockCopy(helloWords, 0, EventArgs.Buffer, 0, helloWords.Length);
-            //EventArgs.SetBuffer(0, helloWords.Length);
             Sender.Push(this, helloWords, true);
-            //Socket.SendToAsync(EventArgs);
-            //while (Socket.SendToAsync(EventArgs)) { }
         }
 
-        // /// <summary>
-        // /// 当消息处理完执行
-        // /// </summary>
-        //protected internal override void MessageSolved(object sender, SocketAsyncEventArgs e)
-        //{
-        //    if (_waitToAccepted)
-        //    {
-        //        _waitToAccepted = false;
-        //        EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(MessageSolved);
-        //        byte[] helloWords = Encoding.UTF8.GetBytes("Author ChenYiZh");
-        //        EventArgs.SetBuffer(helloWords, 0, helloWords.Length);
-        //        Socket.SendAsync(EventArgs);
-        //    }
-        //    else
-        //    {
-        //        base.MessageSolved(sender, e);
-        //    }
-        //}
     }
 }

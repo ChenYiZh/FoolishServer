@@ -101,6 +101,7 @@ namespace FoolishServer.Net
             {
                 if (Socket.Poll(0, SelectMode.SelectRead))
                 {
+                    //Socket.rece
                     if (TryReceive(true))
                     {
                         Receiver.PostReceive(EventArgs);

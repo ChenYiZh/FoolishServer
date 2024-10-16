@@ -128,14 +128,11 @@ namespace FoolishGames.Net
             {
                 //先缓存数据
                 byte[] buffer = new byte[ioEventArgs.BytesTransferred];
-                lock (ioEventArgs)
+                //lock (ioEventArgs)
                 {
                     Buffer.BlockCopy(ioEventArgs.Buffer, ioEventArgs.Offset, buffer, 0, buffer.Length);
                 }
 
-                //byte[] argsBuffer = EventArgs.Buffer;
-                //int argsOffset = EventArgs.Offset;
-                //int argsLength = EventArgs.BytesTransferred;
                 byte[] argsBuffer = buffer;
                 int argsLength = buffer.Length;
 
