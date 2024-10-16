@@ -388,11 +388,6 @@
             内部函数，直接传bytes，会影响数据解析，以及解析顺序
             </summary>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.OnMessageReceived(FoolishGames.Net.IMessageEventArgs{FoolishServer.Net.IRemoteSocket})">
-            <summary>
-            定时处理消息
-            </summary>
-        </member>
         <member name="T:FoolishServer.Net.ServerProxy">
             <summary>
             通用基本服务器类
@@ -608,6 +603,11 @@
             字节流池
             </summary>
         </member>
+        <member name="F:FoolishServer.Net.ServerSocket._heartBeatsCheckingTimer">
+            <summary>
+            心跳检测线程
+            </summary>
+        </member>
         <member name="F:FoolishServer.Net.ServerSocket._loopingThread">
             <summary>
             待处理的Socket的等待线程
@@ -674,9 +674,9 @@
             消息接收处理
             </summary>
         </member>
-        <member name="M:FoolishServer.Net.ServerSocket.ProcessWaiting(System.Object)">
+        <member name="M:FoolishServer.Net.ServerSocket.HeartBeatsChecking(System.Object)">
             <summary>
-            待接收的套接字处理线程
+            心跳检测
             </summary>
         </member>
         <member name="M:FoolishServer.Net.ServerSocket.ReleaseIOEventArgs(System.Net.Sockets.SocketAsyncEventArgs)">

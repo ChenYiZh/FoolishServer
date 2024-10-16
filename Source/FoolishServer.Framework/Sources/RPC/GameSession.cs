@@ -60,7 +60,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 远端地址
         /// </summary>
-        public IPEndPoint RemoteAddress { get { return Socket?.Address; } }
+        public EndPoint RemoteAddress { get { return Socket?.Address; } }
 
         /// <summary>
         /// 自身的Socket

@@ -1645,6 +1645,12 @@
             <param name="msg"></param>
             <returns></returns>
         </member>
+        <member name="M:FoolishGames.Net.UserToken.HasMsg">
+            <summary>
+            是否有消息需要发送
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:FoolishGames.Proxy.IBoss">
             <summary>
             工头

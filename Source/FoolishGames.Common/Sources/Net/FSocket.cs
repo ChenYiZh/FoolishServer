@@ -141,7 +141,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 地址
         /// </summary>
-        public abstract IPEndPoint Address { get; }
+        public abstract EndPoint Address { get; }
 
         /// <summary>
         /// 原生套接字

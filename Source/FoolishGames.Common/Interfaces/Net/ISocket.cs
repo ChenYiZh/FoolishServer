@@ -53,7 +53,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 封装的地址
         /// </summary>
-        IPEndPoint Address { get; }
+        EndPoint Address { get; }
 
         /// <summary>
         /// 原生套接字

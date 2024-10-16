@@ -115,12 +115,12 @@ namespace FoolishServer.Net
         /// <summary>
         /// 地址
         /// </summary>
-        private IPEndPoint _address = null;
+        private EndPoint _address = null;
 
         /// <summary>
         /// 地址
         /// </summary>
-        public override IPEndPoint Address
+        public override EndPoint Address
         {
             get { return _address; }
         }
@@ -203,7 +203,7 @@ namespace FoolishServer.Net
             try
             {
                 //_address = Socket.RemoteEndPoint as IPEndPoint;
-                _address = EventArgs.RemoteEndPoint as IPEndPoint;
+                _address = EventArgs.RemoteEndPoint;// as IPEndPoint;
             }
             catch (Exception e)
             {
@@ -322,20 +322,21 @@ namespace FoolishServer.Net
         // {
         //     return Receiver == null || Sender == null || !Receiver.BeginReceive((TimeLord.Now - RefreshTime).TotalMilliseconds > Constants.HeartBeatsInterval) || !Sender.BeginSend();
         // }
-        private void OnMessageReceived(IMessageEventArgs<IRemoteSocket> e)
-        {
-            ((IServerMessageProcessor) Server).MessageReceived(e);
-        }
-
-        private void OnPong(IMessageEventArgs<IRemoteSocket> e)
-        {
-            RefreshTime = TimeLord.Now;
-            ((IServerMessageProcessor) Server).Pong(e);
-        }
-
-        private void OnPing(IMessageEventArgs<IRemoteSocket> e)
-        {
-            ((IServerMessageProcessor) Server).Ping(e);
-        }
+        
+        // private void OnMessageReceived(IMessageEventArgs<IRemoteSocket> e)
+        // {
+        //     ((IServerMessageProcessor) Server).MessageReceived(e);
+        // }
+        //
+        // private void OnPong(IMessageEventArgs<IRemoteSocket> e)
+        // {
+        //     RefreshTime = TimeLord.Now;
+        //     ((IServerMessageProcessor) Server).Pong(e);
+        // }
+        //
+        // private void OnPing(IMessageEventArgs<IRemoteSocket> e)
+        // {
+        //     ((IServerMessageProcessor) Server).Ping(e);
+        // }
     }
 }

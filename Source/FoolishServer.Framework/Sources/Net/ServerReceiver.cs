@@ -42,7 +42,7 @@ namespace FoolishGames.Net
     /// </summary>
     public abstract class ServerReceiver : SocketReceiver<IRemoteSocket>
     {
-        internal ServerReceiver(ISocket serverSocket):base(serverSocket)
+        internal ServerReceiver(ISocket serverSocket) : base(serverSocket)
         {
         }
 

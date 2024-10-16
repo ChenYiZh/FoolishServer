@@ -10,6 +10,7 @@
       "FoolishServer/1.0.0": {
         "dependencies": {
           "FoolishServer.Common": "1.0.0",
+          "FoolishServer.Framework": "1.0.0",
           "Microsoft.NETCore.App": "2.1.30"
         },
         "runtime": {

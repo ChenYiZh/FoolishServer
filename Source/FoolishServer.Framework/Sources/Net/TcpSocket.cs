@@ -1,6 +1,7 @@
 ﻿using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace FoolishServer.Net
             //https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socket.acceptasync?view=net-6.0
             if (!Socket.AcceptAsync(acceptEventArgs))
             {
-                //ProcessAccept(acceptEventArgs);
+                ProcessAccept(acceptEventArgs);
             }
         }
 
@@ -82,26 +83,25 @@ namespace FoolishServer.Net
                     continue;
                 }
 
-                foreach (RemoteSocket socket in sockets)
+                foreach (KeyValuePair<EndPoint, RemoteSocket> kv in sockets)
                 {
-                    if (socket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectRead))
+                    RemoteSocket remoteSocket = kv.Value;
+                    if (remoteSocket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectRead))
                     {
                         if (TryReceive(true))
                         {
-                            Receiver.PostReceive(socket.EventArgs);
+                            Receiver.PostReceive(remoteSocket.EventArgs);
+                            break;
                         }
-
-                        break;
                     }
 
-                    if (socket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectWrite))
+                    if (remoteSocket.EventArgs.AcceptSocket.Poll(0, SelectMode.SelectWrite))
                     {
-                        if (TrySend(true))
+                        if (remoteSocket.UserToken.HasMsg() && TrySend(true))
                         {
-                            Sender.PostSend(socket.EventArgs);
+                            Sender.PostSend(remoteSocket.EventArgs);
+                            break;
                         }
-
-                        break;
                     }
                 }
             }

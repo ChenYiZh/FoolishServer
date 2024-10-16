@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using FoolishServer.Net;
 
 namespace FoolishGames.Net
@@ -16,6 +17,7 @@ namespace FoolishGames.Net
                 return;
             }
 
+            ioEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, ((ServerSocket) Socket).Port);
             if (!Socket.Socket.ReceiveFromAsync(ioEventArgs))
             {
                 ProcessReceive(ioEventArgs);
@@ -32,6 +34,24 @@ namespace FoolishGames.Net
             {
                 ioEventArgs.AcceptSocket = null;
             }
+        }
+
+        public override void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
+        {
+            RemoteSocket socket;
+            if (((ServerSocket) Socket).sockets.TryGetValue(ioEventArgs.RemoteEndPoint, out socket))
+            {
+                ioEventArgs.UserToken = socket.UserToken;
+            }
+            else
+            {
+                ioEventArgs.UserToken = null;
+                ((ServerSocket) Socket).AcceptCompleted(Socket.Socket, ioEventArgs);
+                Socket.OperationCompleted();
+                return;
+            }
+
+            base.ProcessReceive(ioEventArgs);
         }
 
         public UdpServerReceiver(ServerSocket serverSocket) : base(serverSocket)

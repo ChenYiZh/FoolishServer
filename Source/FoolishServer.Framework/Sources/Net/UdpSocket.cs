@@ -39,13 +39,14 @@ namespace FoolishServer.Net
         /// </summary>
         protected internal override void OnPostAccept()
         {
+            return;
             //对象池里拿结构
             SocketAsyncEventArgs acceptEventArgs = acceptEventArgsPool.Pop() ?? CreateAcceptEventArgs();
             acceptEventArgs.SetBuffer(new byte[BUFFER_SIZE], 0, BUFFER_SIZE);
             acceptEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             if (!Socket.ReceiveFromAsync(acceptEventArgs))
             {
-                //ProcessAccept(acceptEventArgs);
+                ProcessAccept(acceptEventArgs);
             }
         }
 
@@ -68,7 +69,7 @@ namespace FoolishServer.Net
                     throw new AccessViolationException("The accept message is wrong.");
                 }
 
-                acceptEventArgs.AcceptSocket = sender as Socket;
+                //acceptEventArgs.AcceptSocket = sender as Socket;
                 ProcessAccept(acceptEventArgs);
             }
             catch (Exception e)
@@ -99,25 +100,30 @@ namespace FoolishServer.Net
         {
             while (IsRunning)
             {
+                if (Operating())
+                {
+                    continue;
+                }
+
                 if (Socket.Poll(0, SelectMode.SelectRead))
                 {
-                    //Socket.rece
                     if (TryReceive(true))
                     {
                         Receiver.PostReceive(EventArgs);
                     }
-
-                    continue;
                 }
 
                 if (Socket.Poll(0, SelectMode.SelectWrite))
                 {
-                    if (TrySend(true))
+                    foreach (KeyValuePair<EndPoint, RemoteSocket> kv in sockets)
                     {
-                        Sender.PostSend(EventArgs);
+                        RemoteSocket remoteSocket = kv.Value;
+                        if (remoteSocket.UserToken.HasMsg() && TrySend(true))
+                        {
+                            Sender.PostSend(remoteSocket.EventArgs);
+                            break;
+                        }
                     }
-
-                    continue;
                 }
             }
         }

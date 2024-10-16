@@ -95,7 +95,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 处理数据接收回调
         /// </summary>
-        public void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
+        public virtual void ProcessReceive(SocketAsyncEventArgs ioEventArgs)
         {
             if (ioEventArgs == null || ioEventArgs.UserToken == null)
             {

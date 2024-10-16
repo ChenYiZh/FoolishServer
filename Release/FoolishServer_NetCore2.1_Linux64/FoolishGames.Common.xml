@@ -90,7 +90,7 @@
             刚创建时处理，所有参数都还没有赋值
             </summary>
         </member>
-        <member name="F:FoolishGames.Action.GameAction.typeName">
+        <member name="F:FoolishGames.Action.GameAction._typeName">
             <summary>
             类名
             </summary>
@@ -498,12 +498,12 @@
             内容长度
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.readIndex">
+        <member name="F:FoolishGames.IO.MessageReader._readIndex">
             <summary>
             读取的数据指针
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.context">
+        <member name="F:FoolishGames.IO.MessageReader._context">
             <summary>
             通信包内容
             </summary>
@@ -513,7 +513,7 @@
             内容信息
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageReader.packetLength">
+        <member name="F:FoolishGames.IO.MessageReader._packetLength">
             <summary>
             包体长度
             </summary>
@@ -680,7 +680,7 @@
             内容信息
             </summary>
         </member>
-        <member name="F:FoolishGames.IO.MessageWriter.stream">
+        <member name="F:FoolishGames.IO.MessageWriter._stream">
             <summary>
             缓存池
             </summary>
@@ -1053,6 +1053,11 @@
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
+        <member name="P:FoolishGames.Net.ISocket.UserToken">
+            <summary>
+            自定义管理类
+            </summary>
+        </member>
         <member name="P:FoolishGames.Net.ISocket.Type">
             <summary>
             获取类型
@@ -1081,6 +1086,42 @@
         <member name="M:FoolishGames.Net.ISocket.Close(FoolishGames.Net.EOpCode)">
             <summary>
             关闭函数
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.TrySend(System.Boolean)">
+            <summary>
+            尝试开始发送
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.TryReceive(System.Boolean)">
+            <summary>
+            尝试开始接收
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.Operating">
+            <summary>
+            是否正处于操作阶段
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.OperationCompleted">
+            <summary>
+            操作完成时执行
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.NextStep(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            执行下步操作
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.InLooping">
+            <summary>
+            正在NextStep的循环中
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.ISocket.OutLooping">
+            <summary>
+            已经离开NextStep的循环中
             </summary>
         </member>
         <member name="T:FoolishGames.Net.IUserToken">
@@ -1136,7 +1177,7 @@
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs.setbuffer</para>
             </summary>
         </member>
-        <member name="F:FoolishGames.Net.BytePool.SyncRoot">
+        <member name="F:FoolishGames.Net.BytePool._syncRoot">
             <summary>
             锁
             </summary>
@@ -1192,6 +1233,47 @@
             是否在运行
             </summary>
         </member>
+        <member name="F:FoolishGames.Net.FSocket._operation">
+            <summary>
+            0：等待，1：发送，2：接收，3：在循环中
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.TrySend(System.Boolean)">
+            <summary>
+            尝试开始发送
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.TryReceive(System.Boolean)">
+            <summary>
+            尝试接收
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.Operating">
+            <summary>
+            是否正处于操作
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.InLooping">
+            <summary>
+            进入循环
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.OutLooping">
+            <summary>
+            移出循环
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.OperationCompleted">
+            <summary>
+            操作完成时执行
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.FSocket.NextStep(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            执行下步操作
+            </summary>
+        </member>
         <member name="P:FoolishGames.Net.FSocket.Connected">
             <summary>
             是否已经开始运行
@@ -1211,6 +1293,11 @@
             <summary>
             内部关键原生Socket
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.FSocket.UserToken">
+            <summary>
+            自定义数据结构
             </summary>
         </member>
         <member name="P:FoolishGames.Net.FSocket.Type">
@@ -1369,24 +1456,14 @@
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
         </member>
+        <member name="P:FoolishGames.Net.SocketReceiver`1.Socket">
+            <summary>
+            核心Socket
+            </summary>
+        </member>
         <member name="T:FoolishGames.Net.SocketReceiver`1.MessageReceiveEventHandler">
             <summary>
             收发消息处理
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.SocketReceiver`1.Socket">
-            <summary>
-            封装的套接字
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.SocketReceiver`1.EventArgs">
-            <summary>
-            增强类
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.SocketReceiver`1.UserToken">
-            <summary>
-            数据管理对象
             </summary>
         </member>
         <member name="F:FoolishGames.Net.SocketReceiver`1.OnMessageReceived">
@@ -1404,20 +1481,28 @@
             心跳回应事件
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketReceiver`1.#ctor(`0)">
-            <summary>
-            初始化
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketReceiver`1.BeginReceive(System.Boolean)">
-            <summary>
-            等待消息接收
-            </summary>
-            <returns>是否维持等待状态</returns>
-        </member>
-        <member name="M:FoolishGames.Net.SocketReceiver`1.ProcessReceive">
+        <member name="M:FoolishGames.Net.SocketReceiver`1.ProcessReceive(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             处理数据接收回调
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.SocketReceiver`1.CopySocketBuffer(System.Net.Sockets.SocketAsyncEventArgs,System.Byte[],System.Int32)">
+            <summary>
+            统一从缓存池读取数据
+            </summary>
+            <param name="ioEventArgs"></param>
+            <param name="to"></param>
+            <param name="offset"></param>
+        </member>
+        <member name="M:FoolishGames.Net.SocketReceiver`1.PostReceive(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            投递接收数据请求
+            </summary>
+            <param name="ioEventArgs"></param>
+        </member>
+        <member name="M:FoolishGames.Net.SocketReceiver`1.Close(System.Net.Sockets.SocketAsyncEventArgs,FoolishGames.Net.EOpCode)">
+            <summary>
+            关闭操作
             </summary>
         </member>
         <member name="T:FoolishGames.Net.SocketSender">
@@ -1430,123 +1515,24 @@
             套接字管理类
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.SocketSender.EventArgs">
-            <summary>
-            增强类
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.SocketSender.UserToken">
-            <summary>
-            数据管理对象
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.SocketSender.SendableSyncRoot">
-            <summary>
-            发送队列的锁
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessages">
-            <summary>
-            待发送的消息列表
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.SocketSender.messageNumber">
-            <summary>
-            消息Id，需要加原子锁
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.SocketSender.MessageNumber">
-            <summary>
-            消息Id
-            <para>get 返回时会自动 +1</para>
-            </summary>
-        </member>
         <member name="M:FoolishGames.Net.SocketSender.#ctor(FoolishGames.Net.ISocket)">
             <summary>
             消息发送处理类
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketSender.Send(FoolishGames.IO.IMessageWriter)">
-            <summary>
-            消息发送
-            </summary>
-            <param name="message">发送的消息</param>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.SendImmediately(FoolishGames.IO.IMessageWriter)">
-            <summary>
-            立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
-            </summary>
-            <param name="message">发送的消息</param>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.SendBytes(System.Byte[])">
-            <summary>
-            内部函数，直接传bytes，会影响数据解析
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.SendBytesImmediately(System.Byte[])">
-            <summary>
-            内部函数，直接传bytes，会影响数据解析，以及解析顺序
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.CheckIn(System.Byte[],System.Boolean)">
-            <summary>
-            挤入消息队列
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.CheckIn(FoolishGames.IO.IMessageWriter,System.Boolean)">
-            <summary>
-            挤入消息队列
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.CheckIn(FoolishGames.Net.SocketSender.WaitToSendMessage,System.Boolean)">
-            <summary>
-            挤入消息队列
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.Post(System.Byte[])">
-            <summary>
-            最后的消息推送
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.ProcessSend">
+        <member name="M:FoolishGames.Net.SocketSender.ProcessSend(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             消息发送处理
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.SocketSender.BeginSend">
+        <member name="M:FoolishGames.Net.SocketSender.PostSend(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             开始执行发送
             </summary>
-            <returns>是否维持等待状态</returns>
         </member>
-        <member name="M:FoolishGames.Net.SocketSender.SendCompleted">
+        <member name="M:FoolishGames.Net.SocketSender.SendCompleted(System.Net.Sockets.SocketAsyncEventArgs)">
             <summary>
             消息执行完后，判断还有没有需要继续发送的消息
-            </summary>
-        </member>
-        <member name="T:FoolishGames.Net.SocketSender.WaitToSendMessage">
-            <summary>
-            待发送的消息
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessage.Message">
-            <summary>
-            消息
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.SocketSender.WaitToSendMessage.Sender">
-            <summary>
-            发送接口的套接字
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.#ctor(FoolishGames.Net.SocketSender,System.Byte[])">
-            <summary>
-            构造函数
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.SocketSender.WaitToSendMessage.Work">
-            <summary>
-            执行函数
             </summary>
         </member>
         <member name="T:FoolishGames.Net.ESocketType">
@@ -1582,42 +1568,6 @@
         <member name="P:FoolishGames.Net.UserToken.Socket">
             <summary>
             嵌套的Socket
-            </summary>
-        </member>
-        <member name="F:FoolishGames.Net.UserToken.isSendingOrReceivingFlag">
-            <summary>
-            收发数据的标识
-            <para>0: 无状态; 1: 接收状态; 2: 发送状态</para>
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.UserToken.IsWaitingSendOrReceive">
-            <summary>
-            是否是待处理状态
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.UserToken.IsSending">
-            <summary>
-            是否正在发送数据
-            </summary>
-        </member>
-        <member name="P:FoolishGames.Net.UserToken.IsReceiving">
-            <summary>
-            是否正在接收数据
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.UserToken.Sendable">
-            <summary>
-            判断是否可以发送，如果可以则切换至发送状态
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.UserToken.Receivable">
-            <summary>
-            判断是否可以接收，如果可以则切换至接收状态
-            </summary>
-        </member>
-        <member name="M:FoolishGames.Net.UserToken.ResetSendOrReceiveState(System.Int32)">
-            <summary>
-            重置收发标识
             </summary>
         </member>
         <member name="P:FoolishGames.Net.UserToken.ReceivedStartIndex">
@@ -1664,6 +1614,42 @@
             <summary>
             设置原本的生成时的offset
             </summary>
+        </member>
+        <member name="F:FoolishGames.Net.UserToken._messageNumber">
+            <summary>
+            消息Id，需要加原子锁
+            </summary>
+        </member>
+        <member name="P:FoolishGames.Net.UserToken.MessageNumber">
+            <summary>
+            消息Id
+            <para>get 返回时会自动 +1</para>
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Net.UserToken._waitToSendMessages">
+            <summary>
+            待发送的消息列表
+            </summary>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.Push(System.Byte[],System.Boolean)">
+            <summary>
+            缓存需要发送的数据
+            </summary>
+            <param name="msg"></param>
+            <param name="immediate"></param>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.TryDequeueMsg(System.Byte[]@)">
+            <summary>
+            判断是否有数据并且返回第一个值
+            </summary>
+            <param name="msg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FoolishGames.Net.UserToken.HasMsg">
+            <summary>
+            是否有消息需要发送
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:FoolishGames.Proxy.IBoss">
             <summary>
@@ -1804,7 +1790,7 @@
             当前使用的计时控件
             </summary>
         </member>
-        <member name="F:FoolishGames.Timer.TimeLord.syncRoot">
+        <member name="F:FoolishGames.Timer.TimeLord._syncRoot">
             <summary>
             锁
             </summary>
@@ -2021,7 +2007,7 @@
             计时器
             </summary>
         </member>
-        <member name="F:FoolishGames.Timer.TimeWorker.schedules">
+        <member name="F:FoolishGames.Timer.TimeWorker._schedules">
             <summary>
             时间计划
             </summary>
@@ -2104,17 +2090,17 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.Execution">
+        <member name="F:FoolishGames.Common.CachePool`1._execution">
             <summary>
             队列操作
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.Pools">
+        <member name="F:FoolishGames.Common.CachePool`1._pools">
             <summary>
             缓存池
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.CurrentPoolIndex">
+        <member name="F:FoolishGames.Common.CachePool`1._currentPoolIndex">
             <summary>
             当前压入的缓存池索引
             </summary>
@@ -2139,7 +2125,7 @@
             循环中锁的最长等待时间
             </summary>
         </member>
-        <member name="F:FoolishGames.Common.CachePool`1.isReleased">
+        <member name="F:FoolishGames.Common.CachePool`1._isReleased">
             <summary>
             工作状态标识
             </summary>
@@ -2324,7 +2310,7 @@
             反射创建对象
             </summary>
         </member>
-        <member name="F:FoolishGames.Reflection.ObjectFactory.types">
+        <member name="F:FoolishGames.Reflection.ObjectFactory._types">
             <summary>
             缓存池
             </summary>

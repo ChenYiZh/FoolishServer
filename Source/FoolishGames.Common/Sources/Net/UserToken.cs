@@ -214,6 +214,15 @@ namespace FoolishGames.Net
             }
         }
 
+        /// <summary>
+        /// 是否有消息需要发送
+        /// </summary>
+        /// <returns></returns>
+        public bool HasMsg()
+        {
+            return _waitToSendMessages.Count > 0;
+        }
+
         #endregion
     }
 }

@@ -52,12 +52,12 @@ namespace FoolishClient.Net
         /// <summary>
         /// 地址
         /// </summary>
-        protected IPEndPoint address = null;
+        protected EndPoint address = null;
 
         /// <summary>
         /// 地址
         /// </summary>
-        public override IPEndPoint Address
+        public override EndPoint Address
         {
             get { return address; }
         }
@@ -337,7 +337,16 @@ namespace FoolishClient.Net
 
             if (Sender == null)
             {
-                Sender = new SocketSender(this);
+                Sender = null;
+                switch (Type)
+                {
+                    case ESocketType.Tcp:
+                        Sender = new TcpClientSender(this);
+                        break;
+                    case ESocketType.Udp:
+                        Sender = new UdpClientSender(this);
+                        break;
+                }
             }
 
             if (Receiver == null)
@@ -390,13 +399,14 @@ namespace FoolishClient.Net
                 {
                     continue;
                 }
-                
+
                 if (Socket.Poll(0, SelectMode.SelectRead))
                 {
                     if (TryReceive(true))
                     {
                         Receiver.PostReceive(EventArgs);
                     }
+
                     continue;
                 }
 
@@ -406,6 +416,7 @@ namespace FoolishClient.Net
                     {
                         Sender.PostSend(EventArgs);
                     }
+
                     continue;
                 }
             }
@@ -539,7 +550,7 @@ namespace FoolishClient.Net
             {
                 if (!Socket.Connected)
                 {
-                    throw new SocketException((int)SocketError.NotConnected);
+                    throw new SocketException((int) SocketError.NotConnected);
                 }
 
                 // 心跳包
@@ -570,7 +581,7 @@ namespace FoolishClient.Net
         {
             // 创建默认心跳包数据
             MessageWriter msg = new MessageWriter();
-            msg.OpCode = (sbyte)EOpCode.Pong;
+            msg.OpCode = (sbyte) EOpCode.Pong;
             return PackageFactory.Pack(msg, MessageOffset, null, null);
         }
 
@@ -591,7 +602,7 @@ namespace FoolishClient.Net
                 if (Sender != null)
                 {
                     MessageWriter msg = new MessageWriter();
-                    msg.OpCode = (sbyte)EOpCode.Close;
+                    msg.OpCode = (sbyte) EOpCode.Close;
                     byte[] closeMessage = PackageFactory.Pack(msg, MessageOffset, null, null);
                     //立即发送一条客户端关闭消息
                     try
@@ -753,7 +764,7 @@ namespace FoolishClient.Net
             {
                 if (MessageContractor != null)
                 {
-                    MessageContractor.CheckIn(new MessageWorker { Message = args.Message, Socket = this });
+                    MessageContractor.CheckIn(new MessageWorker {Message = args.Message, Socket = this});
                 }
                 else
                 {

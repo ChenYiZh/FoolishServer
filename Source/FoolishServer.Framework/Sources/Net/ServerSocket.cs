@@ -38,6 +38,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FoolishServer.Net
 {
@@ -103,7 +104,7 @@ namespace FoolishServer.Net
 
         private void Ping(IMessageEventArgs<IRemoteSocket> args)
         {
-            ((RemoteSocket)args.Socket).RefreshTime = TimeLord.Now;
+            ((RemoteSocket) args.Socket).RefreshTime = TimeLord.Now;
             OnPing?.Invoke(this, args);
         }
 
@@ -114,6 +115,7 @@ namespace FoolishServer.Net
 
         private void Pong(IMessageEventArgs<IRemoteSocket> args)
         {
+            ((RemoteSocket) args.Socket).RefreshTime = TimeLord.Now;
             OnPong?.Invoke(this, args);
         }
 
@@ -138,7 +140,7 @@ namespace FoolishServer.Net
         /// <summary>
         /// 封装的地址
         /// </summary>
-        public override IPEndPoint Address
+        public override EndPoint Address
         {
             get { return _address; }
         }
@@ -263,7 +265,8 @@ namespace FoolishServer.Net
         /// <summary>
         /// 等待消息处理的缓存列表，主要用于单线程处理
         /// </summary>
-        internal protected ThreadSafeHashSet<RemoteSocket> sockets = new ThreadSafeHashSet<RemoteSocket>();
+        internal protected ThreadSafeDictionary<EndPoint, RemoteSocket> sockets =
+            new ThreadSafeDictionary<EndPoint, RemoteSocket>();
 
         /// <summary>
         /// 生成的所有套接字管理对象都缓存在这里
@@ -276,9 +279,13 @@ namespace FoolishServer.Net
         private BytePool bytePool { get; set; }
 
         /// <summary>
+        /// 心跳检测线程
+        /// </summary>
+        private Timer _heartBeatsCheckingTimer;
+
+        /// <summary>
         /// 待处理的Socket的等待线程
         /// </summary>
-        //private Timer WaitingSocketTimer;
         private Thread _loopingThread;
 
         /// <summary>
@@ -334,7 +341,9 @@ namespace FoolishServer.Net
             _maxConnectionsEnforcer = new Semaphore(setting.MaxConnections, setting.MaxConnections);
             //生成套接字
             _address = new IPEndPoint(IPAddress.Any, Port);
-
+            EventArgs = new SocketAsyncEventArgs();
+            EventArgs.SetBuffer(new byte[bytePool.PoolInfo.SingleLength], 0, bytePool.PoolInfo.SingleLength);
+            EventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, Port);
             BuildSocket();
 
             Receiver = null;
@@ -342,13 +351,14 @@ namespace FoolishServer.Net
             {
                 case ESocketType.Tcp:
                     Receiver = new TcpServerReceiver(this);
+                    Sender = new TcpServerSender(this);
                     break;
                 case ESocketType.Udp:
                     Receiver = new UdpServerReceiver(this);
+                    Sender = new UdpServerSender(this);
                     break;
             }
 
-            Sender = new SocketSender(this);
 
             Receiver.OnMessageReceived = MessageReceived;
             Receiver.OnPing = Ping;
@@ -357,9 +367,11 @@ namespace FoolishServer.Net
             //服务器状态输出周期
             _summaryTask = new Timer(WriteSummary, null, 60000, 60000);
 
+            //心跳检测
+            int waitingInterval = Constants.HeartBeatsInterval;
+            _heartBeatsCheckingTimer = new Timer(HeartBeatsChecking, null, waitingInterval, waitingInterval);
+
             //待接收消息的套接字管理线程
-            //int waitingInterval = 10;
-            //WaitingSocketTimer = new Timer(ProcessWaiting, null, waitingInterval, waitingInterval);
             _loopingThread = new Thread(Looping);
             _loopingThread.Start();
             //启动监听
@@ -418,17 +430,20 @@ namespace FoolishServer.Net
                     // 生成连接对象
                     SocketAsyncEventArgs ioEventArgs = null;
                     RemoteSocket socket = null;
-                    if (_ioEventArgsPool.Count > 0)
+                    lock (sockets.SyncRoot)
                     {
-                        ioEventArgs = _ioEventArgsPool.Pop();
-                        ioEventArgs.AcceptSocket = acceptEventArgs.AcceptSocket;
-                        ioEventArgs.RemoteEndPoint = acceptEventArgs.RemoteEndPoint;
-                        //IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
-                        //ArrangeSocketBuffer(ioEventArgs);
-                        socket = new RemoteSocket(this, ioEventArgs);
-                        socket.AccessTime = TimeLord.Now;
-                        sockets.Add(socket);
-                        //((UserToken)ioEventArgs.UserToken).Socket = socket;
+                        if (!sockets.ContainsKey(acceptEventArgs.RemoteEndPoint) && _ioEventArgsPool.Count > 0)
+                        {
+                            ioEventArgs = _ioEventArgsPool.Pop();
+                            ioEventArgs.AcceptSocket = acceptEventArgs.AcceptSocket;
+                            ioEventArgs.RemoteEndPoint = acceptEventArgs.RemoteEndPoint;
+                            //IUserToken userToken = (IUserToken)ioEventArgs.UserToken;
+                            //ArrangeSocketBuffer(ioEventArgs);
+                            socket = new RemoteSocket(this, ioEventArgs);
+                            socket.AccessTime = TimeLord.Now;
+                            sockets.Add(acceptEventArgs.RemoteEndPoint, socket);
+                            //((UserToken)ioEventArgs.UserToken).Socket = socket;
+                        }
                     }
 
                     acceptEventArgs.AcceptSocket = null;
@@ -474,7 +489,11 @@ namespace FoolishServer.Net
         /// <param name="isRelease"></param>
         internal protected void ReleaseAccept(SocketAsyncEventArgs acceptEventArgs, bool isRelease = true)
         {
-            acceptEventArgsPool.Push(acceptEventArgs);
+            if (acceptEventArgs != EventArgs)
+            {
+                acceptEventArgsPool.Push(acceptEventArgs);
+            }
+
             if (isRelease)
             {
                 try
@@ -501,7 +520,7 @@ namespace FoolishServer.Net
                 //     return;
                 // } 
 
-                RemoteSocket socket = (RemoteSocket)userToken.Socket;
+                RemoteSocket socket = (RemoteSocket) userToken.Socket;
                 socket.AccessTime = TimeLord.Now;
                 switch (ioEventArgs.LastOperation)
                 {
@@ -564,31 +583,24 @@ namespace FoolishServer.Net
         }
 
         /// <summary>
-        /// 待接收的套接字处理线程
+        /// 心跳检测
         /// </summary>
-        private void ProcessWaiting(object state)
+        private void HeartBeatsChecking(object state)
         {
-            List<RemoteSocket> sockets;
-            lock (this.sockets.SyncRoot)
+            Dictionary<EndPoint, RemoteSocket> tSockets;
+            lock (sockets.SyncRoot)
             {
-                sockets = new List<RemoteSocket>(this.sockets);
+                tSockets = new Dictionary<EndPoint, RemoteSocket>(sockets);
             }
 
-            foreach (RemoteSocket socket in sockets)
+            Parallel.ForEach(tSockets, (KeyValuePair<EndPoint, RemoteSocket> kv) =>
             {
-                if ((TimeLord.Now - socket.RefreshTime).TotalMilliseconds > 2 * Constants.HeartBeatsInterval)
+                if ((TimeLord.Now - kv.Value.RefreshTime).TotalMilliseconds > 2 * Constants.HeartBeatsInterval)
                 {
                     //心跳超时2倍，直接关闭
-                    socket.Close();
-                    continue;
+                    kv.Value.Close();
                 }
-
-                ////不做这个处理会认为连接失败
-                //if ((TimeLord.Now - socket.AccessTime).TotalSeconds > 1)
-                //{
-                //socket.CheckSendOrReceive();
-                //}
-            }
+            });
         }
 
         /// <summary>
@@ -600,7 +612,7 @@ namespace FoolishServer.Net
             IUserToken userToken = ioEventArgs.UserToken as IUserToken;
             if (userToken != null)
             {
-                sockets.Remove((RemoteSocket)userToken.Socket);
+                RemoveSocket((RemoteSocket) userToken.Socket);
                 userToken.Reset();
                 //userToken.Socket = null;
             }
@@ -662,7 +674,7 @@ namespace FoolishServer.Net
                 FConsole.WriteException(e);
             }
 
-            sockets.Remove((RemoteSocket)socket);
+            RemoveSocket(socket);
             if (socket.EventArgs != null)
             {
                 IUserToken token = socket.UserToken;
@@ -738,6 +750,34 @@ namespace FoolishServer.Net
             }
         }
 
+        internal void RemoveSocket(IRemoteSocket remoteSocket)
+        {
+            lock (sockets.SyncRoot)
+            {
+                RemoteSocket value;
+                if (sockets.TryGetValue(remoteSocket.Address, out value) && value == remoteSocket)
+                {
+                    sockets.Remove(remoteSocket.Address);
+                    return;
+                }
+
+                EndPoint key = null;
+                foreach (KeyValuePair<EndPoint, RemoteSocket> kv in sockets)
+                {
+                    if (kv.Value == remoteSocket)
+                    {
+                        key = kv.Key;
+                        break;
+                    }
+                }
+
+                if (key != null)
+                {
+                    sockets.Remove(key);
+                }
+            }
+        }
+
         /// <summary>
         /// 设置缓冲区大小
         /// </summary>
@@ -774,29 +814,30 @@ namespace FoolishServer.Net
         {
             IsRunning = false;
             DisposeEventArgs();
-            List<RemoteSocket> sockets = new List<RemoteSocket>();
-            foreach (RemoteSocket socket in this.sockets)
+            List<RemoteSocket> remoteSockets = new List<RemoteSocket>();
+            foreach (KeyValuePair<EndPoint, RemoteSocket> kv in sockets)
             {
-                sockets.Add(socket);
+                remoteSockets.Add(kv.Value);
             }
 
-            foreach (RemoteSocket socket in sockets)
+            foreach (RemoteSocket remoteSocket in remoteSockets)
             {
                 try
                 {
-                    socket.Close();
+                    remoteSocket.Close();
                 }
                 catch
                 {
                 }
             }
 
-            this.sockets.Clear();
-            //if (WaitingSocketTimer != null)
-            //{
-            //    WaitingSocketTimer.Dispose();
-            //    WaitingSocketTimer = null;
-            //}
+            sockets.Clear();
+            if (_heartBeatsCheckingTimer != null)
+            {
+                _heartBeatsCheckingTimer.Dispose();
+                _heartBeatsCheckingTimer = null;
+            }
+
             if (_loopingThread != null)
             {
                 try
