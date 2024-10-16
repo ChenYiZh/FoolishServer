@@ -331,6 +331,7 @@ namespace FoolishClient.Net
                 Socket = MakeSocket();
                 //socket.ReceiveTimeout = 50;//此方法只能在同步模式下使用
                 EventArgs = MakeEventArgs(Socket);
+                //UserToken.Socket = this;
                 EventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnCompleted);
             }
 

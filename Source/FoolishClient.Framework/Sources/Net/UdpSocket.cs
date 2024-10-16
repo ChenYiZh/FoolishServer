@@ -102,9 +102,9 @@ namespace FoolishClient.Net
             //while (Socket.SendToAsync(EventArgs)) { }
         }
 
-        /// <summary>
-        /// 当消息处理完执行
-        /// </summary>
+        // /// <summary>
+        // /// 当消息处理完执行
+        // /// </summary>
         //protected internal override void MessageSolved(object sender, SocketAsyncEventArgs e)
         //{
         //    if (_waitToAccepted)

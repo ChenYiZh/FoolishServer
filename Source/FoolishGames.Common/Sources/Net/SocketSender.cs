@@ -217,14 +217,13 @@ namespace FoolishGames.Net
                 SendCompleted(ioEventArgs);
                 return;
             }
-
-            FConsole.Write("Send");
-            FConsole.Write(Thread.CurrentThread.ManagedThreadId);
+            
             // lock (EventArgs)
             // {
             byte[] argsBuffer = ioEventArgs.Buffer;
             int argsCount = ioEventArgs.Count;
             int argsOffset = ioEventArgs.Offset;
+            FConsole.Write($"Send: ({userToken.SendingBuffer.Length}, {userToken.SendedCount}), Thread: {Thread.CurrentThread.ManagedThreadId}");
             if (argsCount >= userToken.SendingBuffer.Length - userToken.SendedCount)
             {
                 int length = userToken.SendingBuffer.Length - userToken.SendedCount;
@@ -304,7 +303,7 @@ namespace FoolishGames.Net
             // }
             //
             // BeginSend();
-
+            ioEventArgs.SetBuffer(ioEventArgs.Offset, ((UserToken)ioEventArgs.UserToken).OriginalLength);
             Socket.NextStep(ioEventArgs);
         }
 

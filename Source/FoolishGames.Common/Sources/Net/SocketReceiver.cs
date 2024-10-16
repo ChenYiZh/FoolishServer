@@ -190,7 +190,7 @@ namespace FoolishGames.Net
                     while (offset < argsLength)
                     {
                         int totalLength =
-                            PackageFactory.GetTotalLength(argsBuffer, offset + userToken.Socket.MessageOffset);
+                            PackageFactory.GetTotalLength(argsBuffer, offset + Socket.MessageOffset);
                         //包头解析不全
                         if (totalLength < 0)
                         {
@@ -212,9 +212,9 @@ namespace FoolishGames.Net
                             break;
                         }
 
-                        offset += userToken.Socket.MessageOffset;
-                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, userToken.Socket.Compression,
-                            userToken.Socket.CryptoProvider);
+                        offset += Socket.MessageOffset;
+                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, Socket.Compression,
+                            Socket.CryptoProvider);
                         messages.Add(message);
                         offset = totalLength;
                     }
@@ -275,6 +275,7 @@ namespace FoolishGames.Net
             {
                 //数据错乱
                 userToken.ReceivedBuffer = null;
+                userToken.Reset();
                 //return;
             }
 

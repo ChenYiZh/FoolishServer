@@ -428,7 +428,7 @@ namespace FoolishServer.Net
                         socket = new RemoteSocket(this, ioEventArgs);
                         socket.AccessTime = TimeLord.Now;
                         sockets.Add(socket);
-                        //userToken.Socket = socket;
+                        //((UserToken)ioEventArgs.UserToken).Socket = socket;
                     }
 
                     acceptEventArgs.AcceptSocket = null;
