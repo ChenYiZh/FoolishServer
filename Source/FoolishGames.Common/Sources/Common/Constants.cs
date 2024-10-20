@@ -38,5 +38,15 @@ namespace FoolishGames.Common
         /// 心跳包间隔
         /// </summary>
         public const int HeartBeatsInterval = 10000;
+
+        /// <summary>
+        /// Ping间隔
+        /// </summary>
+        public const int PingInterval = 1000;
+
+        /// <summary>
+        /// Ping显示的最大往返时间
+        /// </summary>
+        public const int MaxRoundtripTime = 999;
     }
 }

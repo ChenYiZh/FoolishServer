@@ -38,9 +38,11 @@ using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FoolishClient.Net
 {
@@ -52,7 +54,7 @@ namespace FoolishClient.Net
         /// <summary>
         /// 地址
         /// </summary>
-        protected EndPoint address = null;
+        protected IPEndPoint address = null;
 
         /// <summary>
         /// 地址
@@ -76,6 +78,42 @@ namespace FoolishClient.Net
         /// 服务器端口
         /// </summary>
         public int Port { get; private set; }
+
+        /// <summary>
+        /// Ping 的往返时间，最大值为Constants.MaxRoundtripTime
+        /// </summary>
+        private int _roundtripTime = Constants.MaxRoundtripTime;
+
+        /// <summary>
+        /// Ping 的往返时间，最大值为Constants.MaxRoundtripTime
+        /// </summary>
+        public int RoundtripTime
+        {
+            get
+            {
+                return _roundtripTime;
+            }
+        }
+
+        /// <summary>
+        /// Ping对象
+        /// </summary>
+        Ping _ping = null;
+
+        /// <summary>
+        /// 是否使用Ping
+        /// </summary>
+        public bool UsePing { get; private set; }
+
+        /// <summary>
+        /// Ping间隔
+        /// </summary>
+        public int PingInterval { get; private set; }
+
+        /// <summary>
+        /// Ping线程
+        /// </summary>
+        internal protected virtual Timer PingTimer { get; set; } = null;
 
         /// <summary>
         /// 运行的标识
@@ -209,9 +247,12 @@ namespace FoolishClient.Net
         /// <param name="port"></param>
         /// <param name="actionClassFullName">Action协议类的完整名称</param>
         /// <param name="heartbeatInterval">心跳间隔</param>
+        /// <param name="usePing">是否使用 Ping 延迟</param>
+        /// <param name="pingInterval">Ping 间隔</param>
         public virtual void Ready(string name, string host, int port,
             string actionClassFullName,
-            int heartbeatInterval = Constants.HeartBeatsInterval)
+            int heartbeatInterval = Constants.HeartBeatsInterval,
+            bool usePing = true, int pingInterval = Constants.PingInterval)
         {
             Name = name;
             Host = host;
@@ -220,6 +261,8 @@ namespace FoolishClient.Net
             Category = string.Format("{0}:{1},{2}", GetType().Name, Host, Port);
             ActionProvider = new ClientActionDispatcher(actionClassFullName);
             HeartbeatInterval = heartbeatInterval;
+            UsePing = usePing;
+            PingInterval = pingInterval;
             FConsole.WriteInfoFormatWithCategory(Category, "Socket is ready...");
             Interlocked.Exchange(ref _readyFlag, 1);
         }
@@ -282,10 +325,48 @@ namespace FoolishClient.Net
                 RebuildHeartbeatPackage();
             }
 
-            //if (SendOrReceiveTimer == null)
-            //{
-            //    SendOrReceiveTimer = new Timer(CheckSendOrReceive, null, 15, 15);
-            //}
+            if (UsePing)
+            {
+                if (PingTimer == null)
+                {
+                    PingTimer = new Timer(BeginPing, null, 0, PingInterval);
+                }
+                if (_ping == null)
+                {
+                    _ping = new Ping();
+                    _ping.PingCompleted += OnPingCompleted;
+                }
+            }
+            else
+            {
+                if (PingTimer != null)
+                {
+                    try
+                    {
+                        PingTimer.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Category, "PingTimer dispose error.", e);
+                    }
+
+                    PingTimer = null;
+                }
+
+                if (_ping != null)
+                {
+                    try
+                    {
+                        _ping.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Category, "PingTimer dispose error.", e);
+                    }
+
+                    _ping = null;
+                }
+            }
 
             if (LoopingThread == null)
             {
@@ -550,7 +631,7 @@ namespace FoolishClient.Net
             {
                 if (!Socket.Connected)
                 {
-                    throw new SocketException((int) SocketError.NotConnected);
+                    throw new SocketException((int)SocketError.NotConnected);
                 }
 
                 // 心跳包
@@ -581,7 +662,7 @@ namespace FoolishClient.Net
         {
             // 创建默认心跳包数据
             MessageWriter msg = new MessageWriter();
-            msg.OpCode = (sbyte) EOpCode.Pong;
+            msg.OpCode = (sbyte)EOpCode.Pong;
             return PackageFactory.Pack(msg, MessageOffset, null, null);
         }
 
@@ -602,7 +683,7 @@ namespace FoolishClient.Net
                 if (Sender != null)
                 {
                     MessageWriter msg = new MessageWriter();
-                    msg.OpCode = (sbyte) EOpCode.Close;
+                    msg.OpCode = (sbyte)EOpCode.Close;
                     byte[] closeMessage = PackageFactory.Pack(msg, MessageOffset, null, null);
                     //立即发送一条客户端关闭消息
                     try
@@ -626,36 +707,39 @@ namespace FoolishClient.Net
                     }
                     catch (Exception e)
                     {
-                        FConsole.WriteExceptionWithCategory(Category, "HeartbeatTime dispose error.", e);
+                        FConsole.WriteExceptionWithCategory(Category, "HeartbeatTimer dispose error.", e);
                     }
 
                     HeartbeatTimer = null;
                 }
-                //if (ThreadProcessReceive != null)
-                //{
-                //    try
-                //    {
-                //        ThreadProcessReceive.Abort();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        FConsole.WriteExceptionWithCategory(Category, "ThreadProcessReceive abort error.", e);
-                //    }
-                //    ThreadProcessReceive = null;
-                //}    
 
-                //if (SendOrReceiveTimer != null)
-                //{
-                //    try
-                //    {
-                //        SendOrReceiveTimer.Dispose();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        FConsole.WriteExceptionWithCategory(Category, "SendOrReceiveTimer dispose error.", e);
-                //    }
-                //    SendOrReceiveTimer = null;
-                //}
+                if (PingTimer != null)
+                {
+                    try
+                    {
+                        PingTimer.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Category, "PingTimer dispose error.", e);
+                    }
+
+                    PingTimer = null;
+                }
+
+                if (_ping != null)
+                {
+                    try
+                    {
+                        _ping.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        FConsole.WriteExceptionWithCategory(Category, "PingTimer dispose error.", e);
+                    }
+
+                    _ping = null;
+                }
 
                 if (LoopingThread != null)
                 {
@@ -764,7 +848,7 @@ namespace FoolishClient.Net
             {
                 if (MessageContractor != null)
                 {
-                    MessageContractor.CheckIn(new MessageWorker {Message = args.Message, Socket = this});
+                    MessageContractor.CheckIn(new MessageWorker { Message = args.Message, Socket = this });
                 }
                 else
                 {
@@ -804,6 +888,34 @@ namespace FoolishClient.Net
             {
                 FConsole.WriteExceptionWithCategory(Category, "ActionProvider error.", e);
             }
+        }
+
+        /// <summary>
+        /// Ping延迟
+        /// </summary>
+        public virtual void BeginPing(object state)
+        {
+            if (_ping == null)
+            {
+                _ping = new Ping();
+            }
+            _ping.SendAsync(address.Address, Math.Min(PingInterval, Constants.MaxRoundtripTime), null);
+        }
+
+        private void OnPingCompleted(object sender, PingCompletedEventArgs e)
+        {
+            if (e.Error != null || e.Reply == null)
+            {
+                Interlocked.Exchange(ref _roundtripTime, Constants.MaxRoundtripTime);
+                return;
+            }
+            PingReply reply = e.Reply;
+            if (reply.Status != IPStatus.Success)
+            {
+                Interlocked.Exchange(ref _roundtripTime, Constants.MaxRoundtripTime);
+                return;
+            }
+            Interlocked.Exchange(ref _roundtripTime, (int)reply.RoundtripTime);
         }
     }
 }

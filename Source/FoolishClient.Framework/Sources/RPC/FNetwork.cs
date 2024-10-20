@@ -6,7 +6,6 @@ using FoolishGames.IO;
 using FoolishGames.Log;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FoolishClient.RPC
 {
@@ -135,6 +134,24 @@ namespace FoolishClient.RPC
                 }
             }
             _sockets.Clear();
+        }
+
+        /// <summary>
+        /// 获取 Ping 的往返时间，最大值为Constants.MaxRoundtripTime
+        /// </summary>
+        /// <returns></returns>
+        public static int GetRoundtripTime()
+        {
+            return GetRoundtripTime(DefaultUsableSocketName);
+        }
+
+        /// <summary>
+        /// 获取 Ping 的往返时间，最大值为Constants.MaxRoundtripTime
+        /// </summary>
+        /// <returns></returns>
+        public static int GetRoundtripTime(string serverName)
+        {
+            return GetSocket(serverName).RoundtripTime;
         }
     }
 }

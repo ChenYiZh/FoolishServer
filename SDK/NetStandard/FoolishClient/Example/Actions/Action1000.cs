@@ -38,7 +38,7 @@ namespace Example.Actions
     {
         public override void TakeAction(IMessageReader reader)
         {
-            FConsole.Write("SessionId: " + reader.ReadString());
+            FConsole.Write($"SessionId: {reader.ReadString()}, Msg: {reader.ReadString()}");
         }
     }
 }

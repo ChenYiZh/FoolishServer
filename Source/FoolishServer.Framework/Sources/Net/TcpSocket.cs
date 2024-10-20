@@ -48,6 +48,7 @@ namespace FoolishServer.Net
         {
             try
             {
+                acceptEventArgs.RemoteEndPoint = acceptEventArgs.AcceptSocket.RemoteEndPoint;
                 ProcessAccept(acceptEventArgs);
             }
             catch (Exception e)

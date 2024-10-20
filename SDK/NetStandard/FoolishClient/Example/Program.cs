@@ -33,7 +33,9 @@ using FoolishGames.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Example
@@ -47,8 +49,8 @@ namespace Example
             FConsole.LogStackLevels.Add("Warn");
             FConsole.RegistLogger(new Logger());
 
-            //IClientSocket socket = Network.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
-            IClientSocket socket = FNetwork.MakeUdpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+            IClientSocket tcpSocket = FNetwork.MakeTcpSocket("default", "127.0.0.1", 9001, "Example.Actions.Action{0}");
+            IClientSocket udpSocket = FNetwork.MakeUdpSocket("udpSocket", "127.0.0.1", 9002, "Example.Actions.Action{0}");
             //socket.MessageOffset = 2;
             //socket.Compression = new GZipCompression();
             //socket.CryptoProvide = new AESCryptoProvider("FoolishGames", "ChenYiZh");
@@ -62,26 +64,48 @@ namespace Example
             //message.Compress = false;
             message.WriteString("Hello World!");
             //Console.Read();
-            FNetwork.Send(1000, message);
+            //FNetwork.Send(1000, message);
             //Console.Read();
-            FNetwork.Send(1000, message);
-            FNetwork.Send(1000, message);
-            FNetwork.Send(1000, message);
-            while (true)
-            {
-                Console.ReadLine();
-                if (socket.IsRunning)
-                {
-                    socket.Close();
-                }
-                else
-                {
-                    FNetwork.Send(1000, message);
-                    FNetwork.Send(1000, message);
-                    FNetwork.Send(1000, message);
-                    FNetwork.Send(1000, message);
-                }
-            }
+            //FNetwork.Send(1000, message);
+            //FNetwork.Send(1000, message);
+            //FNetwork.Send(1000, message);
+
+            FNetwork.Send("default", 1000, message);
+            FNetwork.Send("udpSocket", 1000, message);
+
+            //ThreadPool.UnsafeQueueUserWorkItem((stat) =>
+            //{
+            //    for (int i = 0; i < 10000; i++)
+            //    {
+            //        FNetwork.Send("default", 1000, message);
+            //        FNetwork.Send("udpSocket", 1000, message);
+            //        Thread.Sleep(1);
+            //    }
+            //}, null);
+
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    int ping = FNetwork.GetRoundtripTime();
+            //    FConsole.Write(ping);
+            //    Thread.Sleep(100);
+            //}
+
+            Console.Read();
+            //while (true)
+            //{
+            //    Console.ReadLine();
+            //    if (socket.IsRunning)
+            //    {
+            //        socket.Close();
+            //    }
+            //    else
+            //    {
+            //        FNetwork.Send(1000, message);
+            //        FNetwork.Send(1000, message);
+            //        FNetwork.Send(1000, message);
+            //        FNetwork.Send(1000, message);
+            //    }
+            //}
         }
     }
 }

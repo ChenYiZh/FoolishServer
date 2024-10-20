@@ -26,6 +26,7 @@ SOFTWARE.
 using FoolishGames.Net;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Text;
 
 namespace FoolishClient.Net
@@ -35,5 +36,9 @@ namespace FoolishClient.Net
     /// </summary>
     public interface IClientSocket : ISendableSocket, IReceivableSocket, IMsgSocket
     {
+        /// <summary>
+        /// Ping 往返时间，最大值为Constants.MaxRoundtripTime
+        /// </summary>
+        int RoundtripTime { get; }
     }
 }

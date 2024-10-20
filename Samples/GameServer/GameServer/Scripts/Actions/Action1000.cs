@@ -49,6 +49,7 @@ namespace FoolishServer.Actions
             Test entity = set.Find(1000, "Hello World!");
             entity.Password = "123456789";
             MessageWriter msg = new MessageWriter();
+            msg.WriteString("SessionId: " + Session.SessionId);
             msg.WriteString("服务器回复: " + entity.UserName);
             Session.Send(1000, msg);
         }
