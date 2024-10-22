@@ -24,37 +24,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "LogLevel.generated.h"
+
+/**
+ * 输出等级
+ */
+UCLASS(NotBlueprintable, NotBlueprintType, DisplayName="Log Level")
+class FOOLISHGAMES_API ULogLevel : public UBlueprintFunctionLibrary
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
+public:
+	/**
+	 * DEBUG
+	 */
+	inline const static FName LOG_DEBUG = FName(TEXT("Debug"));
+	/**
+	 * INFO
+	 */
+	inline const static FName LOG_INFO = FName(TEXT("Info"));
+	/**
+	 * WARN
+	 */
+	inline const static FName LOG_WARN = FName(TEXT("Warn"));
+	/**
+	 * ERROR
+	 */
+	inline const static FName LOG_ERROR = FName(TEXT("Exception"));
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+public:
+	/**
+	 * DEBUG
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Log Level", DisplayName="DEBUG")
+	static FName GET_DEBUG();
+
+	/**
+	 * INFO
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Log Level", DisplayName="INFO")
+	static FName GET_INFO();
+
+	/**
+	 * WARN
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Log Level", DisplayName="WARN")
+	static FName GET_WARN();
+
+	/**
+	 * ERROR
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Log Level", DisplayName="ERROR")
+	static FName GET_ERROR();
+};

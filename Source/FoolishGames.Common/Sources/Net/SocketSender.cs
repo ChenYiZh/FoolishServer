@@ -58,10 +58,6 @@ namespace FoolishGames.Net
         public void Push(ISocket socket, byte[] msg, bool immediate)
         {
             ((UserToken) socket.EventArgs.UserToken).Push(msg, immediate);
-            // if (Socket.TrySend(true))
-            // {
-            //     ThreadPool.UnsafeQueueUserWorkItem((state) => { PostSend(socket.EventArgs); }, null);
-            // }
         }
 
         /// <summary>
@@ -71,7 +67,6 @@ namespace FoolishGames.Net
         {
             if (ioEventArgs == null)
             {
-                //return true;
                 Socket.OperationCompleted();
                 return;
             }
@@ -79,39 +74,29 @@ namespace FoolishGames.Net
             UserToken userToken = (UserToken) ioEventArgs.UserToken;
             if (userToken.SendingBuffer == null)
             {
-                //if (UserToken.IsSending)
-                //{
-                //    return true;
-                //}
                 SendCompleted(ioEventArgs);
                 return;
             }
 
-            // lock (EventArgs)
-            // {
             byte[] argsBuffer = ioEventArgs.Buffer;
             int argsCount = ioEventArgs.Count;
             int argsOffset = ioEventArgs.Offset;
-            // FConsole.Write(
-            //     $"Send: ({userToken.SendingBuffer.Length}, {userToken.SendedCount}), Thread: {Thread.CurrentThread.ManagedThreadId}");
-            if (argsCount >= userToken.SendingBuffer.Length - userToken.SendedCount)
+            if (argsCount >= userToken.SendingBuffer.Length - userToken.SentCount)
             {
-                int length = userToken.SendingBuffer.Length - userToken.SendedCount;
-                Buffer.BlockCopy(userToken.SendingBuffer, userToken.SendedCount, argsBuffer, argsOffset, length);
+                int length = userToken.SendingBuffer.Length - userToken.SentCount;
+                Buffer.BlockCopy(userToken.SendingBuffer, userToken.SentCount, argsBuffer, argsOffset, length);
                 ioEventArgs.SetBuffer(argsOffset, length);
                 userToken.Reset();
             }
             else
             {
-                Buffer.BlockCopy(userToken.SendingBuffer, userToken.SendedCount, argsBuffer, argsOffset, argsCount);
+                Buffer.BlockCopy(userToken.SendingBuffer, userToken.SentCount, argsBuffer, argsOffset, argsCount);
                 ioEventArgs.SetBuffer(argsOffset, argsCount);
-                userToken.SendedCount += argsCount;
+                userToken.SentCount += argsCount;
             }
-            //}
 
             if (Socket == null || Socket.Socket == null)
             {
-                //return false;
                 Socket.OperationCompleted();
                 return;
             }
@@ -140,7 +125,7 @@ namespace FoolishGames.Net
                 if (usertoken.TryDequeueMsg(out msg))
                 {
                     usertoken.SendingBuffer = msg;
-                    usertoken.SendedCount = 0;
+                    usertoken.SentCount = 0;
                     ProcessSend(ioEventArgs);
                 }
                 else

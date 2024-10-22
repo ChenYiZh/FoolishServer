@@ -24,37 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "IPacketWatch.h"
+#include "UObject/Object.h"
+#include "TimeLord.generated.h"
+
+/**
+ * 时间管理类
+ */
+UCLASS(NotBlueprintable, NotBlueprintType, DisplayName="Time Lord")
+class FOOLISHGAMES_API UTimeLord final : public UBlueprintFunctionLibrary
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
+private:
+	/**
+	 * 当前使用的计时控件
+	 */
+	inline static UObject* PacketWatch = nullptr;
+	/**
+	 * 线程锁
+	 */
+	inline static FCriticalSection Mutex;
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+public:
+	/**
+	 * 设置时间控件
+	 */
+	UFUNCTION(BlueprintCallable, Category="Foolish Games|Time Lord")
+	static void SetPacketWatch(UObject* Watch);
+
+	/**
+	 * 获取当前时间
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Time Lord")
+	static FDateTime Now();
+
+	/**
+	 * 获取当前时间
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Time Lord")
+	static FDateTime UTC();
+};

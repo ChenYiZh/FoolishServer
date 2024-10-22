@@ -24,37 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "IPacketWatch.generated.h"
+
+/**
+ * 时间对象类
+ */
+UINTERFACE()
+class UIPacketWatch : public UInterface
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
+};
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+/**
+ * 时间对象类
+ */
+class FOOLISHGAMES_API IIPacketWatch
+{
+	GENERATED_BODY()
+public:
+	/**
+	 * 获取当前时间
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Foolish Games|Time Lord")
+	FDateTime Now();
+
+	/**
+	 * 获取UTC时间
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Foolish Games|Time Lord")
+	FDateTime UTC();
+	/**
+	 * 开始时候调用一般用于AddToRoot
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Foolish Games|Time Lord")
+	void OnUse();
+
+	/**
+	 * 移除时调用一般用于RemoveFromRoot
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Foolish Games|Time Lord")
+	void OnRelease();
+};

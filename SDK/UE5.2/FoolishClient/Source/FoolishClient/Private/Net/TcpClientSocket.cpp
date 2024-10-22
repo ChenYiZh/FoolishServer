@@ -24,37 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
 
-namespace FoolishGames.Net
+#include "Net/TcpClientSocket.h"
+
+#include "Sockets.h"
+
+FSocket* UTcpClientSocket::MakeSocket()
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	FSocket* FSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(
+		NAME_Stream, GetName().ToString() + TEXT("_") + FString::FromInt(FDateTime::Now().GetTicks()), false);
+	return FSocket;
+}
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
+void UTcpClientSocket::BeginConnectImpl()
+{
+	if (!Socket->Connect(GetAddress()))
+	{
+		throw TEXT("Socket connect failed!");
+	}
 }

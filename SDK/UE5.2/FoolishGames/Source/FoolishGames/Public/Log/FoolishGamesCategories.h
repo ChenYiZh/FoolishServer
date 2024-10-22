@@ -24,37 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "FoolishGamesCategories.generated.h"
+
+/**
+ * 类别类
+ */
+UCLASS(NotBlueprintable, NotBlueprintType, DisplayName="Foolish Games|Categories")
+class FOOLISHGAMES_API UFoolishGamesCategories final : public UBlueprintFunctionLibrary
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+public:
+	/**
+	 * TIME_LORD
+	 */
+	inline const static FName TIME_LORD = FName(TEXT("Time Lord"));
+	/**
+	 * REFLECTION
+	 */
+	inline const static FName REFLECTION = FName(TEXT("Reflection"));
+	/**
+	 * HTTP
+	 */
+	inline const static FName HTTP = FName(TEXT("Http"));
+
+public:
+	/**
+	 * TIME_LORD
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Categories", DisplayName="TIME LORD")
+	static FName GET_TIME_LORD();
+	/**
+	 * REFLECTION
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Categories", DisplayName="REFLECTION")
+	static FName GET_REFLECTION();
+	/**
+	 * HTTP
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Categories", DisplayName="HTTP")
+	static FName GET_HTTP();
+};

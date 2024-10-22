@@ -95,7 +95,7 @@ namespace FoolishGames.Net
         /// <summary>
         /// 已经发送的字节数量
         /// </summary>
-        public int SendedCount { get; internal set; }
+        public int SentCount { get; internal set; }
 
         /// <summary>
         /// 原本的生成时的offset

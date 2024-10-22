@@ -141,7 +141,6 @@ namespace FoolishClient.Net
         /// <summary>
         /// 数据处理线程
         /// </summary>
-        //internal protected virtual Timer SendOrReceiveTimer { get; set; } = null;
         internal protected virtual Thread LoopingThread { get; set; } = null;
 
         /// <summary>
@@ -372,25 +371,7 @@ namespace FoolishClient.Net
             {
                 LoopingThread = new Thread(Looping);
                 LoopingThread.Start();
-                //Receiver.PostReceive(EventArgs);
-                // SendOrReceiveThread = new Thread(CheckSendOrReceive);
-                // try
-                // {
-                //     SendOrReceiveThread.Start();
-                // }
-                // catch
-                // {
-                //     return false;
-                // }
             }
-
-            ////开始监听数据
-            //ThreadProcessReceive = new Thread(new ThreadStart(ProcessReceive));
-            //ThreadProcessReceive.Start();
-
-            //BeginReceive();
-
-            //Sender.PostSend(EventArgs);
 
             FConsole.WriteInfoFormatWithCategory(Category, "Socket connected.");
 
@@ -506,120 +487,12 @@ namespace FoolishClient.Net
         public override void NextStep(SocketAsyncEventArgs eventArgs)
         {
             OperationCompleted();
-            return;
-            InLooping();
-            while (true)
-            {
-                if (Socket.Poll(-1, SelectMode.SelectRead))
-                {
-                    if (TryReceive(true))
-                    {
-                        Receiver.PostReceive(eventArgs);
-                    }
-
-                    return;
-                }
-
-                if (Socket.Poll(-1, SelectMode.SelectWrite))
-                {
-                    if (TrySend(true))
-                    {
-                        Sender.PostSend(eventArgs);
-                    }
-
-                    return;
-                }
-            }
         }
 
         /// <summary>
         /// 创建原生套接字
         /// </summary>
         protected abstract Socket MakeSocket();
-
-        /// <summary>
-        /// 等待的线程锁，防止产生多组线程
-        /// </summary>
-        private int _waitingFlag = 0;
-
-        // /// <summary>
-        // /// 当消息处理完执行
-        // /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-        // /// </summary>
-        // internal protected virtual void MessageSolved(object sender, SocketAsyncEventArgs e)
-        // {
-        //     if (EventArgs == null)
-        //     {
-        //         return;
-        //     }
-        //
-        //     // 等待操作处理
-        //     //bool bWaiting = false;
-        //     try
-        //     {
-        //         // determine which type of operation just completed and call the associated handler
-        //         switch (e.LastOperation)
-        //         {
-        //             case SocketAsyncOperation.Receive:
-        //             case SocketAsyncOperation.ReceiveFrom:
-        //                 Receiver.ProcessReceive(e);
-        //                 break;
-        //             case SocketAsyncOperation.Send:
-        //             case SocketAsyncOperation.SendTo:
-        //
-        //                 Sender.ProcessSend();
-        //                 break;
-        //             default:
-        //                 throw new ArgumentException(
-        //                     "The last operation completed on the socket was not a receive or send");
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         FConsole.WriteExceptionWithCategory(Categories.SOCKET, ex);
-        //     }
-        //
-        //     // if (bWaiting && Interlocked.CompareExchange(ref _waitingFlag, 1, 0) == 0)
-        //     // {
-        //     //     while (Receiver != null && Sender != null && Receiver.BeginReceive() && Sender.BeginSend())
-        //     //     {
-        //     //         Thread.Sleep(10);
-        //     //     }
-        //     //
-        //     //     Interlocked.Exchange(ref _waitingFlag, 0);
-        //     // }
-        // }
-
-        /// <summary>
-        /// 定时处理消息
-        /// </summary>
-        internal void CheckSendOrReceive(object state)
-        {
-            Thread.Sleep(50);
-            while (IsRunning)
-            {
-                try
-                {
-                    if (Socket.Poll(5, SelectMode.SelectRead))
-                    {
-                        Receiver.PostReceive(EventArgs);
-                    }
-                    else
-                    {
-                        Sender.PostSend(EventArgs);
-                    }
-                }
-                catch
-                {
-                }
-
-                Thread.Sleep(1);
-            }
-            // if (Receiver != null && !Receiver.BeginReceive())
-            // {
-            //     Sender?.BeginSend();
-            // }
-        }
 
         /// <summary>
         /// 发送心跳包
@@ -749,7 +622,7 @@ namespace FoolishClient.Net
                     }
                     catch (Exception e)
                     {
-                        FConsole.WriteExceptionWithCategory(Category, "SendOrReceiveThread abort error.", e);
+                        FConsole.WriteExceptionWithCategory(Category, "LoopThread abort error.", e);
                     }
 
                     LoopingThread = null;

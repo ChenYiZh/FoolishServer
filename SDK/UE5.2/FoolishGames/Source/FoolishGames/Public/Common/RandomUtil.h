@@ -24,37 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "RandomUtil.generated.h"
+
+/**
+ * 随机数管理
+ */
+UCLASS(DisplayName="Foolish Games|Random")
+class FOOLISHGAMES_API URandomUtil : public UBlueprintFunctionLibrary
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
-
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+	GENERATED_BODY()
+public:
+	/**
+	 * 随机一个字节
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Random", DisplayName="Random Range (Byte)")
+	static uint8 RandomByte();
+	/**
+	 * 范围随机
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Random", DisplayName="Random Range (Int)")
+	static int32 RandomInt(int32 Min, int32 Max);
+	/**
+	 * 范围随机
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Random", DisplayName="Random Range (Float)")
+	static float RandomFloat(float Min, float Max);
+	/**
+	 * 范围随机
+	 */
+	UFUNCTION(BlueprintPure, Category="Foolish Games|Random", DisplayName="Random Range (Double)")
+	static double RandomDouble(double Min, double Max);
+};

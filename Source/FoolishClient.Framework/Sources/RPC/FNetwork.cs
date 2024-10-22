@@ -32,16 +32,17 @@ namespace FoolishClient.RPC
         /// <param name="port"></param>
         /// <param name="actionClassFullName">Action协议类的完整名称</param>
         /// <param name="heartbeatInterval">心跳间隔</param>
-        public static TcpSocket MakeTcpSocket(string name, string host, int port,
+        public static TcpClientSocket MakeTcpSocket(string name, string host, int port,
             string actionClassFullName,
-            int heartbeatInterval = Constants.HeartBeatsInterval)
+            int heartbeatInterval = Constants.HeartBeatsInterval,
+            bool usePing = true, int pingInterval = Constants.PingInterval)
         {
-            TcpSocket socket = new TcpSocket();
+            TcpClientSocket socket = new TcpClientSocket();
             if (!MakeSocket(name, socket))
             {
                 throw new Exception("The same key: " + name + " exists in Network sockets.");
             }
-            socket.Ready(name, host, port, actionClassFullName, heartbeatInterval);
+            socket.Ready(name, host, port, actionClassFullName, heartbeatInterval, usePing, pingInterval);
             return socket;
         }
 
@@ -53,16 +54,17 @@ namespace FoolishClient.RPC
         /// <param name="port"></param>
         /// <param name="actionClassFullName">Action协议类的完整名称</param>
         /// <param name="heartbeatInterval">心跳间隔</param>
-        public static UdpSocket MakeUdpSocket(string name, string host, int port,
+        public static UdpClientSocket MakeUdpSocket(string name, string host, int port,
             string actionClassFullName,
-            int heartbeatInterval = Constants.HeartBeatsInterval)
+            int heartbeatInterval = Constants.HeartBeatsInterval,
+            bool usePing = true, int pingInterval = Constants.PingInterval)
         {
-            UdpSocket socket = new UdpSocket();
+            UdpClientSocket socket = new UdpClientSocket();
             if (!MakeSocket(name, socket))
             {
                 throw new Exception("The same key: " + name + " exists in Network sockets.");
             }
-            socket.Ready(name, host, port, actionClassFullName, heartbeatInterval);
+            socket.Ready(name, host, port, actionClassFullName, heartbeatInterval, usePing, pingInterval);
             return socket;
         }
 

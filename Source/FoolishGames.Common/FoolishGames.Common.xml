@@ -1585,7 +1585,7 @@
             正在发送的数据
             </summary>
         </member>
-        <member name="P:FoolishGames.Net.UserToken.SendedCount">
+        <member name="P:FoolishGames.Net.UserToken.SentCount">
             <summary>
             已经发送的字节数量
             </summary>
@@ -2161,6 +2161,16 @@
         <member name="F:FoolishGames.Common.Constants.HeartBeatsInterval">
             <summary>
             心跳包间隔
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.Constants.PingInterval">
+            <summary>
+            Ping间隔
+            </summary>
+        </member>
+        <member name="F:FoolishGames.Common.Constants.MaxRoundtripTime">
+            <summary>
+            Ping显示的最大往返时间
             </summary>
         </member>
         <member name="T:FoolishGames.Common.FType`1">

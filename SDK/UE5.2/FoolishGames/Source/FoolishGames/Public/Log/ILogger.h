@@ -24,37 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "ILogger.generated.h"
+
+// This class does not need to be modified.
+UINTERFACE()
+class UILogger : public UInterface
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
+};
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+/**
+ * 日志保存接口
+ */
+class FOOLISHGAMES_API IILogger
+{
+	GENERATED_BODY()
+
+	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+public:
+	/**
+	 * 保存日志
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Foolish Games|Logger")
+	void SaveLog(const FName& Level, const FString& Message, const bool AddToScreen, const float TimeToDisplay);
+	/**
+	 * 保存日志
+	 */
+	virtual void SaveLog_Implementation(const FName& Level, const FString& Message, const bool AddToScreen,
+	                                    const float TimeToDisplay);
+};

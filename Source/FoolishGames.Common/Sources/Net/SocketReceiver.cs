@@ -103,7 +103,7 @@ namespace FoolishGames.Net
                 return;
             }
 
-            UserToken userToken = (UserToken) ioEventArgs.UserToken;
+            UserToken userToken = (UserToken)ioEventArgs.UserToken;
             if (ioEventArgs.BytesTransferred == 0)
             {
                 Socket.OperationCompleted();
@@ -195,7 +195,7 @@ namespace FoolishGames.Net
                             //userToken.ReceivedBuffer = new byte[buffer.Length - offset];
                             userToken.ReceivedBuffer = new byte[argsLength - offset];
                             Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0,
-                                userToken.ReceivedBuffer.Length);
+                                argsLength - offset);
                             break;
                         }
 
@@ -205,13 +205,12 @@ namespace FoolishGames.Net
                             userToken.ReceivedStartIndex = argsLength - offset;
                             userToken.ReceivedBuffer = new byte[totalLength - offset];
                             Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0, totalLength - offset);
-                            //Buffer.BlockCopy(argsBuffer, offset, userToken.ReceivedBuffer, 0, argsLength);
                             break;
                         }
 
                         offset += Socket.MessageOffset;
-                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, Socket.Compression,
-                            Socket.CryptoProvider);
+                        IMessageReader message = PackageFactory.Unpack(argsBuffer, offset, userToken.Socket.Compression,
+                            userToken.Socket.CryptoProvider);
                         messages.Add(message);
                         offset = totalLength;
                     }
@@ -234,30 +233,30 @@ namespace FoolishGames.Net
 
                         switch (message.OpCode)
                         {
-                            case (sbyte) EOpCode.Close:
-                            {
-                                // TODO: 检查关闭协议是否有效
-                                //Close(ioEventArgs, EOpCode.Empty);
-                                Close(ioEventArgs, EOpCode.Empty);
-                            }
+                            case (sbyte)EOpCode.Close:
+                                {
+                                    // TODO: 检查关闭协议是否有效
+                                    //Close(ioEventArgs, EOpCode.Empty);
+                                    Close(ioEventArgs, EOpCode.Empty);
+                                }
                                 break;
-                            case (sbyte) EOpCode.Ping:
-                            {
-                                Ping(new MessageReceiverEventArgs<TSocket>
-                                    {Socket = (TSocket) userToken.Socket, Message = message});
-                            }
+                            case (sbyte)EOpCode.Ping:
+                                {
+                                    Ping(new MessageReceiverEventArgs<TSocket>
+                                    { Socket = (TSocket)userToken.Socket, Message = message });
+                                }
                                 break;
-                            case (sbyte) EOpCode.Pong:
-                            {
-                                Pong(new MessageReceiverEventArgs<TSocket>
-                                    {Socket = (TSocket) userToken.Socket, Message = message});
-                            }
+                            case (sbyte)EOpCode.Pong:
+                                {
+                                    Pong(new MessageReceiverEventArgs<TSocket>
+                                    { Socket = (TSocket)userToken.Socket, Message = message });
+                                }
                                 break;
                             default:
-                            {
-                                MessageReceived(new MessageReceiverEventArgs<TSocket>
-                                    {Socket = (TSocket) userToken.Socket, Message = message});
-                            }
+                                {
+                                    MessageReceived(new MessageReceiverEventArgs<TSocket>
+                                    { Socket = (TSocket)userToken.Socket, Message = message });
+                                }
                                 break;
                         }
                     }

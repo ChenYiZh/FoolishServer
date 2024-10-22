@@ -24,37 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ****************************************************************************/
 
-using FoolishGames.Common;
-using FoolishGames.IO;
-using FoolishGames.Log;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using FoolishClient.Net;
+#pragma once
 
-namespace FoolishGames.Net
+#include "CoreMinimal.h"
+#include "ClientSocket.h"
+#include "UObject/Object.h"
+#include "TcpClientSocket.generated.h"
+
+/**
+ * Tcp连接池
+ */
+UCLASS(DisplayName="Tcp Socket")
+class FOOLISHCLIENT_API UTcpClientSocket : public UClientSocket
 {
-    /// <summary>
-    /// 消息接收处理类
-    /// <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
-    /// </summary>
-    public abstract class ClientReceiver : SocketReceiver<IClientSocket>
-    {
-        public ClientReceiver(ISocket socket) : base(socket)
-        {
-        }
+	GENERATED_BODY()
 
-        /// <summary>
-        /// 关闭操作
-        /// </summary>
-        protected override void Close(SocketAsyncEventArgs ioEventArgs, EOpCode opCode)
-        {
-            if (ioEventArgs != null && ioEventArgs.UserToken != null)
-            {
-                ((UserToken) ioEventArgs.UserToken).Socket?.Close(opCode);
-            }
-        }
-    }
-}
+public:
+	/**  类型 */
+	EFSocketType GetType() override
+	{
+		return EFSocketType::Tcp;
+	}
+
+protected:
+	/** 建立原生套接字 */
+	virtual FSocket* MakeSocket() override;
+
+protected:
+	/** 创建连接 */
+	virtual void BeginConnectImpl() override;
+};
