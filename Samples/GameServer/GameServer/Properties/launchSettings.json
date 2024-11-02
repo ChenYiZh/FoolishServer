@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "GameServer": {
-      "commandName": "Executable",
-      "executablePath": "./FoolishServer.exe",
-      "workingDirectory": "./FoolishServer"
-    }
-  }
-}
