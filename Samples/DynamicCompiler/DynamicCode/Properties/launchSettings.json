@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "DynamicCode": {
+      "commandName": "Executable",
+      "executablePath": ".\\Execution.exe",
+      "workingDirectory": ".\\Execution.NetCore"
+    }
+  }
+}

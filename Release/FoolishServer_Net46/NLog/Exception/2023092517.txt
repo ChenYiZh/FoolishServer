@@ -1,0 +1,6 @@
+2023/9/25 17:44:19 [Foolish Server] - Failed to start the server.
+未能加载文件或程序集“Mono.Cecil, Version=0.11.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e”或它的某一个依赖项。系统找不到指定的文件。
+   在 FoolishServer.Runtime.ILInjection.InjectEntityChangeEvent()
+   在 FoolishServer.Config.Configeration.Initialize()
+   在 FoolishServer.Runtime.RuntimeHost.Startup()
+

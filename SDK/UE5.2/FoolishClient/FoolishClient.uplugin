@@ -1,0 +1,29 @@
+﻿{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "Foolish Client",
+  "Description": "Foolish Client",
+  "Category": "Foolish Games",
+  "CreatedBy": "ChenYiZh",
+  "CreatedByURL": "https://github.com/ChenYiZh/FoolishServer",
+  "DocsURL": "https://github.com/ChenYiZh/FoolishServer/wiki",
+  "MarketplaceURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": true,
+  "EnabledByDefault": true,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "FoolishClient",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "FoolishGames",
+      "Enabled": true
+    }
+  ]
+}
