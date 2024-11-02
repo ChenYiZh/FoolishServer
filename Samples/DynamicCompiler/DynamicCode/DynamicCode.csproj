@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Execution.Net4.6\**" />
+    <Compile Remove="Execution.NetCore\**" />
+    <Compile Remove="Execution\**" />
+    <EmbeddedResource Remove="Execution.Net4.6\**" />
+    <EmbeddedResource Remove="Execution.NetCore\**" />
+    <EmbeddedResource Remove="Execution\**" />
+    <None Remove="Execution.Net4.6\**" />
+    <None Remove="Execution.NetCore\**" />
+    <None Remove="Execution\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\FoolishGames.Common\FoolishGames.Common.csproj" />
+  </ItemGroup>
+
+</Project>
