@@ -249,7 +249,7 @@ namespace FoolishServer.Net
         /// </summary>
         /// <param name="message">大宋的消息</param>
         /// <returns>判断有没有发送出去</returns>
-        public void Send(IMessageWriter message)
+        public void Send(MessageWriter message)
         {
             byte[] data = PackageFactory.Pack(message, MessageOffset, Compression, CryptoProvider);
             ((ServerSocket) Server).Sender.Push(this, data, false);
@@ -262,7 +262,7 @@ namespace FoolishServer.Net
         [Obsolete(
             "Only used in important message. This method will confuse the message queue. You can use 'Send' instead.",
             false)]
-        public void SendImmediately(IMessageWriter message)
+        public void SendImmediately(MessageWriter message)
         {
             byte[] data = PackageFactory.Pack(message, MessageOffset, Compression, CryptoProvider);
             ((ServerSocket) Server).Sender.Push(this, data, true);

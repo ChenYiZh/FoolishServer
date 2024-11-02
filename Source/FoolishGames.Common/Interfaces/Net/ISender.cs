@@ -49,13 +49,13 @@ namespace FoolishGames.Net
         /// </summary>
         /// <param name="message">大宋的消息</param>
         /// <returns>判断有没有发送出去</returns>
-        void Send(IMessageWriter message);
+        void Send(MessageWriter message);
         /// <summary>
         /// 立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
         /// </summary>
         /// <param name="message">发送的消息</param>
         [Obsolete("Only used in important message. This method will confuse the message queue. You can use 'Send' instead.", false)]
-        void SendImmediately(IMessageWriter message);
+        void SendImmediately(MessageWriter message);
         ///// <summary>
         ///// 内部函数，直接传bytes，会影响数据解析
         ///// </summary>

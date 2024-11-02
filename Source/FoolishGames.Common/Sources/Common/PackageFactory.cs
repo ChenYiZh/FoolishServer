@@ -64,7 +64,7 @@ namespace FoolishGames.Common
         /// <summary>
         /// 打包
         /// </summary>
-        public static byte[] Pack(IMessageWriter message, int offset, ICompression compression, ICryptoProvider cryptography)
+        public static byte[] Pack(MessageWriter message, int offset, ICompression compression, ICryptoProvider cryptography)
         {
             byte[] context = message.GetContext();
             byte[] buffer = new byte[MessageInfo.HeaderLength + message.ContextLength];

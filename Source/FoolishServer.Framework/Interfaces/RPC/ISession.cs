@@ -115,6 +115,6 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 异步发送一条数据
         /// </summary>
-        void Send(int actionId, IMessageWriter message);
+        void Send(int actionId, MessageWriter message);
     }
 }

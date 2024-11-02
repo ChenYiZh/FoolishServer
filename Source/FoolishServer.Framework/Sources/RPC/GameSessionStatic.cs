@@ -101,7 +101,7 @@ namespace FoolishServer.RPC
         /// <param name="actionId">协议id</param>
         /// <param name="message">消息</param>
         /// <param name="sessions">目标Session</param>
-        public static void Send(int actionId, IMessageWriter message, IEnumerable<GameSession> sessions)
+        public static void Send(int actionId, MessageWriter message, IEnumerable<GameSession> sessions)
         {
             message.ActionId = actionId;
             foreach (GameSession session in sessions)

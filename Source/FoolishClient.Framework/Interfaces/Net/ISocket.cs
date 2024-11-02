@@ -115,7 +115,7 @@ namespace FoolishClient.Net
         /// <param name="data"></param>
         /// <param name="callback">发送回调</param>
         /// <returns>判断有没有发送出去</returns>
-        void SendAsync(IMessageWriter message, SendCallback callback = null);
+        void SendAsync(MessageWriter message, SendCallback callback = null);
 
         /// <summary>
         /// 关闭函数

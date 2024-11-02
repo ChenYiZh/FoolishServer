@@ -178,7 +178,7 @@ namespace FoolishServer.RPC
         /// <summary>
         /// 异步发送一条数据
         /// </summary>
-        public void Send(int actionId, IMessageWriter message)
+        public void Send(int actionId, MessageWriter message)
         {
             message.ActionId = actionId;
             message.OpCode = 0;

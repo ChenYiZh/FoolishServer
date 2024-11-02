@@ -98,7 +98,7 @@
             重新构建心跳包数据
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ISocketsss.SendAsync(FoolishGames.IO.IMessageWriter,FoolishClient.Delegate.SendCallback)">
+        <member name="M:FoolishClient.Net.ISocketsss.SendAsync(FoolishGames.IO.MessageWriter,FoolishClient.Delegate.SendCallback)">
             <summary>
             数据发送<c>异步</c>
             </summary>
@@ -344,14 +344,14 @@
             设置解密方案
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.Send(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishClient.Net.ClientSocket.Send(FoolishGames.IO.MessageWriter)">
             <summary>
             数据发送<c>异步</c>
             </summary>
             <param name="message">大宋的消息</param>
             <returns>判断有没有发送出去</returns>
         </member>
-        <member name="M:FoolishClient.Net.ClientSocket.SendImmediately(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishClient.Net.ClientSocket.SendImmediately(FoolishGames.IO.MessageWriter)">
             <summary>
             立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
             </summary>
@@ -383,64 +383,64 @@
             Ping延迟
             </summary>
         </member>
-        <member name="T:FoolishClient.Net.TcpSocket">
+        <member name="T:FoolishClient.Net.TcpClientSocket">
             <summary>
             Tcp连接池
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.TcpSocket.#ctor">
+        <member name="M:FoolishClient.Net.TcpClientSocket.#ctor">
             <summary>
             初始化
             </summary>
         </member>
-        <member name="P:FoolishClient.Net.TcpSocket.Type">
+        <member name="P:FoolishClient.Net.TcpClientSocket.Type">
             <summary>
             类型
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.TcpSocket.MakeSocket">
+        <member name="M:FoolishClient.Net.TcpClientSocket.MakeSocket">
             <summary>
             建立原生套接字
             </summary>
             <returns></returns>
         </member>
-        <member name="M:FoolishClient.Net.TcpSocket.BeginConnectImpl">
+        <member name="M:FoolishClient.Net.TcpClientSocket.BeginConnectImpl">
             <summary>
             创建连接
             </summary>
         </member>
-        <member name="T:FoolishClient.Net.UdpSocket">
+        <member name="T:FoolishClient.Net.UdpClientSocket">
             <summary>
             Tcp连接池
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.UdpSocket.#ctor">
+        <member name="M:FoolishClient.Net.UdpClientSocket.#ctor">
             <summary>
             初始化
             </summary>
         </member>
-        <member name="P:FoolishClient.Net.UdpSocket.Type">
+        <member name="P:FoolishClient.Net.UdpClientSocket.Type">
             <summary>
             类型
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.UdpSocket._waitToAccepted">
+        <member name="F:FoolishClient.Net.UdpClientSocket._waitToAccepted">
             <summary>
             等待握手
             </summary>
         </member>
-        <member name="F:FoolishClient.Net.UdpSocket.ACCEPT_FLAG">
+        <member name="F:FoolishClient.Net.UdpClientSocket.ACCEPT_FLAG">
             <summary>
             握手标示
             </summary>
         </member>
-        <member name="M:FoolishClient.Net.UdpSocket.MakeSocket">
+        <member name="M:FoolishClient.Net.UdpClientSocket.MakeSocket">
             <summary>
             建立原生套接字
             </summary>
             <returns></returns>
         </member>
-        <member name="M:FoolishClient.Net.UdpSocket.BeginConnectImpl">
+        <member name="M:FoolishClient.Net.UdpClientSocket.BeginConnectImpl">
             <summary>
             创建连接
             </summary>
@@ -555,13 +555,13 @@
             获取指定的Socket
             </summary>
         </member>
-        <member name="M:FoolishClient.RPC.FNetwork.Send(System.Int32,FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishClient.RPC.FNetwork.Send(System.Int32,FoolishGames.IO.MessageWriter)">
             <summary>
             使用默认套接字来发送消息
             <para>通过DefaultUsableSocketName来配置默认的套接字名称</para>
             </summary>
         </member>
-        <member name="M:FoolishClient.RPC.FNetwork.Send(System.String,System.Int32,FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishClient.RPC.FNetwork.Send(System.String,System.Int32,FoolishGames.IO.MessageWriter)">
             <summary>
             使用套接字来发送消息
             </summary>
@@ -599,6 +599,12 @@
             消息接收处理类
             <para>https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketasynceventargs</para>
             </summary>
+        </member>
+        <member name="M:FoolishGames.Net.TcpClientReceiver.PostReceive(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>
+            投递接收数据请求
+            </summary>
+            <param name="ioEventArgs"></param>
         </member>
         <member name="T:FoolishGames.Net.UdpClientReceiver">
             <summary>

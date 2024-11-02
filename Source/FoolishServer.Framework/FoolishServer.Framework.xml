@@ -365,14 +365,14 @@
             </summary>
             <param name="key">新的id</param>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.Send(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.Net.RemoteSocket.Send(FoolishGames.IO.MessageWriter)">
             <summary>
             数据发送<c>异步</c>
             </summary>
             <param name="message">大宋的消息</param>
             <returns>判断有没有发送出去</returns>
         </member>
-        <member name="M:FoolishServer.Net.RemoteSocket.SendImmediately(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.Net.RemoteSocket.SendImmediately(FoolishGames.IO.MessageWriter)">
             <summary>
             立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
             </summary>
@@ -1071,7 +1071,7 @@
             关闭会话窗口
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.ISession.Send(System.Int32,FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.RPC.ISession.Send(System.Int32,FoolishGames.IO.MessageWriter)">
             <summary>
             异步发送一条数据
             </summary>
@@ -1185,7 +1185,7 @@
             关闭Session
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.MessageWriter)">
             <summary>
             异步发送一条数据
             </summary>
@@ -1210,7 +1210,7 @@
             通过Guid获取Session
             </summary>
         </member>
-        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.IMessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
+        <member name="M:FoolishServer.RPC.GameSession.Send(System.Int32,FoolishGames.IO.MessageWriter,System.Collections.Generic.IEnumerable{FoolishServer.RPC.GameSession})">
             <summary>
             异步给一堆客户端发消息
             </summary>

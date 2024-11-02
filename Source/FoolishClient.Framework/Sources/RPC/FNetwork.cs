@@ -104,7 +104,7 @@ namespace FoolishClient.RPC
         /// 使用默认套接字来发送消息
         /// <para>通过DefaultUsableSocketName来配置默认的套接字名称</para>
         /// </summary>
-        public static void Send(int actionId, IMessageWriter message)
+        public static void Send(int actionId, MessageWriter message)
         {
             Send(DefaultUsableSocketName, actionId, message);
         }
@@ -112,7 +112,7 @@ namespace FoolishClient.RPC
         /// <summary>
         /// 使用套接字来发送消息
         /// </summary>
-        public static void Send(string socketName, int actionId, IMessageWriter message)
+        public static void Send(string socketName, int actionId, MessageWriter message)
         {
             message.ActionId = actionId;
             message.OpCode = 0;

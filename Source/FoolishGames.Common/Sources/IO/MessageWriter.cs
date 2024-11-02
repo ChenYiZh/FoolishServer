@@ -36,7 +36,7 @@ namespace FoolishGames.IO
     /// <summary>
     /// 通讯数据构建
     /// </summary>
-    public class MessageWriter : MessageInfo, IMessageHeader, IMessageWriter
+    public sealed class MessageWriter : MessageInfo, IMessageHeader
     {
         /// <summary>
         /// 消息Id

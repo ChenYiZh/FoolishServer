@@ -308,106 +308,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:FoolishGames.IO.IMessageWriter">
-            <summary>
-            数据写入
-            </summary>
-        </member>
-        <member name="P:FoolishGames.IO.IMessageWriter.MsgId">
-            <summary>
-            消息Id
-            </summary>
-        </member>
-        <member name="P:FoolishGames.IO.IMessageWriter.OpCode">
-            <summary>
-            操作码
-            </summary>
-        </member>
-        <member name="P:FoolishGames.IO.IMessageWriter.ActionId">
-            <summary>
-            通讯协议Id
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteHeader(System.Byte[],System.Int32)">
-            <summary>
-            写入消息头数据
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteBool(System.Boolean)">
-            <summary>
-            写入Boolean
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteChar(System.Char)">
-            <summary>
-            写入Char
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteFloat(System.Single)">
-            <summary>
-            写入Float
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteDouble(System.Double)">
-            <summary>
-            写入Double
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteDecimal(System.Decimal)">
-            <summary>
-            写入Decimal
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteSByte(System.SByte)">
-            <summary>
-            写入SByte
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteShort(System.Int16)">
-            <summary>
-            写入Short
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteInt(System.Int32)">
-            <summary>
-            写入Int
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteLong(System.Int64)">
-            <summary>
-            写入Long
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteByte(System.Byte)">
-            <summary>
-            写入Byte
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteUShort(System.UInt16)">
-            <summary>
-            写入UShort
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteUInt(System.UInt32)">
-            <summary>
-            写入UInt
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteULong(System.UInt64)">
-            <summary>
-            写入ULong
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteDateTime(System.DateTime)">
-            <summary>
-            写入时间
-            </summary>
-        </member>
-        <member name="M:FoolishGames.IO.IMessageWriter.WriteString(System.String)">
-            <summary>
-            写入字符串
-            </summary>
-        </member>
         <member name="T:FoolishGames.IO.FPath">
             <summary>
             路径管理类
@@ -1009,14 +909,14 @@
             消息Id
             </summary>
         </member>
-        <member name="M:FoolishGames.Net.ISender.Send(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishGames.Net.ISender.Send(FoolishGames.IO.MessageWriter)">
             <summary>
             数据发送<c>异步</c>
             </summary>
             <param name="message">大宋的消息</param>
             <returns>判断有没有发送出去</returns>
         </member>
-        <member name="M:FoolishGames.Net.ISender.SendImmediately(FoolishGames.IO.IMessageWriter)">
+        <member name="M:FoolishGames.Net.ISender.SendImmediately(FoolishGames.IO.MessageWriter)">
             <summary>
             立即发送消息，会打乱消息顺序。只有类似心跳包这种及时的需要用到。一般使用Send就满足使用
             </summary>
@@ -2229,7 +2129,7 @@
             消息处理类
             </summary>
         </member>
-        <member name="M:FoolishGames.Common.PackageFactory.Pack(FoolishGames.IO.IMessageWriter,System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
+        <member name="M:FoolishGames.Common.PackageFactory.Pack(FoolishGames.IO.MessageWriter,System.Int32,FoolishGames.IO.ICompression,FoolishGames.Security.ICryptoProvider)">
             <summary>
             打包
             </summary>
